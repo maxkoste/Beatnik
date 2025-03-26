@@ -10,31 +10,11 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import be.tarsos.dsp.effects.DelayEffect; //test to see that TarsosDSP is working
+import view.MainFrame;
 
-public class Main extends Application{
-    private AudioPlayBackTest audioPlayBackTest = new AudioPlayBackTest();
-
-    //Test to play audio.
-    @Override 
-    public void start(Stage primaryStage) throws Exception {
-
-        Button playBtn = new Button("Play");
-        
-        playBtn.setOnAction(e -> audioPlayBackTest.playAudio());
-
-        Image flowers = new Image("flowers.JPG");
-        primaryStage.getIcons().add(flowers);
-        
-        VBox rootBox = new VBox(10, playBtn);
-
-        Scene scene = new Scene(rootBox, 300, 300);
-        
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Audio player test!");
-        primaryStage.show();
-    }
+public class Main {
 
     public static void main(String[] args) {
-        launch(args);
+        Application.launch(MainFrame.class, args); // Put on GUI-Thread
     }
 }

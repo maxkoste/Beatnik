@@ -1,5 +1,227 @@
 package view;
 
-public class MainFrame {
-    
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.NodeOrientation;
+import javafx.geometry.Orientation;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.Stage;
+
+
+public class MainFrame extends Application implements EventHandler<ActionEvent> {
+  AnchorPane anchorPane;
+
+
+  public MainFrame () {
+
+  }
+
+  @Override
+  public void start(Stage primaryStage) throws Exception {
+    primaryStage.setTitle("My first Window!");
+    primaryStage.setResizable(false);
+
+    anchorPane = new AnchorPane(); // Pane which contains all content
+
+    Button playlistButton = new Button();
+    playlistButton.setText("⏏");
+    playlistButton.setOnAction(this);
+    AnchorPane.setTopAnchor(playlistButton, 150.0);
+    AnchorPane.setLeftAnchor(playlistButton, 150.0);
+
+    Button quantize = new Button(); // Temporary implementation
+    quantize.setText("Q");
+    quantize.setOnAction(this::handleQuantizer);
+    AnchorPane.setTopAnchor(quantize, 450.0);
+    AnchorPane.setLeftAnchor(quantize, 150.0);
+
+    Button cueVolume = new Button(); // Temporary implementation
+    cueVolume.setText("CV");
+    cueVolume.setOnAction(this::handleCueVolume);
+    AnchorPane.setTopAnchor(cueVolume, 750.0);
+    AnchorPane.setLeftAnchor(cueVolume, 150.0);
+
+    // Zone 2
+
+    TextArea channelOneContainer = new TextArea(); // Temporary implementation
+    channelOneContainer.setPrefSize(800.0, 75.0);
+    AnchorPane.setTopAnchor(channelOneContainer, 75.0);
+    AnchorPane.setLeftAnchor(channelOneContainer, 410.0);
+
+    TextArea channelTwoContainer = new TextArea(); // Temporary implementation
+    channelTwoContainer.setPrefSize(800.0, 75.0);
+    AnchorPane.setTopAnchor(channelTwoContainer, 150.0);
+    AnchorPane.setLeftAnchor(channelTwoContainer, 410.0);
+
+    Button channelOnePlayPause = new Button();
+    channelOnePlayPause.setPrefSize(20.0, 75.0);
+    channelOnePlayPause.setText("⏯");
+    channelOnePlayPause.setOnAction(this::handleChannelOnePlayPause);
+    AnchorPane.setTopAnchor(channelOnePlayPause, 75.0);
+    AnchorPane.setLeftAnchor(channelOnePlayPause, 390.0);
+
+    Button channelTwoPlayPause = new Button();
+    channelTwoPlayPause.setPrefSize(20.0,75.0);
+    channelTwoPlayPause.setText("⏯");
+    channelTwoPlayPause.setOnAction(this::handleChannelTwoPlayPause);
+    AnchorPane.setTopAnchor(channelTwoPlayPause, 150.0);
+    AnchorPane.setLeftAnchor(channelTwoPlayPause, 390.0);
+
+    // Zone 3
+
+    Slider crossFader = new Slider();
+    crossFader.setMax(100);
+    crossFader.setBlockIncrement(20);
+    crossFader.setShowTickMarks(true);
+    crossFader.setValue(50);
+    crossFader.setOnDragDetected(this::handleCrossFader);
+    AnchorPane.setTopAnchor(crossFader, 800.0);
+    AnchorPane.setLeftAnchor(crossFader, 750.0);
+
+    Label crossFaderLabel = new Label();
+    crossFaderLabel.setText("Crossfader");
+    AnchorPane.setTopAnchor(crossFaderLabel, 825.0);
+    AnchorPane.setLeftAnchor(crossFaderLabel, 790.0);
+
+    ToggleButton channelOneCue = new ToggleButton(); // Button that can be tied to boolean value
+    channelOneCue.setText("CUE");
+    AnchorPane.setTopAnchor(channelOneCue, 800.0);
+    AnchorPane.setLeftAnchor(channelOneCue, 600.0);
+
+    ToggleButton channelTwoCue = new ToggleButton(); // Button that can be tied to boolean value
+    channelTwoCue.setText("CUE");
+    AnchorPane.setTopAnchor(channelTwoCue, 800.0);
+    AnchorPane.setLeftAnchor(channelTwoCue, 1000.0);
+
+    Slider channelOneVolume = new Slider();
+    channelOneVolume.setOrientation(Orientation.VERTICAL);
+    channelOneVolume.setMax(100.0);
+    channelOneVolume.setBlockIncrement(20);
+    channelOneVolume.setShowTickMarks(true);
+    AnchorPane.setTopAnchor(channelOneVolume, 640.0);
+    AnchorPane.setLeftAnchor(channelOneVolume, 612.0);
+
+    Slider channelTwoVolume = new Slider();
+    channelTwoVolume.setOrientation(Orientation.VERTICAL);
+    channelTwoVolume.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+    channelTwoVolume.setMax(100.0);
+    channelTwoVolume.setBlockIncrement(20);
+    channelTwoVolume.setShowTickMarks(true);
+    AnchorPane.setTopAnchor(channelTwoVolume, 640.0);
+    AnchorPane.setLeftAnchor(channelTwoVolume, 1002.0);
+
+    Button channelOneBass = new Button(); // Temporary implementation
+    channelOneBass.setText("B");
+    AnchorPane.setTopAnchor(channelOneBass, 600.0);
+    AnchorPane.setLeftAnchor(channelOneBass, 607.0);
+
+    Button channelTwoBass = new Button(); // Temporary implementation
+    channelTwoBass.setText("B");
+    AnchorPane.setTopAnchor(channelTwoBass, 600.0);
+    AnchorPane.setLeftAnchor(channelTwoBass, 1007.0);
+
+    Button channelOneTreble = new Button(); // Temporary implementation
+    channelOneTreble.setText("T");
+    AnchorPane.setTopAnchor(channelOneTreble, 560.0);
+    AnchorPane.setLeftAnchor(channelOneTreble, 607.0);
+
+    Button channelTwoTreble = new Button(); // Temporary implementation
+    channelTwoTreble.setText("T");
+    AnchorPane.setTopAnchor(channelTwoTreble, 560.0);
+    AnchorPane.setLeftAnchor(channelTwoTreble, 1007.0);
+
+    Button channelOneSpeed = new Button(); // Temporary implementation
+    channelOneSpeed.setText("S");
+    AnchorPane.setTopAnchor(channelOneSpeed, 520.0);
+    AnchorPane.setLeftAnchor(channelOneSpeed, 607.0);
+
+    Button channelTwoSpeed = new Button(); // Temporary implementation
+    channelTwoSpeed.setText("S");
+    AnchorPane.setTopAnchor(channelTwoSpeed, 520.0);
+    AnchorPane.setLeftAnchor(channelTwoSpeed, 1007.0);
+
+    ScrollBar channelOneVolumeIndicator = new ScrollBar(); // Temporary implementation
+    channelOneVolumeIndicator.setPrefSize(1.0, 308.0);
+    channelOneVolumeIndicator.setOrientation(Orientation.VERTICAL);
+    AnchorPane.setTopAnchor(channelOneVolumeIndicator, 460.0);
+    AnchorPane.setLeftAnchor(channelOneVolumeIndicator, 935.0);
+
+    ScrollBar channelTwoVolumeIndicator = new ScrollBar(); // Temporary implementation
+    channelTwoVolumeIndicator.setPrefSize(1.0, 308.0);
+    channelTwoVolumeIndicator.setOrientation(Orientation.VERTICAL);
+    AnchorPane.setTopAnchor(channelTwoVolumeIndicator, 460.0);
+    AnchorPane.setLeftAnchor(channelTwoVolumeIndicator, 685.0);
+
+    // Zone 4
+
+    Button effectIntensity = new Button(); // Temporary implementation
+    effectIntensity.setText("I");
+    AnchorPane.setTopAnchor(effectIntensity, 150.0);
+    AnchorPane.setLeftAnchor(effectIntensity, 1450.0);
+
+    Button effectSelector = new Button(); // Temporary implementation
+    effectSelector.setText("E");
+    AnchorPane.setTopAnchor(effectSelector, 450.0);
+    AnchorPane.setLeftAnchor(effectSelector, 1450.0);
+
+    Slider masterVolume = new Slider();
+    masterVolume.setOrientation(Orientation.VERTICAL);
+    masterVolume.setMax(100.0);
+    masterVolume.setBlockIncrement(20);
+    masterVolume.setShowTickMarks(true);
+    masterVolume.setShowTickLabels(true);
+    AnchorPane.setTopAnchor(masterVolume, 640.0);
+    AnchorPane.setLeftAnchor(masterVolume, 1450.0);
+
+    Label masterVolumeLabel = new Label();
+    masterVolumeLabel.setText("Master Volume");
+    AnchorPane.setTopAnchor(masterVolumeLabel, 800.0);
+    AnchorPane.setLeftAnchor(masterVolumeLabel, 1415.0);
+
+    // Add all elements to anchorPane
+
+    anchorPane.getChildren().addAll(playlistButton, quantize, cueVolume, channelOneContainer, channelTwoContainer,
+        channelOnePlayPause, channelTwoPlayPause, crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
+        channelTwoVolume, channelOneBass, channelTwoBass, channelOneTreble, channelTwoTreble, channelOneSpeed, channelTwoSpeed,
+        channelOneVolumeIndicator, channelTwoVolumeIndicator, effectIntensity, effectSelector, masterVolume, masterVolumeLabel);
+
+    Scene scene = new Scene(anchorPane, 1600, 900); // Add pane to scene
+
+    Image flowers = new Image("flowers.JPG"); // Add icon
+    primaryStage.getIcons().add(flowers);
+
+    primaryStage.setScene(scene); // Finalize window to be shown
+    primaryStage.show();
+  }
+
+  @Override
+  public void handle(ActionEvent actionEvent) {
+    System.out.println("Playlist Button");
+  }
+
+  private void handleQuantizer(ActionEvent actionEvent) {
+    System.out.println("Quantizer");
+  }
+
+  private void handleCueVolume(ActionEvent actionEvent) {
+    System.out.println("Cue Volume");
+  }
+
+  private void handleChannelOnePlayPause(ActionEvent actionEvent) {
+    System.out.println("Channel One Play/Pause");
+  }
+
+  private void handleChannelTwoPlayPause(ActionEvent actionEvent) {
+    System.out.println("Channel Two Play/Pause");
+  }
+
+  private void handleCrossFader(MouseEvent mouseEvent) {
+    System.out.println("Crossfader");
+  }
+
 }
