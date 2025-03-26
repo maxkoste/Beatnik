@@ -1,27 +1,33 @@
 package controller;
 
 import javafx.application.Application;
+import controller.AudioPlayBackTest;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import be.tarsos.dsp.effects.DelayEffect; //test to see that TarsosDSP is working
 
 public class Main extends Application{
+    private AudioPlayBackTest audioPlayBackTest = new AudioPlayBackTest();
 
-    @Override
-    //This is just a test to get a window working and see that
-    //JavaFx is running correctly, will be removed. 
+    //Test to play audio.
+    @Override 
     public void start(Stage primaryStage) throws Exception {
 
-        Group root = new Group();
-        Scene scene = new Scene(root, Color.BEIGE);
+        Button playBtn = new Button("Play");
+        
+        playBtn.setOnAction(e -> audioPlayBackTest.playAudio());
+        
+        VBox rootBox = new VBox(10, playBtn);
 
-        Image flowers = new Image("flowers.JPG");
-        primaryStage.getIcons().add(flowers);
+        Scene scene = new Scene(rootBox, 300, 300);
+        
         primaryStage.setScene(scene);
-        primaryStage.setTitle("My first Window!");
+        primaryStage.setTitle("Audio player test!");
         primaryStage.show();
     }
 
