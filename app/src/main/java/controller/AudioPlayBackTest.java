@@ -15,7 +15,6 @@ public class AudioPlayBackTest {
     }
 
     public void setUp() {
-
         try (InputStream audioStream = getClass().getClassLoader().getResourceAsStream("test.wav")) {
             if (audioStream == null) {
                 throw new IllegalArgumentException("Resource test.wav not found.");
