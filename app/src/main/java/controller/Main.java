@@ -21,6 +21,9 @@ public class Main extends Application{
         Button playBtn = new Button("Play");
         
         playBtn.setOnAction(e -> audioPlayBackTest.playAudio());
+
+        Image flowers = new Image("flowers.JPG");
+        primaryStage.getIcons().add(flowers);
         
         VBox rootBox = new VBox(10, playBtn);
 
