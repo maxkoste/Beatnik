@@ -1,5 +1,6 @@
 package view;
 
+import controller.Controller;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -13,16 +14,16 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 
-public class MainFrame extends Application implements EventHandler<ActionEvent> {
+public class MainFrame implements EventHandler<ActionEvent> {
   AnchorPane anchorPane;
+  Controller controller;
 
-
-  public MainFrame () {
-
+  public MainFrame(Stage primaryStage, Controller controller) {
+    this.controller = controller;
+    start(primaryStage);
   }
 
-  @Override
-  public void start(Stage primaryStage) throws Exception {
+  public void start(Stage primaryStage) {
     primaryStage.setTitle("My first Window!");
     primaryStage.setResizable(false);
 
@@ -214,6 +215,7 @@ public class MainFrame extends Application implements EventHandler<ActionEvent> 
 
   private void handleChannelOnePlayPause(ActionEvent actionEvent) {
     System.out.println("Channel One Play/Pause");
+    controller.playSong();
   }
 
   private void handleChannelTwoPlayPause(ActionEvent actionEvent) {

@@ -12,9 +12,14 @@ import javafx.stage.Stage;
 import be.tarsos.dsp.effects.DelayEffect; //test to see that TarsosDSP is working
 import view.MainFrame;
 
-public class Main {
+public class Main extends Application {
 
     public static void main(String[] args) {
-        Application.launch(MainFrame.class, args); // Put on GUI-Thread
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        Controller controller = new Controller(primaryStage);
     }
 }
