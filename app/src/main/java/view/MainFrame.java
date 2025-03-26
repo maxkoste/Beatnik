@@ -1,22 +1,28 @@
 package view;
 
 import controller.Controller;
-import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 
 public class MainFrame implements EventHandler<ActionEvent> {
-  AnchorPane anchorPane;
+  AnchorPane primaryPane;
+  Stage playlistStage;
   Controller controller;
+  ObservableList<String> songs; // Temp implementation but correct class/collection
 
   public MainFrame(Stage primaryStage, Controller controller) {
     this.controller = controller;
@@ -24,16 +30,25 @@ public class MainFrame implements EventHandler<ActionEvent> {
   }
 
   public void start(Stage primaryStage) {
-    primaryStage.setTitle("My first Window!");
+    primaryStage.setTitle("Beatnik");
     primaryStage.setResizable(false);
 
-    anchorPane = new AnchorPane(); // Pane which contains all content
+    playlistStage = new Stage();
+    playlistStage.setTitle("Songs and Playlists");
+    playlistStage.setResizable(false);
+
+    primaryPane = new AnchorPane(); // Pane which contains all content
+    StackPane playlistPane = new StackPane(); // Pane which contains playlist popup content
 
     Button playlistButton = new Button();
     playlistButton.setText("⏏");
     playlistButton.setOnAction(this);
     AnchorPane.setTopAnchor(playlistButton, 150.0);
     AnchorPane.setLeftAnchor(playlistButton, 150.0);
+
+    songs = FXCollections.observableArrayList("Daler Mehndi - Tunak Tunak Tun", "Talking Heads - Burning Down the House");
+    ListView<String> songList = new ListView<>(songs);
+    StackPane.setAlignment(songList, Pos.CENTER);
 
     Button quantize = new Button(); // Temporary implementation
     quantize.setText("Q");
@@ -49,7 +64,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     // Zone 2
 
-    TextArea channelOneContainer = new TextArea(); // Temporary implementation
+    TextArea channelOneContainer = new TextArea(); // Temporary implementation maybe try splitPane?
     channelOneContainer.setPrefSize(800.0, 75.0);
     AnchorPane.setTopAnchor(channelOneContainer, 75.0);
     AnchorPane.setLeftAnchor(channelOneContainer, 410.0);
@@ -184,24 +199,29 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(masterVolumeLabel, 800.0);
     AnchorPane.setLeftAnchor(masterVolumeLabel, 1415.0);
 
-    // Add all elements to anchorPane
+    // Add all elements to primaryPane
 
-    anchorPane.getChildren().addAll(playlistButton, quantize, cueVolume, channelOneContainer, channelTwoContainer,
+    primaryPane.getChildren().addAll(playlistButton, quantize, cueVolume, channelOneContainer, channelTwoContainer,
         channelOnePlayPause, channelTwoPlayPause, crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
         channelTwoVolume, channelOneBass, channelTwoBass, channelOneTreble, channelTwoTreble, channelOneSpeed, channelTwoSpeed,
         channelOneVolumeIndicator, channelTwoVolumeIndicator, effectIntensity, effectSelector, masterVolume, masterVolumeLabel);
+    Scene primaryScene = new Scene(primaryPane, 1600, 900); // Add pane to scene
 
-    Scene scene = new Scene(anchorPane, 1600, 900); // Add pane to scene
+    playlistPane.getChildren().addAll(songList);
+    Scene playlistScene = new Scene(playlistPane, 400, 600);
 
     Image flowers = new Image("flowers.JPG"); // Add icon
     primaryStage.getIcons().add(flowers);
-
-    primaryStage.setScene(scene); // Finalize window to be shown
+    primaryStage.setScene(primaryScene); // Finalize window to be shown
     primaryStage.show();
+
+    playlistStage.setScene(playlistScene);
+    playlistStage.initModality(Modality.APPLICATION_MODAL);
   }
 
   @Override
   public void handle(ActionEvent actionEvent) {
+    playlistStage.showAndWait();
     System.out.println("Playlist Button");
   }
 
