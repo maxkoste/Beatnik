@@ -15,7 +15,7 @@ Welcome to **Beatnik**, your next-generation DJ software for seamless mixing, be
 ## Installation
 1. Clone this repository:
    ```sh
-   git clone https://github.com/yourusername/beatnik.git
+   git clone https://github.com/maxkoste/Beatnik.git
    ```
 
 ## Running the Application with Gradle
