@@ -17,7 +17,6 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-
 public class MainFrame implements EventHandler<ActionEvent> {
   AnchorPane primaryPane;
   Stage playlistStage;
@@ -46,7 +45,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(playlistButton, 150.0);
     AnchorPane.setLeftAnchor(playlistButton, 150.0);
 
-    songs = FXCollections.observableArrayList("Daler Mehndi - Tunak Tunak Tun", "Talking Heads - Burning Down the House");
+    songs = FXCollections.observableArrayList("Daler Mehndi - Tunak Tunak Tun",
+        "Talking Heads - Burning Down the House");
     ListView<String> songList = new ListView<>(songs);
     StackPane.setAlignment(songList, Pos.CENTER);
 
@@ -82,7 +82,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setLeftAnchor(channelOnePlayPause, 390.0);
 
     Button channelTwoPlayPause = new Button();
-    channelTwoPlayPause.setPrefSize(20.0,75.0);
+    channelTwoPlayPause.setPrefSize(20.0, 75.0);
     channelTwoPlayPause.setText("⏯");
     channelTwoPlayPause.setOnAction(this::handleChannelTwoPlayPause);
     AnchorPane.setTopAnchor(channelTwoPlayPause, 150.0);
@@ -194,6 +194,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(masterVolume, 640.0);
     AnchorPane.setLeftAnchor(masterVolume, 1450.0);
 
+    // listener for setting the volume
+    masterVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
+      float volume = newValue.floatValue();
+      System.out.println("volume: " + volume);
+      controller.setMasterVolume(volume);
+    });
+
     Label masterVolumeLabel = new Label();
     masterVolumeLabel.setText("Master Volume");
     AnchorPane.setTopAnchor(masterVolumeLabel, 800.0);
@@ -202,9 +209,12 @@ public class MainFrame implements EventHandler<ActionEvent> {
     // Add all elements to primaryPane
 
     primaryPane.getChildren().addAll(playlistButton, quantize, cueVolume, channelOneContainer, channelTwoContainer,
-        channelOnePlayPause, channelTwoPlayPause, crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
-        channelTwoVolume, channelOneBass, channelTwoBass, channelOneTreble, channelTwoTreble, channelOneSpeed, channelTwoSpeed,
-        channelOneVolumeIndicator, channelTwoVolumeIndicator, effectIntensity, effectSelector, masterVolume, masterVolumeLabel);
+        channelOnePlayPause, channelTwoPlayPause, crossFader, crossFaderLabel, channelOneCue, channelTwoCue,
+        channelOneVolume,
+        channelTwoVolume, channelOneBass, channelTwoBass, channelOneTreble, channelTwoTreble, channelOneSpeed,
+        channelTwoSpeed,
+        channelOneVolumeIndicator, channelTwoVolumeIndicator, effectIntensity, effectSelector, masterVolume,
+        masterVolumeLabel);
     Scene primaryScene = new Scene(primaryPane, 1600, 900); // Add pane to scene
 
     playlistPane.getChildren().addAll(songList);

@@ -5,16 +5,23 @@ import view.MainFrame;
 
 import java.lang.reflect.AnnotatedArrayType;
 
+import dsp.AudioPlayer;
+
+
 public class Controller {
-  AudioPlayBackTest audioPlayBackTest;
+  AudioPlayer audioPlayer;
   MainFrame frame;
 
   public Controller(Stage primaryStage) {
     frame = new MainFrame(primaryStage, this);
-    audioPlayBackTest = new AudioPlayBackTest();
+    audioPlayer = new AudioPlayer();
   }
 
   public void playSong() {
-    audioPlayBackTest.playAudio();
+    audioPlayer.playAudio();
+  }
+
+  public void setMasterVolume(float volume){
+    audioPlayer.setVolume(volume);
   }
 }
