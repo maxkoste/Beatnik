@@ -215,6 +215,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
       controller.setMasterVolume(volume);
     });
 
+    masterVolume.setValue(50);
+
     Label masterVolumeLabel = new Label();
     masterVolumeLabel.setText("Master Volume");
     AnchorPane.setTopAnchor(masterVolumeLabel, 800.0);

@@ -17,9 +17,9 @@ public class Controller {
   MainFrame frame;
 
   public Controller(Stage primaryStage) {
+    audioPlayer = new AudioPlayer();
     frame = new MainFrame(primaryStage, this);
     addSongs();
-    audioPlayer = new AudioPlayer();
   }
 
   public void playSong() {

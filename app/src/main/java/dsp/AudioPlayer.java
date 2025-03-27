@@ -56,7 +56,9 @@ public class AudioPlayer {
     //This method is called when you want to play the audio.
     public void playAudio() {
         if (clip != null) {
+          if (!clip.isActive()) {
             clip.start();
+          } else clip.stop();
         }
     }
 }
