@@ -7,21 +7,25 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 
 public class MainFrame implements EventHandler<ActionEvent> {
   AnchorPane primaryPane;
   Stage playlistStage;
+  SelectionModel songSelector;
   Controller controller;
-  ObservableList<String> songs; // Temp implementation but correct class/collection
+  ObservableList<String> songs = FXCollections.observableArrayList(); // Temp implementation but correct class/collection
 
   public MainFrame(Stage primaryStage, Controller controller) {
     this.controller = controller;
@@ -37,18 +41,28 @@ public class MainFrame implements EventHandler<ActionEvent> {
     playlistStage.setResizable(false);
 
     primaryPane = new AnchorPane(); // Pane which contains all content
-    StackPane playlistPane = new StackPane(); // Pane which contains playlist popup content
+    BorderPane songsPane = new BorderPane(); // Pane which contains playlist popup content
 
-    Button playlistButton = new Button();
-    playlistButton.setText("⏏");
-    playlistButton.setOnAction(this);
-    AnchorPane.setTopAnchor(playlistButton, 150.0);
-    AnchorPane.setLeftAnchor(playlistButton, 150.0);
+    Button songsButton = new Button();
+    songsButton.setText("⏏");
+    songsButton.setOnAction(this);
+    AnchorPane.setTopAnchor(songsButton, 150.0);
+    AnchorPane.setLeftAnchor(songsButton, 150.0);
 
-    songs = FXCollections.observableArrayList("Daler Mehndi - Tunak Tunak Tun",
-        "Talking Heads - Burning Down the House");
-    ListView<String> songList = new ListView<>(songs);
-    StackPane.setAlignment(songList, Pos.CENTER);
+      ListView<String> songList = new ListView<>(songs);
+      songSelector = songList.getSelectionModel();
+      songList.setOnMouseClicked(this::handleSongSelection);
+      songsPane.setCenter(songList);
+
+      Button importSongs = new Button();
+      importSongs.setText("Import");
+      importSongs.setOnAction(this::handleImport);
+
+      Button viewPlaylists = new Button();
+      viewPlaylists.setText("Playlists");
+
+      ToolBar songsMenu = new ToolBar(importSongs, viewPlaylists);
+      songsPane.setTop(songsMenu);
 
     Button quantize = new Button(); // Temporary implementation
     quantize.setText("Q");
@@ -207,18 +221,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setLeftAnchor(masterVolumeLabel, 1415.0);
 
     // Add all elements to primaryPane
-
-    primaryPane.getChildren().addAll(playlistButton, quantize, cueVolume, channelOneContainer, channelTwoContainer,
-        channelOnePlayPause, channelTwoPlayPause, crossFader, crossFaderLabel, channelOneCue, channelTwoCue,
-        channelOneVolume,
-        channelTwoVolume, channelOneBass, channelTwoBass, channelOneTreble, channelTwoTreble, channelOneSpeed,
-        channelTwoSpeed,
-        channelOneVolumeIndicator, channelTwoVolumeIndicator, effectIntensity, effectSelector, masterVolume,
-        masterVolumeLabel);
+    primaryPane.getChildren().addAll(songsButton, quantize, cueVolume, channelOneContainer, channelTwoContainer,
+        channelOnePlayPause, channelTwoPlayPause, crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
+        channelTwoVolume, channelOneBass, channelTwoBass, channelOneTreble, channelTwoTreble, channelOneSpeed, channelTwoSpeed,
+        channelOneVolumeIndicator, channelTwoVolumeIndicator, effectIntensity, effectSelector, masterVolume, masterVolumeLabel);
     Scene primaryScene = new Scene(primaryPane, 1600, 900); // Add pane to scene
 
-    playlistPane.getChildren().addAll(songList);
-    Scene playlistScene = new Scene(playlistPane, 400, 600);
+    Scene playlistScene = new Scene(songsPane, 400, 600);
 
     Image flowers = new Image("flowers.JPG"); // Add icon
     primaryStage.getIcons().add(flowers);
@@ -229,10 +238,39 @@ public class MainFrame implements EventHandler<ActionEvent> {
     playlistStage.initModality(Modality.APPLICATION_MODAL);
   }
 
+  public void addSongs(String[] songPaths) {
+    songs.addAll(songPaths);
+  }
+
+  public void addSong(String songPath) {
+    songs.add(songPath);
+  }
+
   @Override
   public void handle(ActionEvent actionEvent) {
     playlistStage.showAndWait();
     System.out.println("Playlist Button");
+  }
+
+  public void handleSongSelection(MouseEvent mouseEvent) {
+    if(mouseEvent.getClickCount() == 2) {
+      controller.setSong(1, songs.get(songSelector.getSelectedIndex())); // set only to channel 1 for now
+    }
+  }
+
+  public void handleImport(ActionEvent actionEvent) {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Import a song");
+    fileChooser.getExtensionFilters().addAll(
+        new FileChooser.ExtensionFilter("Audio Files", "*.wav", "*.mp3"));
+    File selectedFile = fileChooser.showOpenDialog(playlistStage);
+    if (selectedFile != null) {
+      try {
+        controller.moveFile(selectedFile, String.valueOf(Paths.get("src/main/resources/songs/" + selectedFile.getName())));
+      } catch (IOException e) {
+        System.out.println("File could not be moved");;
+      }
+    }
   }
 
   private void handleQuantizer(ActionEvent actionEvent) {
