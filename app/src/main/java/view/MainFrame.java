@@ -7,14 +7,12 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -22,15 +20,15 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.sql.SQLOutput;
-import java.util.Stack;
+
 
 
 public class MainFrame implements EventHandler<ActionEvent> {
   AnchorPane primaryPane;
   Stage playlistStage;
+  SelectionModel songSelector;
   Controller controller;
-  ObservableList<String> songs; // Temp implementation but correct class/collection
+  ObservableList<String> songs = FXCollections.observableArrayList(); // Temp implementation but correct class/collection
 
   public MainFrame(Stage primaryStage, Controller controller) {
     this.controller = controller;
@@ -54,8 +52,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(songsButton, 150.0);
     AnchorPane.setLeftAnchor(songsButton, 150.0);
 
-      songs = FXCollections.observableArrayList("Daler Mehndi - Tunak Tunak Tun", "Talking Heads - Burning Down the House");
       ListView<String> songList = new ListView<>(songs);
+      songSelector = songList.getSelectionModel();
+      songList.setOnMouseClicked(this::handleSongSelection);
       songsPane.setCenter(songList);
 
       Button importSongs = new Button();
@@ -236,10 +235,24 @@ public class MainFrame implements EventHandler<ActionEvent> {
     playlistStage.initModality(Modality.APPLICATION_MODAL);
   }
 
+  public void addSongs(String[] songPaths) {
+    songs.addAll(songPaths);
+  }
+
+  public void addSong(String songPath) {
+    songs.add(songPath);
+  }
+
   @Override
   public void handle(ActionEvent actionEvent) {
     playlistStage.showAndWait();
     System.out.println("Playlist Button");
+  }
+
+  public void handleSongSelection(MouseEvent mouseEvent) {
+    if(mouseEvent.getClickCount() == 2) {
+      controller.setSong(1, songs.get(songSelector.getSelectedIndex())); // set only to channel 1 for now
+    }
   }
 
   public void handleImport(ActionEvent actionEvent) {
@@ -250,7 +263,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     File selectedFile = fileChooser.showOpenDialog(playlistStage);
     if (selectedFile != null) {
       try {
-        controller.moveFile(selectedFile, String.valueOf(Paths.get("src/main/resources/" + selectedFile.getName())));
+        controller.moveFile(selectedFile, String.valueOf(Paths.get("src/main/resources/songs/" + selectedFile.getName())));
       } catch (IOException e) {
         System.out.println("File could not be moved");;
       }
