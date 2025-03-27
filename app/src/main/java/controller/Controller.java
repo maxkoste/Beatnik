@@ -9,18 +9,25 @@ import java.lang.reflect.AnnotatedArrayType;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import dsp.AudioPlayer;
+
+
 public class Controller {
-  AudioPlayBackTest audioPlayBackTest;
+  AudioPlayer audioPlayer;
   MainFrame frame;
 
   public Controller(Stage primaryStage) {
     frame = new MainFrame(primaryStage, this);
     addSongs();
-    audioPlayBackTest = new AudioPlayBackTest();
+    audioPlayer = new AudioPlayer();
   }
 
   public void playSong() {
-    audioPlayBackTest.playAudio();
+    audioPlayer.playAudio();
+  }
+
+  public void setMasterVolume(float volume){
+    audioPlayer.setVolume(volume);
   }
 
   public void moveFile(File sourceFile, String destinationPath) throws IOException {

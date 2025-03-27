@@ -16,12 +16,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-
-
 
 public class MainFrame implements EventHandler<ActionEvent> {
   AnchorPane primaryPane;
@@ -99,7 +96,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setLeftAnchor(channelOnePlayPause, 390.0);
 
     Button channelTwoPlayPause = new Button();
-    channelTwoPlayPause.setPrefSize(20.0,75.0);
+    channelTwoPlayPause.setPrefSize(20.0, 75.0);
     channelTwoPlayPause.setText("⏯");
     channelTwoPlayPause.setOnAction(this::handleChannelTwoPlayPause);
     AnchorPane.setTopAnchor(channelTwoPlayPause, 150.0);
@@ -211,13 +208,19 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(masterVolume, 640.0);
     AnchorPane.setLeftAnchor(masterVolume, 1450.0);
 
+    // listener for setting the volume
+    masterVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
+      float volume = newValue.floatValue();
+      System.out.println("volume: " + volume);
+      controller.setMasterVolume(volume);
+    });
+
     Label masterVolumeLabel = new Label();
     masterVolumeLabel.setText("Master Volume");
     AnchorPane.setTopAnchor(masterVolumeLabel, 800.0);
     AnchorPane.setLeftAnchor(masterVolumeLabel, 1415.0);
 
     // Add all elements to primaryPane
-
     primaryPane.getChildren().addAll(songsButton, quantize, cueVolume, channelOneContainer, channelTwoContainer,
         channelOnePlayPause, channelTwoPlayPause, crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
         channelTwoVolume, channelOneBass, channelTwoBass, channelOneTreble, channelTwoTreble, channelOneSpeed, channelTwoSpeed,
