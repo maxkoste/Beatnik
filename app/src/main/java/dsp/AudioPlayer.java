@@ -21,7 +21,7 @@ public class AudioPlayer {
     }
 
     public void setUp() {
-        try (InputStream audioStream = getClass().getClassLoader().getResourceAsStream(currentSongFilePath)) {
+        try (InputStream audioStream = getClass().getClassLoader().getResourceAsStream("songs/" + currentSongFilePath)) {
             if (audioStream == null) {
                 throw new IllegalArgumentException("Resource test.wav not found.");
             }

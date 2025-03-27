@@ -51,7 +51,7 @@ public class Controller {
 
   public void setSong(int channel, String path) {
     if (channel == 1) {
-
+      audioPlayer.setSong(path);
     } else;
   }
 }
