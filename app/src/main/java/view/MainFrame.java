@@ -13,9 +13,17 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.sql.SQLOutput;
+import java.util.Stack;
 
 
 public class MainFrame implements EventHandler<ActionEvent> {
@@ -38,17 +46,27 @@ public class MainFrame implements EventHandler<ActionEvent> {
     playlistStage.setResizable(false);
 
     primaryPane = new AnchorPane(); // Pane which contains all content
-    StackPane playlistPane = new StackPane(); // Pane which contains playlist popup content
+    BorderPane songsPane = new BorderPane(); // Pane which contains playlist popup content
 
-    Button playlistButton = new Button();
-    playlistButton.setText("⏏");
-    playlistButton.setOnAction(this);
-    AnchorPane.setTopAnchor(playlistButton, 150.0);
-    AnchorPane.setLeftAnchor(playlistButton, 150.0);
+    Button songsButton = new Button();
+    songsButton.setText("⏏");
+    songsButton.setOnAction(this);
+    AnchorPane.setTopAnchor(songsButton, 150.0);
+    AnchorPane.setLeftAnchor(songsButton, 150.0);
 
-    songs = FXCollections.observableArrayList("Daler Mehndi - Tunak Tunak Tun", "Talking Heads - Burning Down the House");
-    ListView<String> songList = new ListView<>(songs);
-    StackPane.setAlignment(songList, Pos.CENTER);
+      songs = FXCollections.observableArrayList("Daler Mehndi - Tunak Tunak Tun", "Talking Heads - Burning Down the House");
+      ListView<String> songList = new ListView<>(songs);
+      songsPane.setCenter(songList);
+
+      Button importSongs = new Button();
+      importSongs.setText("Import");
+      importSongs.setOnAction(this::handleImport);
+
+      Button viewPlaylists = new Button();
+      viewPlaylists.setText("Playlists");
+
+      ToolBar songsMenu = new ToolBar(importSongs, viewPlaylists);
+      songsPane.setTop(songsMenu);
 
     Button quantize = new Button(); // Temporary implementation
     quantize.setText("Q");
@@ -201,14 +219,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     // Add all elements to primaryPane
 
-    primaryPane.getChildren().addAll(playlistButton, quantize, cueVolume, channelOneContainer, channelTwoContainer,
+    primaryPane.getChildren().addAll(songsButton, quantize, cueVolume, channelOneContainer, channelTwoContainer,
         channelOnePlayPause, channelTwoPlayPause, crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
         channelTwoVolume, channelOneBass, channelTwoBass, channelOneTreble, channelTwoTreble, channelOneSpeed, channelTwoSpeed,
         channelOneVolumeIndicator, channelTwoVolumeIndicator, effectIntensity, effectSelector, masterVolume, masterVolumeLabel);
     Scene primaryScene = new Scene(primaryPane, 1600, 900); // Add pane to scene
 
-    playlistPane.getChildren().addAll(songList);
-    Scene playlistScene = new Scene(playlistPane, 400, 600);
+    Scene playlistScene = new Scene(songsPane, 400, 600);
 
     Image flowers = new Image("flowers.JPG"); // Add icon
     primaryStage.getIcons().add(flowers);
@@ -223,6 +240,21 @@ public class MainFrame implements EventHandler<ActionEvent> {
   public void handle(ActionEvent actionEvent) {
     playlistStage.showAndWait();
     System.out.println("Playlist Button");
+  }
+
+  public void handleImport(ActionEvent actionEvent) {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Import a song");
+    fileChooser.getExtensionFilters().addAll(
+        new FileChooser.ExtensionFilter("Audio Files", "*.wav", "*.mp3"));
+    File selectedFile = fileChooser.showOpenDialog(playlistStage);
+    if (selectedFile != null) {
+      try {
+        controller.moveFile(selectedFile, String.valueOf(Paths.get("src/main/resources/" + selectedFile.getName())));
+      } catch (IOException e) {
+        System.out.println("File could not be moved");;
+      }
+    }
   }
 
   private void handleQuantizer(ActionEvent actionEvent) {
