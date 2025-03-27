@@ -22,7 +22,7 @@ public class AudioPlayer {
 
         public void setUp() {
             //will replaced with a file path variable.
-        try (InputStream audioStream = getClass().getClassLoader().getResourceAsStream("test.wav")) {
+        try (InputStream audioStream = getClass().getClassLoader().getResourceAsStream("songs/test.wav")) {
             if (audioStream == null) {
                 throw new IllegalArgumentException("Resource test.wav not found.");
             }
