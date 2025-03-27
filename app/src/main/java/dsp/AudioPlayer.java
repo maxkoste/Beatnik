@@ -13,16 +13,14 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 //This class is responsible for playing the audio, and its volume
 public class AudioPlayer {
 
-        private Clip clip;
-        private FloatControl volumeControl;
-        private String currentSongFilePath;
+    private Clip clip;
+    private FloatControl volumeControl;
+    private String currentSongFilePath;
 
-        public AudioPlayer(){
-            setUp();
-        }
+    public AudioPlayer(){
+    }
 
-        public void setUp() {
-            
+    public void setUp() {
         try (InputStream audioStream = getClass().getClassLoader().getResourceAsStream(currentSongFilePath)) {
             if (audioStream == null) {
                 throw new IllegalArgumentException("Resource test.wav not found.");
@@ -61,5 +59,10 @@ public class AudioPlayer {
             clip.start();
           } else clip.stop();
         }
+    }
+
+    public void setSong(String filepath){
+        this.currentSongFilePath = filepath;
+        setUp();
     }
 }
