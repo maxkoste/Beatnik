@@ -15,14 +15,15 @@ public class AudioPlayer {
 
         private Clip clip;
         private FloatControl volumeControl;
+        private String currentSongFilePath;
 
         public AudioPlayer(){
             setUp();
         }
 
         public void setUp() {
-            //will replaced with a file path variable.
-        try (InputStream audioStream = getClass().getClassLoader().getResourceAsStream("songs/test.wav")) {
+            
+        try (InputStream audioStream = getClass().getClassLoader().getResourceAsStream(currentSongFilePath)) {
             if (audioStream == null) {
                 throw new IllegalArgumentException("Resource test.wav not found.");
             }
