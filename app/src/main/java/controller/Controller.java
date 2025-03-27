@@ -41,7 +41,7 @@ public class Controller {
   }
 
   public void addSongs() {
-    File[] files = new File(String.valueOf(Paths.get("src/main/resources/songs/"))).listFiles();
+    File[] files = new File("src/main/resources/songs/").getAbsoluteFile().listFiles();
     String[] songs = new String[files.length];
     for (int i = 0; i < files.length; i++) {
       songs[i] = files[i].getName();

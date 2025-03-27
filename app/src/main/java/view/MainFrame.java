@@ -26,6 +26,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
   SelectionModel songSelector;
   Controller controller;
   ObservableList<String> songs = FXCollections.observableArrayList(); // Temp implementation but correct class/collection
+  TextArea channelOneContainer;
 
   public MainFrame(Stage primaryStage, Controller controller) {
     this.controller = controller;
@@ -78,7 +79,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     // Zone 2
 
-    TextArea channelOneContainer = new TextArea(); // Temporary implementation maybe try splitPane?
+    channelOneContainer = new TextArea(); // Temporary implementation maybe try splitPane?
     channelOneContainer.setPrefSize(800.0, 75.0);
     AnchorPane.setTopAnchor(channelOneContainer, 75.0);
     AnchorPane.setLeftAnchor(channelOneContainer, 410.0);
@@ -257,6 +258,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
   public void handleSongSelection(MouseEvent mouseEvent) {
     if(mouseEvent.getClickCount() == 2) {
       controller.setSong(1, songs.get(songSelector.getSelectedIndex())); // set only to channel 1 for now
+      channelOneContainer.setText("Song loaded: " + songs.get(songSelector.getSelectedIndex()));
     }
   }
 

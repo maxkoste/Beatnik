@@ -1,7 +1,9 @@
 package dsp;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -21,18 +23,16 @@ public class AudioPlayer {
     }
 
     public void setUp() {
-        try (InputStream audioStream = getClass().getClassLoader().getResourceAsStream("songs/" + currentSongFilePath)) {
-            if (audioStream == null) {
-                throw new IllegalArgumentException("Resource test.wav not found.");
+        try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File("src/main/resources/songs/" + currentSongFilePath).getAbsoluteFile())) {
+            if (audioInputStream == null) {
+                throw new IllegalArgumentException("Song cannot be played");
             }
-
-            // Create an audio input stream from the resource stream
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioStream);
             clip = AudioSystem.getClip();
             clip.open(audioInputStream);
 
             //get volume control
             volumeControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            setVolume(50);
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             e.printStackTrace();
         }
