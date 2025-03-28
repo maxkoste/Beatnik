@@ -22,7 +22,7 @@ import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
 
 //This class is responsible for playing the audio, and its volume
 public class MediaPlayer {
-    private Clip clip; // For main playback
+    private Clip clip; // For main playback not used i this i want to use TarsosDSP
     private AudioDispatcher effectDispatcher; // For effects processing
     private GainProcessor gainProcessor;
     private String currentSongFilePath;
@@ -37,29 +37,33 @@ public class MediaPlayer {
     public void setUp() {
         try {
             // Clean up previous resources if they exist
-            if (clip != null) {
-                clip.close();
-                clip = null;
-            }
             if (effectDispatcher != null) {
                 effectDispatcher.stop();
                 effectDispatcher = null;
             }
 
-            // Set up main Clip playback
+            System.out.println("Loading audio file: songs/" + currentSongFilePath);
+            
             InputStream mainStream = getClass().getClassLoader()
                     .getResourceAsStream("songs/" + currentSongFilePath);
+            if (mainStream == null) {
+                System.err.println("Error: Could not load audio file!");
+                return;
+            }
+
             AudioInputStream mainAudioStream = AudioSystem.getAudioInputStream(mainStream);
             AudioFormat format = mainAudioStream.getFormat();
+            
+            System.out.println("Audio format: " + format.toString());
 
-            clip = AudioSystem.getClip();
-            clip.open(mainAudioStream);
-
+            // Create dispatcher with larger buffer size
             effectDispatcher = new AudioDispatcher(
-                    new JVMAudioInputStream(mainAudioStream), 1024, 0);
-            volumeProcessor = new GainProcessor(1.0f);
+                    new JVMAudioInputStream(mainAudioStream), 2048, 0);
 
-            gainVolumeProcessor = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            // Add volume control first - set initial volume to 1.0 (100%)
+            volumeProcessor = new GainProcessor(1.0f);
+            effectDispatcher.addAudioProcessor(volumeProcessor);
+
             // Add effect chain processor
             effectDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
@@ -70,44 +74,45 @@ public class MediaPlayer {
 
                 @Override
                 public void processingFinished() {
+                    System.out.println("Audio processing finished");
                 }
             });
 
-            // Add gain processor for effect mix
-            gainProcessor = new GainProcessor(1.0f); // Start at 50%
-            effectDispatcher.addAudioProcessor(gainProcessor);
+            // Add audio player for final output
+            AudioPlayer audioPlayer = new AudioPlayer(format);
+            effectDispatcher.addAudioProcessor(audioPlayer);
+            
+            System.out.println("Audio setup completed successfully");
 
-            // Add audio player for effects output
-            effectDispatcher.addAudioProcessor(new AudioPlayer(format));
-
-        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+        } catch (Exception e) {
+            System.err.println("Error setting up audio: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     public void playAudio() {
-        if (clip != null) {
-            if (!clip.isActive()) {
-                clip.start();
-            } else
-                clip.stop();
+        if (effectDispatcher == null) {
+            System.err.println("Error: AudioDispatcher is not initialized!");
+            return;
         }
+        System.out.println("Starting audio playback...");
+        Thread audioThread = new Thread(() -> {
+            try {
+                Thread.sleep(100); // Small delay before starting
+                effectDispatcher.run();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }, "Audio Playback Thread");
+        audioThread.start();
     }
 
     public void setVolume(float volume) {
-        if (clip != null) {
-            // Convert percentage (0-100) to gain (-80.0 to 6.0 dB)
-            if (gainVolumeProcessor != null) {
-                
-                float minGain = gainVolumeProcessor.getMinimum(); // Typically -80 dB
-                float maxGain = gainVolumeProcessor.getMaximum(); // Typically 6 dB
-        
-                // Map slider range (0-100) to dB range (minGain to maxGain)
-                float gain = (float) ((volume / 100.0) * (maxGain - minGain) + minGain);
-
-                gainVolumeProcessor.setValue(gain);
-                System.out.println("Setting volume to " + volume);
-            }
+        if (volumeProcessor != null) {
+            // Convert volume percentage (0-100) to gain multiplier (0.0-1.0)
+            float gain = volume / 100.0f;
+            volumeProcessor.setGain(gain);
+            System.out.println("Setting volume to " + volume + " (gain: " + gain + ")");
         }
     }
 
@@ -121,6 +126,7 @@ public class MediaPlayer {
     public void setSong(String filepath) {
         this.currentSongFilePath = filepath;
         setUp();
+        setVolume(100.0f);  // Set initial volume to maximum
     }
 
     public void setEffect(dsp.Effects.AudioEffect effect) {
