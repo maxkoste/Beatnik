@@ -22,7 +22,7 @@ import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
 
 //This class is responsible for playing the audio, and its volume
 public class MediaPlayer {
-    private Clip clip; // For main playback not used i this i want to use TarsosDSP
+    private Clip clip; // For main playback not used in this implementation
     private AudioDispatcher effectDispatcher; // For effects processing
     private GainProcessor gainProcessor;
     private String currentSongFilePath;
@@ -30,6 +30,7 @@ public class MediaPlayer {
     private EffectChain effectChain;
     private float effectMix = 0.0f; // 0 = dry only, 1 = wet only
     private FloatControl gainVolumeProcessor;
+
     public MediaPlayer() {
         effectChain = new EffectChain();
     }
@@ -43,7 +44,7 @@ public class MediaPlayer {
             }
 
             System.out.println("Loading audio file: songs/" + currentSongFilePath);
-            
+
             InputStream mainStream = getClass().getClassLoader()
                     .getResourceAsStream("songs/" + currentSongFilePath);
             if (mainStream == null) {
@@ -53,12 +54,12 @@ public class MediaPlayer {
 
             AudioInputStream mainAudioStream = AudioSystem.getAudioInputStream(mainStream);
             AudioFormat format = mainAudioStream.getFormat();
-            
+
             System.out.println("Audio format: " + format.toString());
 
             // Create dispatcher with larger buffer size
             effectDispatcher = new AudioDispatcher(
-                    new JVMAudioInputStream(mainAudioStream), 2048, 0);
+                    new JVMAudioInputStream(mainAudioStream), 8192, 0);
 
             // Add volume control first - set initial volume to 1.0 (100%)
             volumeProcessor = new GainProcessor(1.0f);
@@ -74,14 +75,14 @@ public class MediaPlayer {
 
                 @Override
                 public void processingFinished() {
-                    System.out.println("Audio processing finished");
+                    System.out.println("Processing finished");
                 }
             });
 
             // Add audio player for final output
             AudioPlayer audioPlayer = new AudioPlayer(format);
             effectDispatcher.addAudioProcessor(audioPlayer);
-            
+
             System.out.println("Audio setup completed successfully");
 
         } catch (Exception e) {
@@ -96,14 +97,8 @@ public class MediaPlayer {
             return;
         }
         System.out.println("Starting audio playback...");
-        Thread audioThread = new Thread(() -> {
-            try {
-                Thread.sleep(100); // Small delay before starting
-                effectDispatcher.run();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }, "Audio Playback Thread");
+        Thread audioThread = new Thread(effectDispatcher, "Audio Playback Thread");
+        audioThread.setPriority(Thread.MAX_PRIORITY);  // Give audio thread high priority
         audioThread.start();
     }
 
@@ -126,7 +121,7 @@ public class MediaPlayer {
     public void setSong(String filepath) {
         this.currentSongFilePath = filepath;
         setUp();
-        setVolume(100.0f);  // Set initial volume to maximum
+        setVolume(100.0f); // Set initial volume to maximum
     }
 
     public void setEffect(dsp.Effects.AudioEffect effect) {
