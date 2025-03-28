@@ -8,6 +8,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -25,13 +26,12 @@ public class MediaPlayer {
     private AudioDispatcher effectDispatcher; // For effects processing
     private GainProcessor gainProcessor;
     private String currentSongFilePath;
+    private GainProcessor volumeProcessor;
     private EffectChain effectChain;
-    private boolean isPlaying;
     private float effectMix = 0.0f; // 0 = dry only, 1 = wet only
-
+    private FloatControl gainVolumeProcessor;
     public MediaPlayer() {
         effectChain = new EffectChain();
-        isPlaying = false;
     }
 
     public void setUp() {
@@ -55,13 +55,11 @@ public class MediaPlayer {
             clip = AudioSystem.getClip();
             clip.open(mainAudioStream);
 
-            // Set up parallel effects processing with a fresh stream
-            InputStream effectStream = getClass().getClassLoader()
-                    .getResourceAsStream("songs/" + currentSongFilePath);
-            AudioInputStream effectAudioStream = AudioSystem.getAudioInputStream(effectStream);
             effectDispatcher = new AudioDispatcher(
-                    new JVMAudioInputStream(effectAudioStream), 1024, 0);
+                    new JVMAudioInputStream(mainAudioStream), 1024, 0);
+            volumeProcessor = new GainProcessor(1.0f);
 
+            gainVolumeProcessor = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
             // Add effect chain processor
             effectDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
@@ -88,30 +86,28 @@ public class MediaPlayer {
     }
 
     public void playAudio() {
-        if (!isPlaying) {
-            if (clip == null) {
-                setUp();
-            }
-            clip.start();
-            try {
-                new Thread(effectDispatcher, "Effects Processing").start();
-                isPlaying = true;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            clip.stop();
-            effectDispatcher.stop();
-            isPlaying = false;
+        if (clip != null) {
+            if (!clip.isActive()) {
+                clip.start();
+            } else
+                clip.stop();
         }
     }
 
     public void setVolume(float volume) {
         if (clip != null) {
-            // Convert percentage (0-100) to gain (0-1)
-            float gain = volume / 100.0f;
-            // TODO: Implement clip volume control
-            System.out.println("Setting volume to " + volume);
+            // Convert percentage (0-100) to gain (-80.0 to 6.0 dB)
+            if (gainVolumeProcessor != null) {
+                
+                float minGain = gainVolumeProcessor.getMinimum(); // Typically -80 dB
+                float maxGain = gainVolumeProcessor.getMaximum(); // Typically 6 dB
+        
+                // Map slider range (0-100) to dB range (minGain to maxGain)
+                float gain = (float) ((volume / 100.0) * (maxGain - minGain) + minGain);
+
+                gainVolumeProcessor.setValue(gain);
+                System.out.println("Setting volume to " + volume);
+            }
         }
     }
 

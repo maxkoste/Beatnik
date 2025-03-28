@@ -21,7 +21,7 @@ public class AudioPlayBackTest {
             mediaPlayer.setSong("test.wav");
             
             // Add a delay effect for testing
-            Delay delayEffect = new Delay(0.2, 0.5, 44100); // 200ms delay, 50% decay, 44.1kHz sample rate
+            Delay delayEffect = new Delay(2, 0.8, 44100); // 200ms delay, 50% decay, 44.1kHz sample rate
             mediaPlayer.setEffect(delayEffect);
             
             // Set initial volume to 50%
