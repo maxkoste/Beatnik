@@ -38,7 +38,7 @@ public class AudioPlayer {
         }
     }
 
-    public void setVolume(float volume){
+    public void setVolume(int volume){
         if(volumeControl != null ){
             //we need to convert the 0-100 float number to mimic how dB scales 
             float minGain = volumeControl.getMinimum(); // Typically -80 dB

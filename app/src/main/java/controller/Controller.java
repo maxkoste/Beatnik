@@ -18,7 +18,8 @@ public class Controller {
 
   public Controller(Stage primaryStage) {
     audioPlayer = new AudioPlayer();
-    frame = new MainFrame(primaryStage, this);
+    frame = new MainFrame(this);
+    frame.start(primaryStage);
     addSongs();
   }
 
@@ -26,7 +27,7 @@ public class Controller {
     audioPlayer.playAudio();
   }
 
-  public void setMasterVolume(float volume){
+  public void setMasterVolume(int volume){
     audioPlayer.setVolume(volume);
   }
 
