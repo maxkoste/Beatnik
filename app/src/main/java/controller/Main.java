@@ -9,6 +9,9 @@ public class Main extends Application {
     public static void main(String[] args) {
         //Application.launch(CircularSlider.class, args);
         launch(args);
+        AudioPlayBackTest test = new AudioPlayBackTest();
+        test.setUp();
+        test.playAudio();
     }
 
     @Override
