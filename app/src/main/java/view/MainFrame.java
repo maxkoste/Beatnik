@@ -191,7 +191,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     channelTwoVolume.setBlockIncrement(20);
     channelTwoVolume.setShowTickMarks(true);
     AnchorPane.setTopAnchor(channelTwoVolume, (screenHeight / 1.635));
-    AnchorPane.setLeftAnchor(channelTwoVolume, ((screenWidth / 1.449) - (channelOneVolume.getPrefWidth() / 2)));
+    AnchorPane.setLeftAnchor(channelTwoVolume, ((screenWidth / 1.453) - (channelOneVolume.getPrefWidth() / 2)));
 
     CircularSlider channelOneBass = new CircularSlider();
     channelOneBass.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -297,7 +297,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     Label masterVolumeLabel = new Label();
     masterVolumeLabel.setPrefSize(95, 10);
     masterVolumeLabel.setText("Master Volume");
-    AnchorPane.setTopAnchor(masterVolumeLabel, (screenHeight / 1.2));
+    AnchorPane.setTopAnchor(masterVolumeLabel, (screenHeight / 1.3) + 85);
     AnchorPane.setLeftAnchor(masterVolumeLabel, ((screenWidth / 1.15) - (masterVolumeLabel.getPrefWidth() / 2)) +25);
 
     primaryPane.getChildren().addAll(effectIntensity, effectSelector, masterVolume, masterVolumeLabel);
