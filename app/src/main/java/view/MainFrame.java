@@ -76,6 +76,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
   private void initializeZoneOne() {
     Button songsButton = new Button();
+    songsButton.setPrefSize(50, 50);
     songsButton.setText("⏏");
     songsButton.setOnAction(this);
     AnchorPane.setTopAnchor(songsButton, screenHeight / 10);
@@ -144,7 +145,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
   private void initializeZoneThree() {
     Slider crossFader = new Slider();
-    crossFader.setPrefSize((screenWidth / 10), (screenHeight / 20));
+    crossFader.setPrefSize(250, 5);
     crossFader.setMax(100);
     crossFader.setBlockIncrement(20);
     crossFader.setShowTickMarks(true);
@@ -160,93 +161,95 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setLeftAnchor(crossFaderLabel, ((screenWidth / 2) - (crossFaderLabel.getPrefWidth() / 2)));
 
     ToggleButton channelOneCue = new ToggleButton(); // Button that can be tied to boolean value
-    channelOneCue.setPrefSize((screenWidth / 60), (screenHeight / 100));
+    channelOneCue.setPrefSize(50, 30);
     channelOneCue.setText("CUE");
     AnchorPane.setTopAnchor(channelOneCue, (screenHeight / 1.1));
-    AnchorPane.setLeftAnchor(channelOneCue, (screenWidth / 2.33) - (channelOneCue.getPrefWidth() / 2));
+    AnchorPane.setLeftAnchor(channelOneCue, ((screenWidth / 2) - (channelOneCue.getPrefWidth() / 2) - (250)));
 
     ToggleButton channelTwoCue = new ToggleButton(); // Button that can be tied to boolean value
-    channelTwoCue.setPrefSize((screenWidth / 60), (screenHeight / 100));
+    channelTwoCue.setPrefSize(50, 30);
     channelTwoCue.setText("CUE");
     AnchorPane.setTopAnchor(channelTwoCue, (screenHeight / 1.1));
-    AnchorPane.setLeftAnchor(channelTwoCue, (screenWidth / 1.75) - (channelTwoCue.getPrefWidth() / 2));
+    AnchorPane.setLeftAnchor(channelTwoCue, ((screenWidth / 2) - (channelTwoCue.getPrefWidth() / 2) + (250)));
 
     Slider channelOneVolume = new Slider();
+    channelOneVolume.setPrefSize(5, 200);
     channelOneVolume.setOrientation(Orientation.VERTICAL);
     channelOneVolume.setMax(100.0);
     channelOneVolume.setBlockIncrement(20);
     channelOneVolume.setShowTickMarks(true);
-    AnchorPane.setTopAnchor(channelOneVolume, (screenHeight / 1.25));
-    AnchorPane.setLeftAnchor(channelOneVolume, (screenWidth / 2.342));
+    AnchorPane.setTopAnchor(channelOneVolume, (screenHeight - 350));
+    AnchorPane.setLeftAnchor(channelOneVolume, ((screenWidth / 2) - (channelOneVolume.getPrefWidth() / 2) - (250)));
 
     Slider channelTwoVolume = new Slider();
+    channelTwoVolume.setPrefSize(5, 200);
     channelTwoVolume.setOrientation(Orientation.VERTICAL);
     channelTwoVolume.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
     channelTwoVolume.setMax(100.0);
     channelTwoVolume.setBlockIncrement(20);
     channelTwoVolume.setShowTickMarks(true);
-    AnchorPane.setTopAnchor(channelTwoVolume, (screenHeight / 1.25));
-    AnchorPane.setLeftAnchor(channelTwoVolume, (screenWidth / 1.77));
+    AnchorPane.setTopAnchor(channelTwoVolume, (screenHeight - 350));
+    AnchorPane.setLeftAnchor(channelTwoVolume, ((screenWidth / 2) - (channelOneVolume.getPrefWidth() / 2) + (243)));
 
     CircularSlider channelOneBass = new CircularSlider();
     channelOneBass.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
     });
-    AnchorPane.setTopAnchor(channelOneBass, screenHeight / 1.35);
-    AnchorPane.setLeftAnchor(channelOneBass, screenWidth / 2.385);
+    AnchorPane.setTopAnchor(channelOneBass, (screenHeight - 450));
+    AnchorPane.setLeftAnchor(channelOneBass,(screenWidth / 2) - (275));
 
     CircularSlider channelTwoBass = new CircularSlider();
     channelTwoBass.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
     });
-    AnchorPane.setTopAnchor(channelTwoBass, (screenHeight / 1.35));
-    AnchorPane.setLeftAnchor(channelTwoBass, (screenWidth / 1.78));
+    AnchorPane.setTopAnchor(channelTwoBass, (screenHeight - 450));
+    AnchorPane.setLeftAnchor(channelTwoBass, (screenWidth / 2) + (225));
 
     CircularSlider channelOneTreble = new CircularSlider();
     channelOneTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
     });
-    AnchorPane.setTopAnchor(channelOneTreble, (screenHeight / 1.45));
-    AnchorPane.setLeftAnchor(channelOneTreble, (screenWidth / 2.385));
+    AnchorPane.setTopAnchor(channelOneTreble, (screenHeight - 550));
+    AnchorPane.setLeftAnchor(channelOneTreble, (screenWidth / 2) - (275));
 
     CircularSlider channelTwoTreble = new CircularSlider();
     channelTwoTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
     });
-    AnchorPane.setTopAnchor(channelTwoTreble, (screenHeight / 1.45));
-    AnchorPane.setLeftAnchor(channelTwoTreble, (screenWidth / 1.78));
+    AnchorPane.setTopAnchor(channelTwoTreble, (screenHeight - 550));
+    AnchorPane.setLeftAnchor(channelTwoTreble, (screenWidth / 2) + (225));
 
     CircularSlider channelOneSpeed = new CircularSlider();
     channelOneSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
     });
-    AnchorPane.setTopAnchor(channelOneSpeed, (screenHeight / 1.565));
-    AnchorPane.setLeftAnchor(channelOneSpeed, (screenWidth / 2.385));
+    AnchorPane.setTopAnchor(channelOneSpeed, (screenHeight - 650));
+    AnchorPane.setLeftAnchor(channelOneSpeed, (screenWidth / 2) - (275));
 
     CircularSlider channelTwoSpeed = new CircularSlider();
     channelTwoSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
     });
-    AnchorPane.setTopAnchor(channelTwoSpeed, (screenHeight / 1.565));
-    AnchorPane.setLeftAnchor(channelTwoSpeed, (screenWidth / 1.78));
+    AnchorPane.setTopAnchor(channelTwoSpeed, (screenHeight - 650));
+    AnchorPane.setLeftAnchor(channelTwoSpeed, (screenWidth / 2) + (225));
 
     ScrollBar channelOneVolumeIndicator = new ScrollBar(); // Temporary implementation
-    channelOneVolumeIndicator.setPrefSize(1.0, 308.0);
+    channelOneVolumeIndicator.setPrefSize(10.0, 300.0);
     channelOneVolumeIndicator.setOrientation(Orientation.VERTICAL);
-    AnchorPane.setTopAnchor(channelOneVolumeIndicator, (screenHeight / 1.47));
-    AnchorPane.setLeftAnchor(channelOneVolumeIndicator, (screenWidth / 2.2));
+    AnchorPane.setTopAnchor(channelOneVolumeIndicator, (screenHeight - 500));
+    AnchorPane.setLeftAnchor(channelOneVolumeIndicator, ((screenWidth / 2) - 150) - (channelOneVolumeIndicator.getPrefWidth() / 2));
 
     ScrollBar channelTwoVolumeIndicator = new ScrollBar(); // Temporary implementation
-    channelTwoVolumeIndicator.setPrefSize(1.0, 308.0);
+    channelTwoVolumeIndicator.setPrefSize(10.0, 300.0);
     channelTwoVolumeIndicator.setOrientation(Orientation.VERTICAL);
-    AnchorPane.setTopAnchor(channelTwoVolumeIndicator, (screenHeight / 1.47));
-    AnchorPane.setLeftAnchor(channelTwoVolumeIndicator, (screenWidth / 1.85));
+    AnchorPane.setTopAnchor(channelTwoVolumeIndicator, (screenHeight - 500));
+    AnchorPane.setLeftAnchor(channelTwoVolumeIndicator, ((screenWidth / 2) + 150) - (channelOneVolumeIndicator.getPrefWidth() / 2));
 
     primaryPane.getChildren().addAll(crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
         channelTwoVolume, channelOneBass, channelTwoBass, channelOneTreble, channelTwoTreble, channelOneSpeed, channelTwoSpeed,
@@ -260,21 +263,22 @@ public class MainFrame implements EventHandler<ActionEvent> {
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
     });
     AnchorPane.setTopAnchor(effectIntensity, screenHeight / 10);
-    AnchorPane.setLeftAnchor(effectIntensity, screenWidth / 1.1);
+    AnchorPane.setLeftAnchor(effectIntensity, screenWidth - 250);
 
     Button effectSelector = new Button(); // Temporary implementation
     effectSelector.setText("E");
     AnchorPane.setTopAnchor(effectSelector, screenHeight / 2);
-    AnchorPane.setLeftAnchor(effectSelector, (screenWidth / 1.1));
+    AnchorPane.setLeftAnchor(effectSelector, (screenWidth - 250));
 
     Slider masterVolume = new Slider();
+    masterVolume.setPrefSize(5, 250);
     masterVolume.setOrientation(Orientation.VERTICAL);
     masterVolume.setMax(100.0);
     masterVolume.setBlockIncrement(20);
     masterVolume.setMinorTickCount(0);
     masterVolume.setShowTickLabels(true);
-    AnchorPane.setTopAnchor(masterVolume, (screenHeight / 1.25));
-    AnchorPane.setLeftAnchor(masterVolume, (screenWidth / 1.1));
+    AnchorPane.setTopAnchor(masterVolume, (screenHeight - 250) - (masterVolume.getPrefHeight() / 2));
+    AnchorPane.setLeftAnchor(masterVolume, (screenWidth - 250));
 
     // listener for setting the volume
     masterVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -287,8 +291,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     Label masterVolumeLabel = new Label();
     masterVolumeLabel.setText("Master Volume");
-    AnchorPane.setTopAnchor(masterVolumeLabel, (screenHeight / 1.1));
-    AnchorPane.setLeftAnchor(masterVolumeLabel, (screenWidth / 1.115));
+    AnchorPane.setTopAnchor(masterVolumeLabel, (screenHeight - 120));
+    AnchorPane.setLeftAnchor(masterVolumeLabel, (screenWidth - 295));
 
     primaryPane.getChildren().addAll(effectIntensity, effectSelector, masterVolume, masterVolumeLabel);
   }

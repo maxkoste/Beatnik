@@ -9,7 +9,7 @@ import javafx.scene.paint.Color;
 
 public class CircularSliderSkin extends SkinBase<CircularSlider> {
 
-  private static final int SIZE = 50;
+  private static final int size = 50;
   private final Canvas canvas;
   private final GraphicsContext gc;
   private double lastAngle = 0; // Track last valid angle
@@ -17,7 +17,7 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
   protected CircularSliderSkin(CircularSlider control) {
     super(control);
 
-    canvas = new Canvas(SIZE, SIZE);
+    canvas = new Canvas(size, size);
     gc = canvas.getGraphicsContext2D();
 
     drawKnob(control.getAngle());
@@ -26,7 +26,7 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
     canvas.setOnMousePressed(this::handleMouseDrag);
 
     StackPane container = new StackPane();
-    container.setPrefSize(SIZE, SIZE);
+    container.setPrefSize(size, size);
 
     container.getChildren().addAll(canvas);
 
@@ -34,8 +34,8 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
   }
 
   private void handleMouseDrag(MouseEvent event) {
-    double centerX = SIZE / 2.0;
-    double centerY = SIZE / 2.0;
+    double centerX = size / 2.0;
+    double centerY = size / 2.0;
     double dx = event.getX() - centerX;
     double dy = event.getY() - centerY;
 
@@ -60,15 +60,15 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
   }
 
   private void drawKnob(double angle) {
-    gc.clearRect(0, 0, SIZE, SIZE);
+    gc.clearRect(0, 0, size, size);
     gc.setFill(Color.LIGHTGRAY);
-    gc.fillOval(0, 0, SIZE, SIZE);
+    gc.fillOval(0, 0, size, size);
     gc.setFill(Color.DARKGRAY);
-    gc.fillOval(10, 10, SIZE - 20, SIZE - 20);
+    gc.fillOval(10, 10, size - 20, size - 20);
 
-    double centerX = SIZE / 2.0;
-    double centerY = SIZE / 2.0;
-    double knobRadius = (SIZE / 2.0) - 5;
+    double centerX = size / 2.0;
+    double centerY = size / 2.0;
+    double knobRadius = (size / 2.0) - 5;
     double knobX = centerX + knobRadius * Math.cos(Math.toRadians(angle + 135));
     double knobY = centerY + knobRadius * Math.sin(Math.toRadians(angle + 135));
 
