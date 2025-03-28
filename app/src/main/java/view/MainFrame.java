@@ -263,12 +263,12 @@ public class MainFrame implements EventHandler<ActionEvent> {
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
     });
     AnchorPane.setTopAnchor(effectIntensity, screenHeight / 10);
-    AnchorPane.setLeftAnchor(effectIntensity, screenWidth - 250);
+    AnchorPane.setLeftAnchor(effectIntensity, screenWidth / 1.15);
 
     Button effectSelector = new Button(); // Temporary implementation
     effectSelector.setText("E");
     AnchorPane.setTopAnchor(effectSelector, screenHeight / 2);
-    AnchorPane.setLeftAnchor(effectSelector, (screenWidth - 250));
+    AnchorPane.setLeftAnchor(effectSelector, (screenWidth / 1.15));
 
     Slider masterVolume = new Slider();
     masterVolume.setPrefSize(5, 250);
@@ -278,7 +278,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     masterVolume.setMinorTickCount(0);
     masterVolume.setShowTickLabels(true);
     AnchorPane.setTopAnchor(masterVolume, (screenHeight - 250) - (masterVolume.getPrefHeight() / 2));
-    AnchorPane.setLeftAnchor(masterVolume, (screenWidth - 250));
+    AnchorPane.setLeftAnchor(masterVolume, (screenWidth / 1.15));
 
     // listener for setting the volume
     masterVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -292,7 +292,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     Label masterVolumeLabel = new Label();
     masterVolumeLabel.setText("Master Volume");
     AnchorPane.setTopAnchor(masterVolumeLabel, (screenHeight - 120));
-    AnchorPane.setLeftAnchor(masterVolumeLabel, (screenWidth - 295));
+    AnchorPane.setLeftAnchor(masterVolumeLabel, (screenWidth / 1.15));
 
     primaryPane.getChildren().addAll(effectIntensity, effectSelector, masterVolume, masterVolumeLabel);
   }
