@@ -7,6 +7,7 @@ import java.io.InputStream;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -20,11 +21,13 @@ import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
 
 //This class is responsible for playing the audio, and its volume
 public class MediaPlayer {
-    private AudioDispatcher dispatcher;
+    private Clip clip; // For main playback
+    private AudioDispatcher effectDispatcher; // For effects processing
     private GainProcessor gainProcessor;
     private String currentSongFilePath;
     private EffectChain effectChain;
     private boolean isPlaying;
+    private float effectMix = 0.0f; // 0 = dry only, 1 = wet only
 
     public MediaPlayer() {
         effectChain = new EffectChain();
@@ -32,37 +35,36 @@ public class MediaPlayer {
     }
 
     public void setUp() {
-        // Clean up previous dispatcher if it exists
-        if (dispatcher != null) {
-            dispatcher.stop();
-            dispatcher = null;
-        }
-
-        try (InputStream audioStream = getClass().getClassLoader()
-                .getResourceAsStream("songs/" + currentSongFilePath)) {
-            if (audioStream == null) {
-                throw new IllegalArgumentException("Song not found: " + currentSongFilePath);
+        try {
+            // Clean up previous resources if they exist
+            if (clip != null) {
+                clip.close();
+                clip = null;
+            }
+            if (effectDispatcher != null) {
+                effectDispatcher.stop();
+                effectDispatcher = null;
             }
 
-            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(audioStream);
-            AudioFormat originalFormat = audioInputStream.getFormat();
+            // Set up main Clip playback
+            InputStream mainStream = getClass().getClassLoader()
+                    .getResourceAsStream("songs/" + currentSongFilePath);
+            AudioInputStream mainAudioStream = AudioSystem.getAudioInputStream(mainStream);
+            AudioFormat format = mainAudioStream.getFormat();
 
-            // Create TarsosDSP audio stream
-            TarsosDSPAudioInputStream audioDSPStream = new JVMAudioInputStream(audioInputStream);
-            
-            // Configure dispatcher with buffer size and overlap
-            int bufferSize = 1024;
-            int overlap = 0;
-            dispatcher = new AudioDispatcher(audioDSPStream, bufferSize, overlap);
+            clip = AudioSystem.getClip();
+            clip.open(mainAudioStream);
 
-            // Set up gain processor for volume control
-            gainProcessor = new GainProcessor(0.5f); // Start at 50% volume
-            dispatcher.addAudioProcessor(gainProcessor);
+            // Set up parallel effects processing with a fresh stream
+            InputStream effectStream = getClass().getClassLoader()
+                    .getResourceAsStream("songs/" + currentSongFilePath);
+            AudioInputStream effectAudioStream = AudioSystem.getAudioInputStream(effectStream);
+            effectDispatcher = new AudioDispatcher(
+                    new JVMAudioInputStream(effectAudioStream), 1024, 0);
 
             // Add effect chain processor
-            dispatcher.addAudioProcessor(new AudioProcessor() {
+            effectDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
-                System.out.print("Adding audio processor!");
                 public boolean process(AudioEvent audioEvent) {
                     effectChain.process(audioEvent.getFloatBuffer());
                     return true;
@@ -70,37 +72,53 @@ public class MediaPlayer {
 
                 @Override
                 public void processingFinished() {
-                    // Nothing to do here
                 }
             });
 
-            // Add audio player as final processor
-            dispatcher.addAudioProcessor(new AudioPlayer(originalFormat));
+            // Add gain processor for effect mix
+            gainProcessor = new GainProcessor(1.0f); // Start at 50%
+            effectDispatcher.addAudioProcessor(gainProcessor);
+
+            // Add audio player for effects output
+            effectDispatcher.addAudioProcessor(new AudioPlayer(format));
 
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             e.printStackTrace();
         }
     }
 
-    public void setVolume(float volume) {
-        if (gainProcessor != null) {
-            // Convert percentage (0-100) to gain (0-1)
-            float gain = volume / 100.0f;
-            gainProcessor.setGain(gain);
+    public void playAudio() {
+        if (!isPlaying) {
+            if (clip == null) {
+                setUp();
+            }
+            clip.start();
+            try {
+                new Thread(effectDispatcher, "Effects Processing").start();
+                isPlaying = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            clip.stop();
+            effectDispatcher.stop();
+            isPlaying = false;
         }
     }
 
-    public void playAudio() {
-        if (dispatcher == null) {
-            setUp();
+    public void setVolume(float volume) {
+        if (clip != null) {
+            // Convert percentage (0-100) to gain (0-1)
+            float gain = volume / 100.0f;
+            // TODO: Implement clip volume control
+            System.out.println("Setting volume to " + volume);
         }
+    }
 
-        if (!isPlaying) {
-            new Thread(dispatcher, "Audio Dispatching").start();
-            isPlaying = true;
-        } else {
-            dispatcher.stop();
-            isPlaying = false;
+    public void setEffectMix(float mix) { // 0.0f to 1.0f
+        this.effectMix = mix;
+        if (gainProcessor != null) {
+            gainProcessor.setGain(mix);
         }
     }
 

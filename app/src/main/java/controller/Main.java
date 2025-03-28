@@ -7,11 +7,22 @@ import view.CircularSlider;
 public class Main extends Application {
 
     public static void main(String[] args) {
-        //Application.launch(CircularSlider.class, args);
-        launch(args);
+        // Run the audio test
         AudioPlayBackTest test = new AudioPlayBackTest();
         test.setUp();
         test.playAudio();
+
+        // After 2 seconds, gradually increase the effect mix
+        try {
+            Thread.sleep(2000);
+            test.setEffectMix(1.0f);
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+       
+        //launch(args);
     }
 
     @Override

@@ -27,6 +27,9 @@ public class AudioPlayBackTest {
             // Set initial volume to 50%
             mediaPlayer.setVolume(50);
             
+            // Set initial effect mix to 0 (dry only)
+            mediaPlayer.setEffectMix(0.0f);
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -38,9 +41,26 @@ public class AudioPlayBackTest {
         }
     }
 
+    public void setEffectMix(float mix) {
+        if (mediaPlayer != null) {
+            mediaPlayer.setEffectMix(mix);
+        }
+    }
+
     public static void main(String[] args) {
         AudioPlayBackTest test = new AudioPlayBackTest();
         test.setUp();
         test.playAudio();
+        
+        // After 2 seconds, gradually increase the effect mix
+        try {
+            Thread.sleep(2000);
+            for (float mix = 0.0f; mix <= 1.0f; mix += 0.1f) {
+                test.setEffectMix(mix);
+                Thread.sleep(500);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
