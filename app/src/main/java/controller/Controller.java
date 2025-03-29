@@ -14,7 +14,6 @@ import java.util.ArrayList;
 
 import dsp.MediaPlayer;
 
-
 public class Controller {
   MediaPlayer audioPlayer;
   MainFrame frame;
