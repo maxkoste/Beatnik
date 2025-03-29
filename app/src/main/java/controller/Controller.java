@@ -21,6 +21,7 @@ public class Controller {
     frame = new MainFrame(this);
     frame.start(primaryStage);
     addSongs();
+    addPlaylists();
   }
 
   public void playSong() {
@@ -47,7 +48,12 @@ public class Controller {
     for (int i = 0; i < files.length; i++) {
       songs[i] = files[i].getName();
     }
-    frame.addSongs(songs);
+    frame.addSong(songs);
+  }
+
+  public void addPlaylists() {
+    String[] playlists = {"-", "New Playlist", "Beats", "Quinceañera", "Funeral"};
+    frame.addPlaylist(playlists);
   }
 
   public void setSong(int channel, String path) {

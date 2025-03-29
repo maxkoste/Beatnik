@@ -13,8 +13,8 @@ public class CircularSlider extends Control {
   private DoubleProperty min;
   private DoubleProperty value;
 
-  public CircularSlider() {
-    setSkin(new CircularSliderSkin(this));
+  public CircularSlider(int tickCount, boolean snapToTick) {
+    setSkin(new CircularSliderSkin(this, tickCount, snapToTick));
     setAngle(0.0);
     setMin(0.0);
     setMax(290.0);
