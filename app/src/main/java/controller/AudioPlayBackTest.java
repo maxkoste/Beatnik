@@ -34,9 +34,9 @@ public class AudioPlayBackTest {
             e.printStackTrace();
         }
     }
-
-    public void playAudio() {
-        if (mediaPlayer != null) {
+    
+    public void playAudio(){
+        if(mediaPlayer != null){
             mediaPlayer.playAudio();
         }
     }

@@ -16,14 +16,16 @@ import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.GainProcessor;
+import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.TarsosDSPAudioInputStream;
+import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
 import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
 
 //This class is responsible for playing the audio, and its volume
 public class MediaPlayer {
     private Clip clip; // For main playback not used in this implementation
-    private AudioDispatcher effectDispatcher; // For effects processing
+    private AudioDispatcher playbackDispatcher; // For effects processing
     private GainProcessor gainProcessor;
     private String currentSongFilePath;
     private GainProcessor volumeProcessor;
@@ -38,35 +40,34 @@ public class MediaPlayer {
     public void setUp() {
         try {
             // Clean up previous resources if they exist
-            if (effectDispatcher != null) {
-                effectDispatcher.stop();
-                effectDispatcher = null;
+            if (playbackDispatcher != null) {
+                playbackDispatcher.stop();
+                playbackDispatcher = null;
             }
 
-            System.out.println("Loading audio file: songs/" + currentSongFilePath);
+            System.out.println("Sampling this file in the: songs/" + currentSongFilePath);
 
-            InputStream mainStream = getClass().getClassLoader()
-                    .getResourceAsStream("songs/" + currentSongFilePath);
-            if (mainStream == null) {
-                System.err.println("Error: Could not load audio file!");
+            // Get the resource URL and convert it to a file path
+            java.net.URL resourceUrl = getClass().getClassLoader().getResource("songs/" + currentSongFilePath);
+            if (resourceUrl == null) {
+                System.err.println("Error: Could not find audio file in resources!");
                 return;
             }
+            
+            String filePath = new File(resourceUrl.toURI()).getAbsolutePath();
+            System.out.println("Loading audio file from: " + filePath);
 
-            AudioInputStream mainAudioStream = AudioSystem.getAudioInputStream(mainStream);
-            AudioFormat format = mainAudioStream.getFormat();
-
+            // Use AudioDispatcherFactory with the actual file path
+            playbackDispatcher = AudioDispatcherFactory.fromPipe(filePath, 44100, 4096, 0);
+            TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
             System.out.println("Audio format: " + format.toString());
-
-            // Create dispatcher with larger buffer size
-            effectDispatcher = new AudioDispatcher(
-                    new JVMAudioInputStream(mainAudioStream), 8192, 0);
 
             // Add volume control first - set initial volume to 1.0 (100%)
             volumeProcessor = new GainProcessor(1.0f);
-            effectDispatcher.addAudioProcessor(volumeProcessor);
+            playbackDispatcher.addAudioProcessor(volumeProcessor);
 
             // Add effect chain processor
-            effectDispatcher.addAudioProcessor(new AudioProcessor() {
+            playbackDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
                 public boolean process(AudioEvent audioEvent) {
                     effectChain.process(audioEvent.getFloatBuffer());
@@ -75,15 +76,15 @@ public class MediaPlayer {
 
                 @Override
                 public void processingFinished() {
-                    System.out.println("Processing finished");
+                    System.out.println("Processing finished..");
                 }
             });
 
             // Add audio player for final output
             AudioPlayer audioPlayer = new AudioPlayer(format);
-            effectDispatcher.addAudioProcessor(audioPlayer);
+            playbackDispatcher.addAudioProcessor(audioPlayer);
 
-            System.out.println("Audio setup completed successfully");
+            System.out.println("Setup complete..");
 
         } catch (Exception e) {
             System.err.println("Error setting up audio: " + e.getMessage());
@@ -92,12 +93,12 @@ public class MediaPlayer {
     }
 
     public void playAudio() {
-        if (effectDispatcher == null) {
-            System.err.println("Error: AudioDispatcher is not initialized!");
+        if (playbackDispatcher == null) {
+            System.err.println("Error could not play audio...");
             return;
         }
-        System.out.println("Starting audio playback...");
-        Thread audioThread = new Thread(effectDispatcher, "Audio Playback Thread");
+        System.out.println("Playing..");
+        Thread audioThread = new Thread(playbackDispatcher, "Audio Playback thread");
         audioThread.setPriority(Thread.MAX_PRIORITY);  // Give audio thread high priority
         audioThread.start();
     }
@@ -107,10 +108,12 @@ public class MediaPlayer {
             // Convert volume percentage (0-100) to gain multiplier (0.0-1.0)
             float gain = volume / 100.0f;
             volumeProcessor.setGain(gain);
-            System.out.println("Setting volume to " + volume + " (gain: " + gain + ")");
+            System.out.println("Setting the volume to " + volume + " (gain: " + gain + ")");
         }
     }
-
+    
+    // Set the effect mix between 0.0f and 1.0f, 0.0f is dry only, 1.0f is wet only
+    // 0.5f is equal mix of dry and wet
     public void setEffectMix(float mix) { // 0.0f to 1.0f
         this.effectMix = mix;
         if (gainProcessor != null) {

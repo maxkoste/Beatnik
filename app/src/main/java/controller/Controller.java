@@ -18,6 +18,7 @@ public class Controller {
 
   public Controller(Stage primaryStage) {
     audioPlayer = new MediaPlayer();
+    //this is the frame that contains the playlist and the songs
     frame = new MainFrame(primaryStage, this);
     addSongs();
   }
@@ -37,7 +38,7 @@ public class Controller {
     System.out.println(desinationFile.toPath());
     Files.copy(sourceFile.toPath(), desinationFile.toPath());
     frame.addSong(desinationFile.getName());
-    System.out.println("File moved");
+    System.out.println("File moved into the songs folder");
   }
 
   public void addSongs() {
@@ -45,6 +46,8 @@ public class Controller {
     String[] songs = new String[files.length];
     for (int i = 0; i < files.length; i++) {
       songs[i] = files[i].getName();
+      //wanted to see if it prints the correct song name
+      System.out.println("Songs added: " + songs[i]);
     }
     frame.addSongs(songs);
   }
