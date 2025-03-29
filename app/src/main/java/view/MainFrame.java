@@ -323,7 +323,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
     // listener for setting the volume
     masterVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
       float volume = newValue.floatValue();
-      System.out.println("Master : " + volume);
       controller.setMasterVolume(volume);
     });
 
