@@ -1,7 +1,6 @@
 package view;
 
 import controller.Controller;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -21,21 +20,24 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 public class MainFrame implements EventHandler<ActionEvent> {
   AnchorPane primaryPane;
   BorderPane songsPane;
+  BorderPane playlistsPane;
   Stage playlistStage;
+  Scene songsScene;
+  Scene playlistsScene;
   MultipleSelectionModel<String> songSelector;
   SelectionModel<String> playlistSelector;
+  ListView<String> currentPlaylist;
+  MultipleSelectionModel<String> playlistSongSelector;
   Controller controller;
-  ObservableList<String> songs = FXCollections.observableArrayList(); // Temp implementation but correct class/collection
-  ObservableList<String> playlists = FXCollections.observableArrayList(); //TODO: Listener could be attached to all observable lists
   TextArea channelOneContainer;
   double screenHeight;
   double screenWidth;
@@ -58,23 +60,27 @@ public class MainFrame implements EventHandler<ActionEvent> {
     playlistStage.setResizable(false);
 
     primaryPane = new AnchorPane(); // Pane which contains all content
-    songsPane = new BorderPane(); // Pane which contains playlist popup content
+    songsPane = new BorderPane(); // Pane which contains songs popup content
+    playlistsPane = new BorderPane(); // Pane which contains currentPlaylist popup content
 
     initializeZoneOne();
+    initializeSongsPane();
+    initializePlaylistPane();
     initializeZoneTwo();
     initializeZoneThree();
     initializeZoneFour();
 
     Scene primaryScene = new Scene(primaryPane, screenWidth, screenHeight); // Add pane to scene
 
-    Scene playlistScene = new Scene(songsPane, 400, 400);
+    songsScene = new Scene(songsPane, 400, 400);
+    playlistsScene = new Scene(playlistsPane, 400, 400);
 
     Image flowers = new Image("flowers.JPG"); // Add icon
     primaryStage.getIcons().add(flowers);
     primaryStage.setScene(primaryScene); // Finalize window to be shown
     primaryStage.show();
 
-    playlistStage.setScene(playlistScene);
+    playlistStage.setScene(songsScene);
     playlistStage.initModality(Modality.APPLICATION_MODAL);
   }
 
@@ -85,38 +91,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
     songsButton.setOnAction(this);
     AnchorPane.setTopAnchor(songsButton, screenHeight / 10);
     AnchorPane.setLeftAnchor(songsButton, screenWidth / 10);
-
-      ListView<String> songList = new ListView<>(songs);
-      songSelector = songList.getSelectionModel();
-      songSelector.setSelectionMode(SelectionMode.MULTIPLE);
-      songList.setOnMouseClicked(this::handleSongSelection);
-      songsPane.setCenter(songList);
-
-      Label infoLabel = new Label();
-      infoLabel.setText("Hold CTRL for Multiple Selections");
-      infoLabel.setPrefSize(400, 40);
-      infoLabel.setAlignment(Pos.CENTER);
-      songsPane.setBottom(infoLabel);
-
-      Button importSongs = new Button();
-      importSongs.setText("Import");
-      importSongs.setOnAction(this::handleImport);
-
-      Button viewPlaylists = new Button();
-      viewPlaylists.setText("Playlists");
-
-      Button addToPlaylist = new Button();
-      addToPlaylist.setText("Add Song/s to Playlist");
-      addToPlaylist.setOnAction(this::handleAddToPlaylist);
-
-      ChoiceBox<String> playlistBox = new ChoiceBox<>();
-      playlistBox.setPrefSize(133, 10);
-      playlistBox.setItems(playlists);
-      playlistBox.getSelectionModel().select(0);
-      playlistSelector = playlistBox.getSelectionModel();
-
-      ToolBar songsMenu = new ToolBar(importSongs, viewPlaylists, addToPlaylist, playlistBox);
-      songsPane.setTop(songsMenu);
 
     CircularSlider quantize = new CircularSlider(10, false);
     quantize.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -338,21 +312,61 @@ public class MainFrame implements EventHandler<ActionEvent> {
     primaryPane.getChildren().addAll(effectIntensity, effectSelector, masterVolume, masterVolumeLabel);
   }
 
-  public void addSong(String[] songFileNames) {
-    songs.addAll(songFileNames);
-  }
+  public void initializeSongsPane() {
+    ListView<String> songList = new ListView<>(controller.getSongsGUI());
+    songSelector = songList.getSelectionModel();
+    songSelector.setSelectionMode(SelectionMode.MULTIPLE);
+    songList.setOnMouseClicked(this::handleSongSelection);
+    songsPane.setCenter(songList);
 
-  public void addSong(String songFileName) {
-    songs.add(songFileName);
-  }
+    Label infoLabel = new Label();
+    infoLabel.setText("Hold CTRL for Multiple Selections");
+    infoLabel.setPrefSize(400, 40);
+    infoLabel.setAlignment(Pos.CENTER);
+    songsPane.setBottom(infoLabel);
 
-  public void addPlaylist(String[] playlistNames) {
-    playlists.addAll(playlistNames);
+    Button importSongs = new Button();
+    importSongs.setText("Import");
+    importSongs.setOnAction(this::handleImport);
+
+    Button viewPlaylist = new Button();
+    viewPlaylist.setText("View Playlist");
+    viewPlaylist.setOnAction(this::handleViewPlaylist);
+
+    Button addToPlaylist = new Button();
+    addToPlaylist.setText("Add to Playlist");
+    addToPlaylist.setOnAction(this::handleAddToPlaylist);
+
+    ChoiceBox<String> playlistBox = new ChoiceBox<>();
+    playlistBox.setPrefSize(133, 10);
+    playlistBox.setItems(controller.getPlaylistsGUI());
+    playlistBox.getSelectionModel().select(0);
+    playlistSelector = playlistBox.getSelectionModel();
     playlistSelector.select(0);
+
+    ToolBar songsMenu = new ToolBar(importSongs, viewPlaylist, addToPlaylist, playlistBox);
+    songsPane.setTop(songsMenu);
   }
 
-  public void addPlaylist(String playlistName) {
-    playlists.add(playlistName);
+  public void initializePlaylistPane() {
+    currentPlaylist = new ListView<>();
+    playlistSongSelector = currentPlaylist.getSelectionModel();
+    songSelector.setSelectionMode(SelectionMode.MULTIPLE);
+    currentPlaylist.setOnMouseClicked(this::handlePlaylistSongSelection);
+    playlistsPane.setCenter(currentPlaylist);
+
+    Label infoLabel = new Label();
+    infoLabel.setText("Hold CTRL for Multiple Selections");
+    infoLabel.setPrefSize(400, 40);
+    infoLabel.setAlignment(Pos.CENTER);
+    playlistsPane.setBottom(infoLabel);
+
+    Button viewSongs = new Button();
+    viewSongs.setText("View Songs");
+    viewSongs.setOnAction(this::handleViewSongs);
+
+    ToolBar playlistMenu = new ToolBar(viewSongs);
+    playlistsPane.setTop(playlistMenu);
   }
 
   @Override
@@ -363,8 +377,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
   public void handleSongSelection(MouseEvent mouseEvent) {
     if(mouseEvent.getClickCount() == 2) {
-      controller.setSong(1, songs.get(songSelector.getSelectedIndex())); // set only to channel 1 for now
-      channelOneContainer.setText("Song loaded: " + songs.get(songSelector.getSelectedIndex()));
+      controller.setSong(1, songSelector.getSelectedItem()); // set only to channel 1 for now
+      channelOneContainer.setText("Song loaded: " + songSelector.getSelectedItem()); // TODO: Replace with spectral analyzer
     }
   }
 
@@ -383,15 +397,38 @@ public class MainFrame implements EventHandler<ActionEvent> {
     }
   }
 
-  public void handleAddToPlaylist(ActionEvent actionEvent) {
-    String playlistSelected = playlists.get(playlistSelector.getSelectedIndex());
+  public void handleViewPlaylist(ActionEvent actionEvent) {
+    currentPlaylist.setItems(controller.getPlaylistSongs(playlistSelector.getSelectedItem()));
+    playlistStage.setScene(playlistsScene);
+  }
+
+  public void handleViewSongs(ActionEvent actionEvent) {
+    playlistStage.setScene(songsScene);
+  }
+
+  public void handleAddToPlaylist(ActionEvent actionEvent) { //TODO: Make switch-case, maybe in Controller
+    String playlistSelected = playlistSelector.getSelectedItem();
 
     if (playlistSelected.equals("New Playlist")) {
-      ObservableList<Integer> selections = songSelector.getSelectedIndices();
-      for (int i = 0; i < selections.size(); i++) {
-        System.out.println(selections.get(i));
-      }
+        TextInputDialog inputPlaylistName = new TextInputDialog();
+        inputPlaylistName.setTitle("New Playlist");
+        inputPlaylistName.setHeaderText("Input Playlist Name");
+        Optional<String> name = inputPlaylistName.showAndWait();
+
+        if (name.isPresent()) { //TODO: Do not allow same name multiple times
+          if (!(name.get().isBlank())) {
+            ObservableList<Integer> selections = songSelector.getSelectedIndices();
+            controller.createNewPlaylist(name.get(), selections);
+          }
+        }
     } else System.out.println("not implemented");
+  }
+
+  public void handlePlaylistSongSelection(MouseEvent mouseEvent) {
+    if(mouseEvent.getClickCount() == 2) {
+      controller.setSong(1, playlistSongSelector.getSelectedItem()); // set only to channel 1 for now
+      channelOneContainer.setText("Song loaded: " + playlistSongSelector.getSelectedItem()); // TODO: Replace with spectral analyzer
+    }
   }
 
   private void handleChannelOnePlayPause(ActionEvent actionEvent) {
