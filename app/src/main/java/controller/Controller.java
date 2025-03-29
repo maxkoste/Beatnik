@@ -5,9 +5,7 @@ import view.MainFrame;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.AnnotatedArrayType;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import dsp.MediaPlayer;
 
@@ -22,7 +20,7 @@ public class Controller {
     frame = new MainFrame(primaryStage, this);
     addSongs();
   }
-
+  //plays the song from the MediaPlayer class
   public void playSong() {
     audioPlayer.playAudio();
   }
@@ -46,8 +44,6 @@ public class Controller {
     String[] songs = new String[files.length];
     for (int i = 0; i < files.length; i++) {
       songs[i] = files[i].getName();
-      //wanted to see if it prints the correct song name
-      System.out.println("Songs added: " + songs[i]);
     }
     frame.addSongs(songs);
   }

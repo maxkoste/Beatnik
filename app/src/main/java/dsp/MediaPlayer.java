@@ -2,9 +2,6 @@ package dsp;
 
 import java.io.File;
 
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
-
 import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
@@ -15,14 +12,12 @@ import be.tarsos.dsp.io.jvm.AudioPlayer;
 
 //This class is responsible for playing the audio, and its volume
 public class MediaPlayer {
-    private Clip clip; // For main playback not used in this implementation
     private AudioDispatcher playbackDispatcher; // For effects processing
     private GainProcessor gainProcessor;
     private String currentSongFilePath;
     private GainProcessor volumeProcessor;
     private EffectChain effectChain;
-    private float effectMix = 0.0f; // 0 = dry only, 1 = wet only
-    private FloatControl gainVolumeProcessor;
+    private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
 
     public MediaPlayer() {
         effectChain = new EffectChain();
@@ -104,7 +99,7 @@ public class MediaPlayer {
     }
     
     // Set the effect mix between 0.0f and 1.0f, 0.0f is dry only, 1.0f is wet only
-    // 0.5f is equal mix of dry and wet
+    // 0.5f is equal mix of dry and wet not implemented yet...
     public void setEffectMix(float mix) { // 0.0f to 1.0f
         this.effectMix = mix;
         if (gainProcessor != null) {
