@@ -77,7 +77,6 @@ public class MediaPlayer {
             e.printStackTrace();
         }
     }
-
     public void playAudio() {
         if (playbackDispatcher == null) {
             System.err.println("Error could not play audio...");

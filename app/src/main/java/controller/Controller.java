@@ -16,16 +16,18 @@ public class Controller {
 
   public Controller(Stage primaryStage) {
     audioPlayer = new MediaPlayer();
-    //this is the frame that contains the playlist and the songs
-    frame = new MainFrame(primaryStage, this);
+
+    frame = new MainFrame(this);
+    frame.start(primaryStage);
     addSongs();
+    addPlaylists();
   }
   //plays the song from the MediaPlayer class
   public void playSong() {
     audioPlayer.playAudio();
   }
 
-  public void setMasterVolume(float volume){
+  public void setMasterVolume(int volume){
     audioPlayer.setVolume(volume);
   }
 
@@ -45,7 +47,12 @@ public class Controller {
     for (int i = 0; i < files.length; i++) {
       songs[i] = files[i].getName();
     }
-    frame.addSongs(songs);
+    frame.addSong(songs);
+  }
+
+  public void addPlaylists() {
+    String[] playlists = {"-", "New Playlist", "Beats", "Quinceañera", "Funeral"};
+    frame.addPlaylist(playlists);
   }
 
   public void setSong(int channel, String path) {
