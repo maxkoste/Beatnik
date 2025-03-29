@@ -13,13 +13,13 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 //This class is responsible for playing the audio, and its volume
-public class AudioPlayer {
+public class MediaPlayer {
 
     private Clip clip;
     private FloatControl volumeControl;
     private String currentSongFilePath;
 
-    public AudioPlayer(){
+    public MediaPlayer(){
     }
 
     public void setUp() {

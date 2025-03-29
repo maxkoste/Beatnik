@@ -9,15 +9,15 @@ import java.lang.reflect.AnnotatedArrayType;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import dsp.AudioPlayer;
+import dsp.MediaPlayer;
 
 
 public class Controller {
-  AudioPlayer audioPlayer;
+  MediaPlayer audioPlayer;
   MainFrame frame;
 
   public Controller(Stage primaryStage) {
-    audioPlayer = new AudioPlayer();
+    audioPlayer = new MediaPlayer();
     frame = new MainFrame(this);
     frame.start(primaryStage);
     addSongs();
