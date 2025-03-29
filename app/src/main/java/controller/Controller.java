@@ -5,23 +5,22 @@ import view.MainFrame;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.AnnotatedArrayType;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 
-import dsp.AudioPlayer;
+import dsp.MediaPlayer;
 
 
 public class Controller {
-  AudioPlayer audioPlayer;
+  MediaPlayer audioPlayer;
   MainFrame frame;
 
   public Controller(Stage primaryStage) {
-    audioPlayer = new AudioPlayer();
+    audioPlayer = new MediaPlayer();
+    //this is the frame that contains the playlist and the songs
     frame = new MainFrame(primaryStage, this);
     addSongs();
   }
-
+  //plays the song from the MediaPlayer class
   public void playSong() {
     audioPlayer.playAudio();
   }
@@ -37,7 +36,7 @@ public class Controller {
     System.out.println(desinationFile.toPath());
     Files.copy(sourceFile.toPath(), desinationFile.toPath());
     frame.addSong(desinationFile.getName());
-    System.out.println("File moved");
+    System.out.println("File moved into the songs folder");
   }
 
   public void addSongs() {
