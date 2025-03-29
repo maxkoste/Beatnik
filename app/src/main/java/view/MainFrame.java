@@ -56,7 +56,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     primaryStage.setMaximized(true);
 
     playlistStage = new Stage();
-    playlistStage.setTitle("Songs and Playlists");
+    playlistStage.setTitle("All Songs");
     playlistStage.setResizable(false);
 
     primaryPane = new AnchorPane(); // Pane which contains all content
@@ -319,7 +319,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     songsPane.setCenter(songList);
 
     Label infoLabel = new Label();
-    infoLabel.setText("Hold CTRL for Multiple Selections");
+    infoLabel.setText("Double Click To Pick Song — Hold CTRL for Multiple Selections");
     infoLabel.setPrefSize(400, 40);
     infoLabel.setAlignment(Pos.CENTER);
     songsPane.setBottom(infoLabel);
@@ -397,30 +397,24 @@ public class MainFrame implements EventHandler<ActionEvent> {
   }
 
   public void handleViewPlaylist(ActionEvent actionEvent) {
-    currentPlaylist.setItems(controller.getPlaylistSongs(playlistSelector.getSelectedItem()));
-    playlistStage.setScene(playlistsScene);
+    String playlistName = playlistSelector.getSelectedItem();
+    if (playlistName.equals("New Playlist")) {
+      userMessage(Alert.AlertType.INFORMATION, "No Playlist Selected");
+    } else {
+      currentPlaylist.setItems(controller.getPlaylistSongs(playlistName));
+      playlistStage.setTitle(playlistName);
+      playlistStage.setScene(playlistsScene);
+    }
   }
 
   public void handleViewSongs(ActionEvent actionEvent) {
+    playlistStage.setTitle("All Songs");
     playlistStage.setScene(songsScene);
   }
 
   public void handleAddToPlaylist(ActionEvent actionEvent) { //TODO: Make switch-case, maybe in Controller
     String playlistSelected = playlistSelector.getSelectedItem();
-
-    if (playlistSelected.equals("New Playlist")) {
-        TextInputDialog inputPlaylistName = new TextInputDialog();
-        inputPlaylistName.setTitle("New Playlist");
-        inputPlaylistName.setHeaderText("Input Playlist Name");
-        Optional<String> name = inputPlaylistName.showAndWait();
-
-        if (name.isPresent()) { //TODO: Do not allow same name multiple times
-          if (!(name.get().isBlank())) {
-            ObservableList<Integer> selections = songSelector.getSelectedIndices();
-            controller.createNewPlaylist(name.get(), selections);
-          }
-        }
-    } else System.out.println("not implemented");
+    controller.addToPlaylist(playlistSelected);
   }
 
   public void handlePlaylistSongSelection(MouseEvent mouseEvent) {
@@ -449,6 +443,26 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
   private void handleCrossFader(MouseEvent mouseEvent) {
     System.out.println("Crossfader");
+  }
+
+  public String promptUserInput(String title, String headerText) {
+    TextInputDialog inputPlaylistName = new TextInputDialog();
+    inputPlaylistName.setTitle(title);
+    inputPlaylistName.setHeaderText(headerText);
+    Optional<String> name = inputPlaylistName.showAndWait();
+
+    return name.orElse(null); // A Java-suggested improvement to an isPresent check. Returns null if the user
+    // closed the window etc instead of throwing an exception.
+  }
+
+  public void userMessage(Alert.AlertType alertType, String headerText) {
+    Alert message = new Alert(alertType);
+    message.setHeaderText(headerText);
+    message.showAndWait();
+  }
+
+  public ObservableList<Integer> getSelectedIndices() {
+    return songSelector.getSelectedIndices();
   }
 
 }

@@ -2,6 +2,7 @@ package controller;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import model.Playlist;
 import view.MainFrame;
@@ -73,14 +74,14 @@ public class Controller {
 
         // TODO: Collect playlists from .dat file
 
-        playlistsGUI.addAll("Select Playlist", "New Playlist");
+        playlistsGUI.addAll("New Playlist");
 
         for (int i = 0; i < playlists.size(); i++) {
             playlistsGUI.add(playlists.get(i).getName());
         }
     }
 
-    public ObservableList<String> getPlaylistSongs(String name) {
+    public ObservableList<String> getPlaylistSongs(String name) { //TODO: No duplicate songs
         for (int i = 0; i < playlists.size(); i++) {
             if (playlists.get(i).getName().equals(name)) {
                 ObservableList<String> songs = FXCollections.observableArrayList();
@@ -99,6 +100,38 @@ public class Controller {
         }
         playlists.add(new Playlist(name, songPaths));
         playlistsGUI.add(name);
+    }
+
+    public void addToPlaylist(String playlistName) {
+        ObservableList<Integer> selectedIndices = frame.getSelectedIndices();
+
+        if (playlistName.equals("New Playlist")) {
+
+
+            String input = frame.promptUserInput("New Playlist", "Input Playlist Name");
+            if (input != null) {
+                if (input.isEmpty() || input.isBlank()) {
+                    frame.userMessage(Alert.AlertType.ERROR, "Playlist Name is Blank");
+                    return;
+                }
+            } else return;
+            for (int i = 0; i < playlistsGUI.size(); i++) {
+                if (playlistsGUI.get(i).equals(input)) {
+                    frame.userMessage(Alert.AlertType.ERROR, "Playlist Name Taken");
+                    return;
+                }
+            }
+            createNewPlaylist(input, selectedIndices);
+        } else {
+            for (int i = 0; i < playlists.size(); i++) {
+                if (playlists.get(i).getName().equals(playlistName)) {
+                    for (int j = 0; j < selectedIndices.size(); j++) {
+                        playlists.get(i).addSong(songsGUI.get(selectedIndices.get(j))); //TODO: Do not allow duplicate songs, Set implementation maybe?
+                    }
+                    return;
+                }
+            }
+        }
     }
 
     public void setSong(int channel, String songName) {
