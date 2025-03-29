@@ -86,7 +86,7 @@ public class MediaPlayer {
             setUp();
             System.out.println("Playing..");
             playbackDispatcher.skip(currentTime);
-            Thread audioThread = new Thread(playbackDispatcher, "Audio Playback thread");
+            Thread audioThread = new Thread(playbackDispatcher, "Audio Playback Thread!");
             audioThread.setPriority(Thread.MAX_PRIORITY); // Give audio thread high priority
             audioThread.start();
             isPlaying = true;
@@ -103,7 +103,6 @@ public class MediaPlayer {
             // Convert volume percentage (0-100) to gain multiplier (0.0-1.0)
             float gain = volume / 100.0f;
             volumeProcessor.setGain(gain);
-            System.out.println("Setting the volume to " + volume + " (gain: " + gain + ")");
         }
     }
 
