@@ -27,7 +27,7 @@ public class Controller {
     audioPlayer.playAudio();
   }
 
-  public void setMasterVolume(int volume){
+  public void setMasterVolume(float volume){
     audioPlayer.setVolume(volume);
   }
 
