@@ -391,7 +391,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
       try {
         controller.moveFile(selectedFile, String.valueOf(Paths.get("src/main/resources/songs/" + selectedFile.getName())));
       } catch (IOException e) {
-        System.out.println("File could not be moved");;
+        System.out.println("File could not be moved");
       }
     }
   }
