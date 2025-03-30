@@ -19,7 +19,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import model.Playlist;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
@@ -337,11 +339,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
     addToPlaylist.setOnAction(this::handleAddToPlaylist);
 
     ChoiceBox<String> playlistBox = new ChoiceBox<>();
-    playlistBox.setPrefSize(133, 10);
+    playlistBox.setPrefSize(147, 10);
     playlistBox.setItems(controller.getPlaylistsGUI());
-    playlistBox.getSelectionModel().select(0);
     playlistSelector = playlistBox.getSelectionModel();
-    playlistSelector.select(0);
+    selectPlaylistIndex(0);
 
     ToolBar songsMenu = new ToolBar(importSongs, viewPlaylist, addToPlaylist, playlistBox);
     songsPane.setTop(songsMenu);
@@ -350,12 +351,12 @@ public class MainFrame implements EventHandler<ActionEvent> {
   public void initializePlaylistPane() {
     currentPlaylist = new ListView<>();
     playlistSongSelector = currentPlaylist.getSelectionModel();
-    songSelector.setSelectionMode(SelectionMode.MULTIPLE);
+    playlistSongSelector.setSelectionMode(SelectionMode.MULTIPLE);
     currentPlaylist.setOnMouseClicked(this::handlePlaylistSongSelection);
     playlistsPane.setCenter(currentPlaylist);
 
     Label infoLabel = new Label();
-    infoLabel.setText("Hold CTRL for Multiple Selections");
+    infoLabel.setText("Double Click To Pick Song — Hold CTRL for Multiple Selections");
     infoLabel.setPrefSize(400, 40);
     infoLabel.setAlignment(Pos.CENTER);
     playlistsPane.setBottom(infoLabel);
@@ -364,7 +365,24 @@ public class MainFrame implements EventHandler<ActionEvent> {
     viewSongs.setText("View Songs");
     viewSongs.setOnAction(this::handleViewSongs);
 
-    ToolBar playlistMenu = new ToolBar(viewSongs);
+    Button editName = new Button();
+    editName.setText("Edit Name");
+    editName.setOnAction(this::handleEditPlaylistName);
+
+    Button removeSongsFromPlaylist = new Button();
+    removeSongsFromPlaylist.setText("Remove Songs");
+    removeSongsFromPlaylist.setOnAction(this::handleRemoveSongsFromPlaylist);
+
+    Button deletePlaylist = new Button();
+    deletePlaylist.setText("Delete Playlist");
+    deletePlaylist.setOnAction(this::handleDeletePlaylist);
+
+    Button playPlaylist = new Button();
+    playPlaylist.setPrefSize(35, 10);
+    playPlaylist.setText("⏯");
+    playPlaylist.setOnAction(this::handlePlayPlaylist);
+
+    ToolBar playlistMenu = new ToolBar(viewSongs, editName, removeSongsFromPlaylist, deletePlaylist, playPlaylist);
     playlistsPane.setTop(playlistMenu);
   }
 
@@ -412,7 +430,25 @@ public class MainFrame implements EventHandler<ActionEvent> {
     playlistStage.setScene(songsScene);
   }
 
-  public void handleAddToPlaylist(ActionEvent actionEvent) { //TODO: Make switch-case, maybe in Controller
+  public void handleEditPlaylistName(ActionEvent actionEvent) {
+    playlistStage.setTitle(controller.editPlaylistName(playlistSelector.getSelectedItem()));
+  }
+
+  public void handleDeletePlaylist(ActionEvent actionEvent) {
+    controller.deletePlaylist(playlistStage.getTitle());
+    handleViewSongs(actionEvent);
+  }
+
+  public void handleRemoveSongsFromPlaylist(ActionEvent actionEvent) {
+    controller.removeSongsFromPlaylist(playlistStage.getTitle(), playlistSongSelector.getSelectedItems());
+    currentPlaylist.setItems(controller.getPlaylistSongs(playlistStage.getTitle()));
+  }
+
+  public void handlePlayPlaylist(ActionEvent actionEvent) {
+
+  }
+
+  public void handleAddToPlaylist(ActionEvent actionEvent) {
     String playlistSelected = playlistSelector.getSelectedItem();
     controller.addToPlaylist(playlistSelected);
   }
@@ -461,8 +497,19 @@ public class MainFrame implements EventHandler<ActionEvent> {
     message.showAndWait();
   }
 
+  public boolean userConfirm(String headerText) {
+    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+    confirm.setHeaderText(headerText);
+    confirm.showAndWait();
+    return confirm.getResult() == ButtonType.OK;
+  }
+
   public ObservableList<Integer> getSelectedIndices() {
     return songSelector.getSelectedIndices();
+  }
+
+  public void selectPlaylistIndex(int index) {
+    playlistSelector.select(index);
   }
 
 }
