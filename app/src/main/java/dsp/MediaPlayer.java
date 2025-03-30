@@ -79,7 +79,7 @@ public class MediaPlayer {
             e.printStackTrace();
         }
     }
-
+    
     // plays the song from the MediaPlayer class
     public void playAudio() {
         if (!isPlaying) {
@@ -97,7 +97,7 @@ public class MediaPlayer {
             playbackDispatcher.stop();
         }
     }
-
+    
     public void setVolume(float volume) {
         if (volumeProcessor != null) {
             // Convert volume percentage (0-100) to gain multiplier (0.0-1.0)
@@ -105,7 +105,7 @@ public class MediaPlayer {
             volumeProcessor.setGain(gain);
         }
     }
-
+    
     // Set the effect mix between 0.0f and 1.0f, 0.0f is dry only, 1.0f is wet only
     // 0.5f is equal mix of dry and wet not implemented yet...
     public void setEffectMix(float mix) { // 0.0f to 1.0f
@@ -115,12 +115,12 @@ public class MediaPlayer {
             gainProcessor.setGain(mix);
         }
     }
-
+    
     public void setSong(String filepath) {
         this.currentSongFilePath = filepath;
         setVolume(100.0f); // Set initial volume to maximum
     }
-
+    
     public void setEffect(dsp.Effects.AudioEffect effect) {
         effectChain.setEffect(effect);
     }
