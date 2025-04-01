@@ -16,7 +16,7 @@ public class Equalizer implements AudioProcessor {
         this.sampleRate = sampleRate;
         this.bassCutoffHz = bassCutoffHz;
         this.trebleCutoffHz = trebleCutoffHz;
-        updateBassFilter(); // Initialize with 0dB gain
+        updateBassFilter(); 
         updateTrebleFilter();
     }
 
@@ -40,7 +40,7 @@ public class Equalizer implements AudioProcessor {
 
     @Override
     public boolean process(AudioEvent audioEvent) {
-        // Apply bass filter first, then treble filter
+        // Apply bass filter first, then treble filter for absolutely no reason at all
         bassFilter.process(audioEvent);
         trebleFilter.process(audioEvent);
         return true;
