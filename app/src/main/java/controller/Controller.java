@@ -7,8 +7,8 @@ import javafx.stage.Stage;
 import model.Playlist;
 import view.MainFrame;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.Buffer;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,12 +21,15 @@ public class Controller {
     ObservableList<String> songsGUI = FXCollections.observableArrayList();
     ObservableList<String> playlistsGUI = FXCollections.observableArrayList();
     ArrayList<Playlist> playlists = new ArrayList<>();
+    File dataDestinationFile;
 
     public Controller(Stage primaryStage) {
+        dataDestinationFile = new File("src/main/resources/data.dat").getAbsoluteFile();
         audioPlayer = new MediaPlayer();
 
         addSongsFromResources();
-        addPlaylistsFromResources();
+        loadPlaylistData();
+        updatePlaylistGUI();
 
         frame = new MainFrame(this);
         frame.start(primaryStage);
@@ -51,12 +54,47 @@ public class Controller {
         System.out.println("File moved into the songsGUI folder");
     }
 
+    public void savePlaylistData() { //TODO: Maybe redo to only save relevant playlist. Downside = find way to not overwrite file on new call.
+        try (FileOutputStream fos = new FileOutputStream(dataDestinationFile);
+             BufferedOutputStream bos = new BufferedOutputStream(fos); ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+            oos.writeInt(playlists.size());
+            for (int i = 0; i < playlists.size(); i++) {
+                oos.writeObject(playlists.get(i));
+            }
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+    }
+
+    public void loadPlaylistData() { // TODO: Exception handling
+        System.out.println(dataDestinationFile);
+        try (FileInputStream fis = new FileInputStream(dataDestinationFile);
+             BufferedInputStream bis = new BufferedInputStream(fis); ObjectInputStream ois = new ObjectInputStream(bis)) {
+
+            int playlistAmount = ois.readInt();
+            for (int i = 0; i < playlistAmount; i++) {
+                playlists.add((Playlist) ois.readObject());
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("No Playlists Found or data.dat file Corrupted");
+        }
+    }
+
     public ObservableList<String> getSongsGUI() {
         return songsGUI;
     }
 
     public ObservableList<String> getPlaylistsGUI() {
         return playlistsGUI;
+    }
+
+    public Playlist findPlaylist(String playlistName) {
+        for (int i = 0; i < playlists.size(); i++) {
+            if (playlists.get(i).getName().equals(playlistName)) {
+                return playlists.get(i);
+            }
+        }
+        return null;
     }
 
     public void addSongsFromResources() {

@@ -12,7 +12,7 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
   private static final int size = 50;
   private final Canvas canvas;
   private final GraphicsContext gc;
-  private double lastAngle = 0; // Track last valid angle
+  private double lastAngle; // Track last valid angle
   int tickCount;
   boolean snapToTick;
 
@@ -24,6 +24,7 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
     canvas = new Canvas(size, size);
     gc = canvas.getGraphicsContext2D();
 
+    lastAngle = control.getAngle();
     drawKnob(control.getAngle());
 
     canvas.setOnMouseDragged(this::handleMouseDrag);

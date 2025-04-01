@@ -94,7 +94,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(songsButton, screenHeight / 10);
     AnchorPane.setLeftAnchor(songsButton, screenWidth / 10);
 
-    CircularSlider quantize = new CircularSlider(10, false);
+    CircularSlider quantize = new CircularSlider(9, false);
     quantize.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
@@ -102,7 +102,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(quantize, (screenHeight / 2));
     AnchorPane.setLeftAnchor(quantize,(screenWidth / 10));
 
-    CircularSlider cueVolume = new CircularSlider(10, false);
+    CircularSlider cueVolume = new CircularSlider(9, false);
     cueVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
@@ -204,7 +204,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(channelTwoVolume, (screenHeight / 1.635));
     AnchorPane.setLeftAnchor(channelTwoVolume, ((screenWidth / 1.453) - (channelOneVolume.getPrefWidth() / 2)));
 
-    CircularSlider channelOneBass = new CircularSlider(10, false);
+    CircularSlider channelOneBass = new CircularSlider(9, false);
     channelOneBass.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
@@ -212,7 +212,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(channelOneBass, (screenHeight / 1.87));
     AnchorPane.setLeftAnchor(channelOneBass,(screenWidth / 3.275) -25);
 
-    CircularSlider channelTwoBass = new CircularSlider(10, false);
+    CircularSlider channelTwoBass = new CircularSlider(9, false);
     channelTwoBass.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
@@ -220,7 +220,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(channelTwoBass, (screenHeight / 1.87));
     AnchorPane.setLeftAnchor(channelTwoBass, (screenWidth / 1.442) - 25);
 
-    CircularSlider channelOneTreble = new CircularSlider(10, false);
+    CircularSlider channelOneTreble = new CircularSlider(9, false);
     channelOneTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
@@ -228,7 +228,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(channelOneTreble, (screenHeight / 1.87) -75);
     AnchorPane.setLeftAnchor(channelOneTreble, (screenWidth / 3.275) -25);
 
-    CircularSlider channelTwoTreble = new CircularSlider(10, false);
+    CircularSlider channelTwoTreble = new CircularSlider(9, false);
     channelTwoTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
@@ -236,7 +236,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(channelTwoTreble, (screenHeight / 1.87) -75);
     AnchorPane.setLeftAnchor(channelTwoTreble, (screenWidth / 1.442) - 25);
 
-    CircularSlider channelOneSpeed = new CircularSlider(10, false);
+    CircularSlider channelOneSpeed = new CircularSlider(9, false);
     channelOneSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
@@ -244,7 +244,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(channelOneSpeed, ((screenHeight / 1.87) - 150));
     AnchorPane.setLeftAnchor(channelOneSpeed, (screenWidth / 3.275) - 25);
 
-    CircularSlider channelTwoSpeed = new CircularSlider(10, false);
+    CircularSlider channelTwoSpeed = new CircularSlider(9, false);
     channelTwoSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
@@ -270,7 +270,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
   }
 
   private void initializeZoneFour() {
-    CircularSlider effectIntensity = new CircularSlider(10, false);
+    CircularSlider effectIntensity = new CircularSlider(9, false);
     effectIntensity.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
       System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
@@ -432,16 +432,19 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
   public void handleEditPlaylistName(ActionEvent actionEvent) {
     playlistStage.setTitle(controller.editPlaylistName(playlistSelector.getSelectedItem()));
+    controller.savePlaylistData();
   }
 
   public void handleDeletePlaylist(ActionEvent actionEvent) {
     controller.deletePlaylist(playlistStage.getTitle());
     handleViewSongs(actionEvent);
+    controller.savePlaylistData();
   }
 
   public void handleRemoveSongsFromPlaylist(ActionEvent actionEvent) {
     controller.removeSongsFromPlaylist(playlistStage.getTitle(), playlistSongSelector.getSelectedItems());
     currentPlaylist.setItems(controller.getPlaylistSongs(playlistStage.getTitle()));
+    controller.savePlaylistData();
   }
 
   public void handlePlayPlaylist(ActionEvent actionEvent) {
@@ -451,6 +454,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
   public void handleAddToPlaylist(ActionEvent actionEvent) {
     String playlistSelected = playlistSelector.getSelectedItem();
     controller.addToPlaylist(playlistSelected);
+    controller.savePlaylistData();
   }
 
   public void handlePlaylistSongSelection(MouseEvent mouseEvent) {
