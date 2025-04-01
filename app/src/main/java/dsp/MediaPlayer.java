@@ -22,12 +22,12 @@ public class MediaPlayer {
     private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
     private boolean isPlaying;
     private float currentTime;
-
+    
     public MediaPlayer() {
         effectChain = new EffectChain();
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
-        bassEqualizer = new Equalizer(44100, 20000, 100);    // 100Hz center, 20kHz bandwidth
-        trebleEqualizer = new Equalizer(44100, 20000, 10000); // 10kHz center, 20kHz bandwidth
+        bassEqualizer = new Equalizer(44100, 20000, 100, null);    // 100Hz center, 20kHz bandwidth
+        trebleEqualizer = new Equalizer(44100, 20000, 10000, null); // 10kHz center, 20kHz bandwidth
     }
 
     public void setUp() {
@@ -50,6 +50,9 @@ public class MediaPlayer {
             String filePath = new File(resourceUrl.toURI()).getAbsolutePath();
             System.out.println("Loading audio file from: " + filePath);
 
+            bassEqualizer.setFilePath(filePath);
+            trebleEqualizer.setFilePath(filePath);
+            
             // Use AudioDispatcherFactory with the actual file path
             playbackDispatcher = AudioDispatcherFactory.fromPipe(filePath, 44100, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
