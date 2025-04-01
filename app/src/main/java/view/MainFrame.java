@@ -1,6 +1,7 @@
 package view;
 
 import controller.Controller;
+import controller.PlaylistManager;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -40,6 +41,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
   ListView<String> currentPlaylist;
   MultipleSelectionModel<String> playlistSongSelector;
   Controller controller;
+  PlaylistManager playlistManager;
   TextArea channelOneContainer;
   double screenHeight;
   double screenWidth;
@@ -314,7 +316,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
   }
 
   public void initializeSongsPane() {
-    ListView<String> songList = new ListView<>(controller.getSongsGUI());
+    ListView<String> songList = new ListView<>(playlistManager.getSongsGUI());
     songSelector = songList.getSelectionModel();
     songSelector.setSelectionMode(SelectionMode.MULTIPLE);
     songList.setOnMouseClicked(this::handleSongSelection);
@@ -340,7 +342,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     ChoiceBox<String> playlistBox = new ChoiceBox<>();
     playlistBox.setPrefSize(147, 10);
-    playlistBox.setItems(controller.getPlaylistsGUI());
+    playlistBox.setItems(playlistManager.getPlaylistsGUI());
     playlistSelector = playlistBox.getSelectionModel();
     selectPlaylistIndex(0);
 
@@ -419,7 +421,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     if (playlistName.equals("New Playlist")) {
       userMessage(Alert.AlertType.INFORMATION, "No Playlist Selected");
     } else {
-      currentPlaylist.setItems(controller.getPlaylistSongs(playlistName));
+      currentPlaylist.setItems(playlistManager.getPlaylistSongs(playlistName));
       playlistStage.setTitle(playlistName);
       playlistStage.setScene(playlistsScene);
     }
@@ -431,20 +433,20 @@ public class MainFrame implements EventHandler<ActionEvent> {
   }
 
   public void handleEditPlaylistName(ActionEvent actionEvent) {
-    playlistStage.setTitle(controller.editPlaylistName(playlistSelector.getSelectedItem()));
-    controller.savePlaylistData();
+    playlistStage.setTitle(playlistManager.editPlaylistName(playlistSelector.getSelectedItem()));
+    playlistManager.savePlaylistData();
   }
 
   public void handleDeletePlaylist(ActionEvent actionEvent) {
-    controller.deletePlaylist(playlistStage.getTitle());
+    playlistManager.deletePlaylist(playlistStage.getTitle());
     handleViewSongs(actionEvent);
-    controller.savePlaylistData();
+    playlistManager.savePlaylistData();
   }
 
   public void handleRemoveSongsFromPlaylist(ActionEvent actionEvent) {
-    controller.removeSongsFromPlaylist(playlistStage.getTitle(), playlistSongSelector.getSelectedItems());
-    currentPlaylist.setItems(controller.getPlaylistSongs(playlistStage.getTitle()));
-    controller.savePlaylistData();
+    playlistManager.removeSongsFromPlaylist(playlistStage.getTitle(), playlistSongSelector.getSelectedItems());
+    currentPlaylist.setItems(playlistManager.getPlaylistSongs(playlistStage.getTitle()));
+    playlistManager.savePlaylistData();
   }
 
   public void handlePlayPlaylist(ActionEvent actionEvent) {
@@ -453,8 +455,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
   public void handleAddToPlaylist(ActionEvent actionEvent) {
     String playlistSelected = playlistSelector.getSelectedItem();
-    controller.addToPlaylist(playlistSelected);
-    controller.savePlaylistData();
+    playlistManager.addToPlaylist(playlistSelected, songSelector.getSelectedIndices());
+    playlistManager.savePlaylistData();
   }
 
   public void handlePlaylistSongSelection(MouseEvent mouseEvent) {
@@ -508,12 +510,12 @@ public class MainFrame implements EventHandler<ActionEvent> {
     return confirm.getResult() == ButtonType.OK;
   }
 
-  public ObservableList<Integer> getSelectedIndices() {
-    return songSelector.getSelectedIndices();
-  }
-
   public void selectPlaylistIndex(int index) {
     playlistSelector.select(index);
+  }
+
+  public void registerPlaylistManager(PlaylistManager playlistManager) {
+    this.playlistManager = playlistManager;
   }
 
 }
