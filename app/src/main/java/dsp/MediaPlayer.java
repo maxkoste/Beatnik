@@ -87,6 +87,7 @@ public class MediaPlayer {
         }
     }
     
+    
     // plays the song from the MediaPlayer class
     public void playAudio() {
         if (!isPlaying) {
@@ -113,6 +114,13 @@ public class MediaPlayer {
         }
     }
     
+    public void setTreble(float trebleCutoff){
+        equalizer.setTrebleCutoff(trebleCutoff);
+    }
+
+    public void setBass(float bassCutoff){
+        equalizer.setBassCutoff(bassCutoff);
+    }
     // Set the effect mix between 0.0f and 1.0f, 0.0f is dry only, 1.0f is wet only
     // 0.5f is equal mix of dry and wet not implemented yet...
     public void setEffectMix(float mix) { // 0.0f to 1.0f
@@ -132,6 +140,7 @@ public class MediaPlayer {
         effectChain.setEffect(effect);
     }
     
+
     // Test method for equalizer
     public void testEqualizer() {
         try {

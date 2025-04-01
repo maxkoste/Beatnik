@@ -204,8 +204,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     CircularSlider channelOneBass = new CircularSlider(10, false);
     channelOneBass.valueProperty().addListener((observable, oldValue, newValue) -> {
-      double volume = newValue.doubleValue();
-      System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
+      float bassCutoff = newValue.floatValue();
+    
+      // Scale value from 0–270 to 0–8000
+      float bass = (bassCutoff / 270) * 8000;
+      controller.setBass(bass);
+      //Debugging
+      System.out.println("Bass Knob Ch 1: " + bass);
     });
     AnchorPane.setTopAnchor(channelOneBass, (screenHeight / 1.87));
     AnchorPane.setLeftAnchor(channelOneBass,(screenWidth / 3.275) -25);

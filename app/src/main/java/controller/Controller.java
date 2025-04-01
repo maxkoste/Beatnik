@@ -32,9 +32,15 @@ public class Controller {
 
     // plays the song from the MediaPlayer class
     public void playSong() {
-        //audioPlayer.playAudio();
-        //Test method
-        audioPlayer.testEqualizer();
+        audioPlayer.playAudio();
+    }
+
+    public void setTreble(float trebleCutoff){
+        audioPlayer.setTreble(trebleCutoff);
+    }
+    
+    public void setBass(float bassCutoff){
+        audioPlayer.setBass(bassCutoff);
     }
 
     public void setMasterVolume(float volume) {
