@@ -211,7 +211,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
       float bassCutoff = newValue.floatValue();
     
       // Scale value from 0–270 to 0–8000
-      float bass = (bassCutoff / 270) * 8000;
+      float bass = (bassCutoff / 270) * 100;
       controller.setBass(bass);
       //Debugging
       System.out.println("Bass Knob Ch 1: " + bass);
