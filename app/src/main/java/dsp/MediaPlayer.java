@@ -17,12 +17,16 @@ public class MediaPlayer {
     private String currentSongFilePath;
     private GainProcessor volumeProcessor;
     private EffectChain effectChain;
+    private Equalizer equalizer;
     private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
     private boolean isPlaying;
     private float currentTime;
+    
 
     public MediaPlayer() {
         effectChain = new EffectChain();
+        // Initialize equalizer with standard frequencies (100Hz for bass, 10kHz for treble)
+        equalizer = new Equalizer(44100,20000 , 0);
     }
 
     public void setUp() {
@@ -54,6 +58,9 @@ public class MediaPlayer {
             volumeProcessor = new GainProcessor(1.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
 
+            // Add equalizer processor
+            playbackDispatcher.addAudioProcessor(equalizer);
+            
             // Add effect chain processor
             playbackDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
@@ -123,5 +130,28 @@ public class MediaPlayer {
     
     public void setEffect(dsp.Effects.AudioEffect effect) {
         effectChain.setEffect(effect);
+    }
+    
+    // Test method for equalizer
+    public void testEqualizer() {
+        try {
+            // Set up a test song
+            //setSong("test.wav");
+            
+            // Start playing
+            playAudio();
+            
+            // Wait for 2 seconds
+            Thread.sleep(5000);
+            
+            // Test bass boost
+            System.out.println("Testing bass boost...");
+            equalizer.setBassCutoff(800);
+           
+            
+        } catch (InterruptedException e) {
+            System.err.println("Test interrupted: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

@@ -32,7 +32,9 @@ public class Controller {
 
     // plays the song from the MediaPlayer class
     public void playSong() {
-        audioPlayer.playAudio();
+        //audioPlayer.playAudio();
+        //Test method
+        audioPlayer.testEqualizer();
     }
 
     public void setMasterVolume(float volume) {
