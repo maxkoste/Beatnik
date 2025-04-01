@@ -18,6 +18,8 @@ public class MediaPlayer {
     private GainProcessor volumeProcessor;
     private EffectChain effectChain;
     private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
+    private boolean isPlaying;
+    private float currentTime;
 
     public MediaPlayer() {
         effectChain = new EffectChain();
@@ -39,7 +41,7 @@ public class MediaPlayer {
                 System.err.println("Error: Could not find audio file in resources!");
                 return;
             }
-            
+
             String filePath = new File(resourceUrl.toURI()).getAbsolutePath();
             System.out.println("Loading audio file from: " + filePath);
 
@@ -77,15 +79,23 @@ public class MediaPlayer {
             e.printStackTrace();
         }
     }
+
+    // plays the song from the MediaPlayer class
     public void playAudio() {
-        if (playbackDispatcher == null) {
-            System.err.println("Error could not play audio...");
-            return;
+        if (!isPlaying) {
+            setUp();
+            System.out.println("Playing..");
+            playbackDispatcher.skip(currentTime);
+            Thread audioThread = new Thread(playbackDispatcher, "Playback thread");
+            audioThread.setPriority(Thread.MAX_PRIORITY); // Give audio thread high priority
+            audioThread.start();
+            isPlaying = true;
+        } else {
+            isPlaying = !isPlaying;
+            System.out.println("Stopping..");
+            currentTime = playbackDispatcher.secondsProcessed();
+            playbackDispatcher.stop();
         }
-        System.out.println("Playing..");
-        Thread audioThread = new Thread(playbackDispatcher, "Audio Playback thread");
-        audioThread.setPriority(Thread.MAX_PRIORITY);  // Give audio thread high priority
-        audioThread.start();
     }
 
     public void setVolume(float volume) {
@@ -93,13 +103,13 @@ public class MediaPlayer {
             // Convert volume percentage (0-100) to gain multiplier (0.0-1.0)
             float gain = volume / 100.0f;
             volumeProcessor.setGain(gain);
-            System.out.println("Setting the volume to " + volume + " (gain: " + gain + ")");
         }
     }
-    
+
     // Set the effect mix between 0.0f and 1.0f, 0.0f is dry only, 1.0f is wet only
     // 0.5f is equal mix of dry and wet not implemented yet...
     public void setEffectMix(float mix) { // 0.0f to 1.0f
+        // TODO: Implement this
         this.effectMix = mix;
         if (gainProcessor != null) {
             gainProcessor.setGain(mix);
@@ -108,7 +118,6 @@ public class MediaPlayer {
 
     public void setSong(String filepath) {
         this.currentSongFilePath = filepath;
-        setUp();
         setVolume(100.0f); // Set initial volume to maximum
     }
 
