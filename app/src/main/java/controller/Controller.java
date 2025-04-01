@@ -58,6 +58,7 @@ public class Controller {
     public void setSong(int channel, String songName) {
         if (channel == 1) {
             audioPlayer.setSong(songName);
-        } else;
+        } else
+            ;
     }
 }
