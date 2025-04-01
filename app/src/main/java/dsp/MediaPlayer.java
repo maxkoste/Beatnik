@@ -86,15 +86,14 @@ public class MediaPlayer {
             e.printStackTrace();
         }
     }
-    
-    
+
     // plays the song from the MediaPlayer class
     public void playAudio() {
         if (!isPlaying) {
             setUp();
             System.out.println("Playing..");
             playbackDispatcher.skip(currentTime);
-            Thread audioThread = new Thread(playbackDispatcher, "Audio Playback Thread!");
+            Thread audioThread = new Thread(playbackDispatcher, "Playback thread");
             audioThread.setPriority(Thread.MAX_PRIORITY); // Give audio thread high priority
             audioThread.start();
             isPlaying = true;
@@ -105,7 +104,7 @@ public class MediaPlayer {
             playbackDispatcher.stop();
         }
     }
-    
+
     public void setVolume(float volume) {
         if (volumeProcessor != null) {
             // Convert volume percentage (0-100) to gain multiplier (0.0-1.0)
@@ -130,12 +129,12 @@ public class MediaPlayer {
             gainProcessor.setGain(mix);
         }
     }
-    
+
     public void setSong(String filepath) {
         this.currentSongFilePath = filepath;
         setVolume(100.0f); // Set initial volume to maximum
     }
-    
+
     public void setEffect(dsp.Effects.AudioEffect effect) {
         effectChain.setEffect(effect);
     }

@@ -14,10 +14,11 @@ public class CircularSlider extends Control {
   private DoubleProperty value;
 
   public CircularSlider(int tickCount, boolean snapToTick) {
-    setSkin(new CircularSliderSkin(this, tickCount, snapToTick));
-    setAngle(0.0);
+    setAngle(0); // Set twice because of bad design, give me a break
     setMin(0.0);
-    setMax(290.0);
+    setMax(270.0);
+    setAngle(135.0); // Could be made into a parameter to allow custom start position
+    setSkin(new CircularSliderSkin(this, tickCount, snapToTick));
   }
 
   public double getValue() {
