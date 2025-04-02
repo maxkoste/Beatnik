@@ -79,6 +79,7 @@ public class Controller {
         }
     }
 
+
     public void setChannelOneVolume(float volume) {
         audioPlayer1.setVolume((volume * masterModifier) * crossfaderModifier1);
         latestVolume1 = volume;
@@ -103,6 +104,18 @@ public class Controller {
         }
         setChannelOneVolume(latestVolume1);
         setChannelTwoVolume(latestVolume2);
+
+    public void setTreble(float trebleCutoff){
+        audioPlayer.setTreble(trebleCutoff);
+    }
+    
+    public void setBass(float bassCutoff){
+        audioPlayer.setBass(bassCutoff);
+    }
+
+    public void setMasterVolume(float volume) {
+        audioPlayer.setVolume(volume);
+
     }
 
     public void moveFile(File sourceFile, String destinationPath) throws IOException {
