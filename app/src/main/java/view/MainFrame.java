@@ -28,6 +28,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.List;
+
+import dsp.WaveForm;
+
 
 public class MainFrame implements EventHandler<ActionEvent> {
   AnchorPane primaryPane;
@@ -403,6 +407,16 @@ public class MainFrame implements EventHandler<ActionEvent> {
     if(mouseEvent.getClickCount() == 2) {
       controller.setSong(1, songSelector.getSelectedItem()); // set only to channel 1 for now
       channelOneContainer.setText("Song loaded: " + songSelector.getSelectedItem()); // TODO: Replace with spectral analyzer
+
+      String selectedSong = playlistManager.getSongsGUI().get(songSelector.getSelectedIndex());
+
+      primaryPane.getChildren().removeIf(node -> node instanceof WaveFormCanvas);
+
+      List<Float> waveformSamples = WaveForm.extract(selectedSong);
+      WaveFormCanvas waveform = new WaveFormCanvas(waveformSamples, screenWidth / 2, 75);
+      AnchorPane.setTopAnchor(waveform, 75.0);
+      AnchorPane.setLeftAnchor(waveform, (screenWidth - waveform.getWidth()) / 2);
+      primaryPane.getChildren().add(waveform);
     }
   }
 
