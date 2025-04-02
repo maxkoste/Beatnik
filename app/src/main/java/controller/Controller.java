@@ -16,8 +16,9 @@ public class Controller {
     MediaPlayer audioPlayer2;
     MainFrame frame;
     PlaylistManager playlistManager;
+    String currentSong;
     ObservableList<String> playlistSongPaths; //TODO: Find way of alerting Controller when a song has naturally finished playing
-    int currentSongInPlaylist;
+    int currentPosInPlaylist;
     float masterModifier = 0.5F;
     float crossfaderModifier1 = 1.0F;
     float crossfaderModifier2 = 1.0F;
@@ -39,19 +40,20 @@ public class Controller {
         playlistManager.loadPlaylistData();
     }
 
-    public void setSong(int channel, String songName) {
+    public void setSong(int channel, String songPath) {
         if (channel == 1) {
-            audioPlayer1.setSong(songName);
+            audioPlayer1.setSong(songPath);
         } else {
-            audioPlayer2.setSong(songName);
+            audioPlayer2.setSong(songPath);
         }
         playSong(channel);
+        currentSong = songPath;
     }
 
     public void startPlaylist(int channel, int selectedIndex, ObservableList<String> songPaths) {
         playlistSongPaths = songPaths; //TODO: Make into a queue or smth? Might not be needed.
-        currentSongInPlaylist = selectedIndex;
-        setSong(channel, playlistSongPaths.get(currentSongInPlaylist));
+        currentPosInPlaylist = selectedIndex;
+        setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
     }
 
     // plays the song from the MediaPlayer class
@@ -67,9 +69,9 @@ public class Controller {
 
     public void nextSong(int channel) { //TODO: Update GUI with Waveforms and names etc
         if (playlistSongPaths != null) {
-            if (!(currentSongInPlaylist >= playlistSongPaths.size() - 1)) {
-                currentSongInPlaylist++;
-                setSong(channel, playlistSongPaths.get(currentSongInPlaylist));
+            if (!(currentPosInPlaylist >= playlistSongPaths.size() - 1)) {
+                currentPosInPlaylist++;
+                setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
             } else {
                 frame.userMessage(Alert.AlertType.INFORMATION, "Playlist Finished, Skip now Random");
                 playlistSongPaths = null;
@@ -106,12 +108,20 @@ public class Controller {
         setChannelTwoVolume(latestVolume2);
     }
 
-    public void setTreble(float trebleCutoff){
-        //audioPlayer.setTreble(trebleCutoff);
+    public void setTreble1(float trebleCutoff){
+        audioPlayer1.setTreble(trebleCutoff);
+    }
+
+    public void setTreble2(float trebleCutoff){
+        audioPlayer2.setTreble(trebleCutoff);
     }
     
-    public void setBass(float bassCutoff){
-        //audioPlayer.setBass(bassCutoff);
+    public void setBass1(float bassCutoff){
+        audioPlayer1.setBass(bassCutoff);
+    }
+
+    public void setBass2(float bassCutoff){
+        audioPlayer2.setBass(bassCutoff);
     }
 
     public void moveFile(File sourceFile, String destinationPath) throws IOException {
@@ -122,5 +132,9 @@ public class Controller {
         Files.copy(sourceFile.toPath(), desinationFile.toPath());
         playlistManager.getSongsGUI().add(desinationFile.getName());
         System.out.println("File moved into the songsGUI folder");
+    }
+
+    public String getCurrentSong() {
+        return currentSong;
     }
 }

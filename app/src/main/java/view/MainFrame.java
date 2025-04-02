@@ -224,11 +224,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
     CircularSlider channelOneBass = new CircularSlider(9, false);
     channelOneBass.valueProperty().addListener((observable, oldValue, newValue) -> {
       float bassCutoff = newValue.floatValue();
-    
       // Scale value from 0–270 to 0–8000
       float bass = (bassCutoff / 270) * 8000;
-      controller.setBass(bass);
-      //Debugging
+      controller.setBass1(bass);
       System.out.println("Bass Knob Ch 1: " + bass);
     });
     AnchorPane.setTopAnchor(channelOneBass, (screenHeight / 1.87));
@@ -236,8 +234,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     CircularSlider channelTwoBass = new CircularSlider(9, false);
     channelTwoBass.valueProperty().addListener((observable, oldValue, newValue) -> {
-      double volume = newValue.doubleValue();
-      System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
+      float bassCutoff = newValue.floatValue();
+      // Scale value from 0–270 to 0–8000
+      float bass = (bassCutoff / 270) * 8000;
+      controller.setBass2(bass);
+      System.out.println("Bass Knob Ch 2: " + bass);
     });
     AnchorPane.setTopAnchor(channelTwoBass, (screenHeight / 1.87));
     AnchorPane.setLeftAnchor(channelTwoBass, (screenWidth / 1.442) - 25);
@@ -412,17 +413,19 @@ public class MainFrame implements EventHandler<ActionEvent> {
   public void handle(ActionEvent actionEvent) {
     playlistStage.showAndWait();
   }
-
+  //TODO: Redo Waveform-creation to be initialized in Zone 2, allow it to be blank when no song is active.
+  //TODO: Place Waveform in a separate pane like SplitPane which is then attached with anchorPane.
+  //TODO: Make Waveform instance variable so that it can be cleared without instanceof.
   public void handleSongSelection(MouseEvent mouseEvent) {
     if(mouseEvent.getClickCount() == 2) {
       if (channelOneActive) {
-        controller.setSong(1, songSelector.getSelectedItem());
-        channelOneContainer.setText("Song loaded: " + songSelector.getSelectedItem()); // TODO: Replace with spectral analyzer
-        String selectedSong = playlistManager.getSongsGUI().get(songSelector.getSelectedIndex());
+        String currentSong = songSelector.getSelectedItem();
+        controller.setSong(1, currentSong);
+        channelOneContainer.setText("Song loaded: " + currentSong); // TODO: Replace with song/playlist info-label
 
         primaryPane.getChildren().removeIf(node -> node instanceof WaveFormCanvas);
 
-        List<Float> waveformSamples = WaveForm.extract(selectedSong);
+        List<Float> waveformSamples = WaveForm.extract(currentSong);
         WaveFormCanvas waveform = new WaveFormCanvas(waveformSamples, screenWidth / 2, 75);
         AnchorPane.setTopAnchor(waveform, 75.0);
         AnchorPane.setLeftAnchor(waveform, (screenWidth - waveform.getWidth()) / 2);

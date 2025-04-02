@@ -34,7 +34,6 @@ public class PlaylistManager {
       }
     } catch (IOException e) {
       throw new RuntimeException(e);
-
     }
   }
 
@@ -86,18 +85,6 @@ public class PlaylistManager {
             }
         }
     }
-
-    /*
-    public void updatePlaylistGUI() {
-        playlistsGUI.clear(); // TODO: Maybe better way of keeping a playlist "clean"
-        playlistsGUI.add("New Playlist");
-        for (int i = 0; i < playlists.size(); i++) {
-            System.out.println(playlists.get(i).getName());
-            playlistsGUI.add(playlists.get(i).getName());
-        }
-    }
-
-     */
 
     public void createNewPlaylist(String name, ObservableList<Integer> songIndices) {
         HashSet<String> songPaths = new HashSet<>();
