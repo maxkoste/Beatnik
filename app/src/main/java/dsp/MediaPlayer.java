@@ -17,10 +17,16 @@ public class MediaPlayer {
     private String currentSongFilePath;
     private GainProcessor volumeProcessor;
     private EffectChain effectChain;
+    private Equalizer equalizer;
     private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
+    private boolean isPlaying;
+    private float currentTime;
+    
 
     public MediaPlayer() {
         effectChain = new EffectChain();
+        // Initialize equalizer with standard frequencies (100Hz for bass, 10kHz for treble)
+        equalizer = new Equalizer(44100,20000 , 0);
     }
 
     public void setUp() {
@@ -39,7 +45,7 @@ public class MediaPlayer {
                 System.err.println("Error: Could not find audio file in resources!");
                 return;
             }
-            
+
             String filePath = new File(resourceUrl.toURI()).getAbsolutePath();
             System.out.println("Loading audio file from: " + filePath);
 
@@ -49,9 +55,13 @@ public class MediaPlayer {
             System.out.println("Audio format: " + format.toString());
 
             // Add volume control first - set initial volume to 1.0 (100%)
+            // TODO: Should this be done here? Initial volume being so high seems risky.
             volumeProcessor = new GainProcessor(1.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
 
+            // Add equalizer processor
+            playbackDispatcher.addAudioProcessor(equalizer);
+            
             // Add effect chain processor
             playbackDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
@@ -77,15 +87,23 @@ public class MediaPlayer {
             e.printStackTrace();
         }
     }
+
+    // plays the song from the MediaPlayer class
     public void playAudio() {
-        if (playbackDispatcher == null) {
-            System.err.println("Error could not play audio...");
-            return;
+        if (!isPlaying) {
+            setUp();
+            System.out.println("Playing..");
+            playbackDispatcher.skip(currentTime);
+            Thread audioThread = new Thread(playbackDispatcher, "Playback thread");
+            audioThread.setPriority(Thread.MAX_PRIORITY); // Give audio thread high priority
+            audioThread.start();
+            isPlaying = true;
+        } else {
+            isPlaying = !isPlaying;
+            System.out.println("Stopping..");
+            currentTime = playbackDispatcher.secondsProcessed();
+            playbackDispatcher.stop();
         }
-        System.out.println("Playing..");
-        Thread audioThread = new Thread(playbackDispatcher, "Audio Playback thread");
-        audioThread.setPriority(Thread.MAX_PRIORITY);  // Give audio thread high priority
-        audioThread.start();
     }
 
     public void setVolume(float volume) {
@@ -93,13 +111,20 @@ public class MediaPlayer {
             // Convert volume percentage (0-100) to gain multiplier (0.0-1.0)
             float gain = volume / 100.0f;
             volumeProcessor.setGain(gain);
-            System.out.println("Setting the volume to " + volume + " (gain: " + gain + ")");
         }
     }
     
+    public void setTreble(float trebleCutoff){
+        equalizer.setTrebleCutoff(trebleCutoff);
+    }
+
+    public void setBass(float bassCutoff){
+        equalizer.setBassCutoff(bassCutoff);
+    }
     // Set the effect mix between 0.0f and 1.0f, 0.0f is dry only, 1.0f is wet only
     // 0.5f is equal mix of dry and wet not implemented yet...
     public void setEffectMix(float mix) { // 0.0f to 1.0f
+        // TODO: Implement this
         this.effectMix = mix;
         if (gainProcessor != null) {
             gainProcessor.setGain(mix);
@@ -107,12 +132,37 @@ public class MediaPlayer {
     }
 
     public void setSong(String filepath) {
+        this.isPlaying = false;
         this.currentSongFilePath = filepath;
-        setUp();
-        setVolume(100.0f); // Set initial volume to maximum
+        this.currentTime = 0;
+        //setVolume(100.0f); // Set initial volume to maximum
     }
 
     public void setEffect(dsp.Effects.AudioEffect effect) {
         effectChain.setEffect(effect);
+    }
+    
+
+    // Test method for equalizer
+    public void testEqualizer() {
+        try {
+            // Set up a test song
+            //setSong("test.wav");
+            
+            // Start playing
+            playAudio();
+            
+            // Wait for 2 seconds
+            Thread.sleep(5000);
+            
+            // Test bass boost
+            System.out.println("Testing bass boost...");
+            equalizer.setBassCutoff(800);
+           
+            
+        } catch (InterruptedException e) {
+            System.err.println("Test interrupted: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
