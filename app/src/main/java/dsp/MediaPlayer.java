@@ -51,6 +51,7 @@ public class MediaPlayer {
             System.out.println("Audio format: " + format.toString());
 
             // Add volume control first - set initial volume to 1.0 (100%)
+            // TODO: Should this be done here? Initial volume being so high seems risky.
             volumeProcessor = new GainProcessor(1.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
 
@@ -117,7 +118,9 @@ public class MediaPlayer {
     }
 
     public void setSong(String filepath) {
+        this.isPlaying = false;
         this.currentSongFilePath = filepath;
+        this.currentTime = 0;
         //setVolume(100.0f); // Set initial volume to maximum
     }
 

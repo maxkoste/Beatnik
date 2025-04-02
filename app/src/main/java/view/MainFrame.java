@@ -42,7 +42,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
   PlaylistManager playlistManager;
   TextArea channelOneContainer;
   TextArea channelTwoContainer;
-  Button switchChannel;
+  Button switchChannelOne;
+  Button switchChannelTwo;
   double screenHeight;
   double screenWidth;
 
@@ -127,28 +128,28 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setLeftAnchor(channelTwoContainer, (((screenWidth / 2)) - ((screenWidth / 2) / 2)));
 
     Button channelOnePlayPause = new Button();
-    channelOnePlayPause.setPrefSize(26.0, 75.0);
+    channelOnePlayPause.setPrefSize(30.0, 75.0);
     channelOnePlayPause.setText("⏯");
     channelOnePlayPause.setOnAction(this::handleChannelOnePlayPause);
     AnchorPane.setTopAnchor(channelOnePlayPause, 75.0);
-    AnchorPane.setLeftAnchor(channelOnePlayPause, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 26));
+    AnchorPane.setLeftAnchor(channelOnePlayPause, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
 
     Button channelTwoPlayPause = new Button();
-    channelTwoPlayPause.setPrefSize(26.0, 75.0);
+    channelTwoPlayPause.setPrefSize(30.0, 75.0);
     channelTwoPlayPause.setText("⏯");
     channelTwoPlayPause.setOnAction(this::handleChannelTwoPlayPause);
     AnchorPane.setTopAnchor(channelTwoPlayPause, 150.0);
-    AnchorPane.setLeftAnchor(channelTwoPlayPause, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 26));
+    AnchorPane.setLeftAnchor(channelTwoPlayPause, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
 
     Button channelOneSkip = new Button();
-    channelOneSkip.setPrefSize(26.0, 75.0);
+    channelOneSkip.setPrefSize(30.0, 75.0);
     channelOneSkip.setText("⏭");
     channelOneSkip.setOnAction(this::handleChannelOneSkip);
     AnchorPane.setTopAnchor(channelOneSkip, 75.0);
     AnchorPane.setLeftAnchor(channelOneSkip, ((((screenWidth / 2)) + ((screenWidth / 2) / 2))));
 
     Button channelTwoSkip = new Button();
-    channelTwoSkip.setPrefSize(26.0, 75.0);
+    channelTwoSkip.setPrefSize(30.0, 75.0);
     channelTwoSkip.setText("⏭");
     channelTwoSkip.setOnAction(this::handleChannelTwoSkip);
     AnchorPane.setTopAnchor(channelTwoSkip, 150.0);
@@ -352,11 +353,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
     playlistSelector = playlistBox.getSelectionModel();
     selectPlaylistIndex(0);
 
-    switchChannel = new Button();
-    switchChannel.setText("1");
-    switchChannel.setOnAction(this::handleChannelSwitch);
+    switchChannelOne = new Button();
+    switchChannelOne.setText("1");
+    switchChannelOne.setOnAction(this::handleChannelSwitch);
 
-    ToolBar songsMenu = new ToolBar(importSongs, viewPlaylist, addToPlaylist, playlistBox, switchChannel);
+    ToolBar songsMenu = new ToolBar(importSongs, viewPlaylist, addToPlaylist, playlistBox, switchChannelOne);
     songsPane.setTop(songsMenu);
   }
 
@@ -374,6 +375,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     playlistsPane.setBottom(infoLabel);
 
     Button viewSongs = new Button();
+    viewSongs.setPrefSize(90, 10);
     viewSongs.setText("View Songs");
     viewSongs.setOnAction(this::handleViewSongs);
 
@@ -389,12 +391,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
     deletePlaylist.setText("Delete Playlist");
     deletePlaylist.setOnAction(this::handleDeletePlaylist);
 
-    Button playPlaylist = new Button();
-    playPlaylist.setPrefSize(35, 10);
-    playPlaylist.setText("⏯");
-    playPlaylist.setOnAction(this::handlePlayPlaylist);
+    switchChannelTwo = new Button();
+    switchChannelTwo.setText("1");
+    switchChannelTwo.setOnAction(this::handleChannelSwitch);
 
-    ToolBar playlistMenu = new ToolBar(viewSongs, editName, removeSongsFromPlaylist, deletePlaylist, playPlaylist);
+    ToolBar playlistMenu = new ToolBar(viewSongs, editName, removeSongsFromPlaylist, deletePlaylist, switchChannelTwo);
     playlistsPane.setTop(playlistMenu);
   }
 
@@ -459,12 +460,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
   public void handleRemoveSongsFromPlaylist(ActionEvent actionEvent) {
     playlistManager.removeSongsFromPlaylist(playlistStage.getTitle(), playlistSongSelector.getSelectedItems());
-    currentPlaylist.setItems(playlistManager.getPlaylistSongs(playlistStage.getTitle()));
+    currentPlaylist.getItems().removeAll(playlistSongSelector.getSelectedItem());
     playlistManager.savePlaylistData();
-  }
-
-  public void handlePlayPlaylist(ActionEvent actionEvent) {
-
   }
 
   public void handleAddToPlaylist(ActionEvent actionEvent) {
@@ -476,17 +473,24 @@ public class MainFrame implements EventHandler<ActionEvent> {
   public void handleChannelSwitch(ActionEvent actionEvent) {
     if (channelOneActive) {
       channelOneActive = false;
-      switchChannel.setText("2");
+      switchChannelOne.setText("2");
+      switchChannelTwo.setText("2");
     } else {
       channelOneActive = true;
-      switchChannel.setText("1");
+      switchChannelOne.setText("1");
+      switchChannelTwo.setText("1");
     }
   }
 
   public void handlePlaylistSongSelection(MouseEvent mouseEvent) {
     if(mouseEvent.getClickCount() == 2) {
-      controller.setSong(1, playlistSongSelector.getSelectedItem()); // set only to channel 1 for now
-      channelOneContainer.setText("Song loaded: " + playlistSongSelector.getSelectedItem()); // TODO: Replace with spectral analyzer
+      if (channelOneActive) {
+        controller.startPlaylist(1, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
+        channelOneContainer.setText("Song loaded: " + playlistSongSelector.getSelectedItem()); // TODO: Replace with spectral analyzer
+      } else {
+        controller.startPlaylist(2, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
+        channelTwoContainer.setText("Song loaded: " + playlistSongSelector.getSelectedItem()); // TODO: Replace with spectral analyzer
+      }
     }
   }
 
@@ -499,11 +503,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
   }
 
   public void handleChannelOneSkip(ActionEvent actionEvent) {
-
+    controller.nextSong(1);
   }
 
   public void handleChannelTwoSkip(ActionEvent actionEvent) {
-
+    controller.nextSong(2);
   }
 
   public String promptUserInput(String title, String headerText) {

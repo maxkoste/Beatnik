@@ -1,5 +1,7 @@
 package controller;
 
+import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import view.MainFrame;
 
@@ -14,6 +16,8 @@ public class Controller {
     MediaPlayer audioPlayer2;
     MainFrame frame;
     PlaylistManager playlistManager;
+    ObservableList<String> playlistSongPaths; //TODO: Find way of alerting Controller when a song has naturally finished playing
+    int currentSongInPlaylist;
     float masterModifier = 0.5F;
     float crossfaderModifier1 = 1.0F;
     float crossfaderModifier2 = 1.0F;
@@ -41,6 +45,13 @@ public class Controller {
         } else {
             audioPlayer2.setSong(songName);
         }
+        playSong(channel);
+    }
+
+    public void startPlaylist(int channel, int selectedIndex, ObservableList<String> songPaths) {
+        playlistSongPaths = songPaths; //TODO: Make into a queue or smth? Might not be needed.
+        currentSongInPlaylist = selectedIndex;
+        setSong(channel, playlistSongPaths.get(currentSongInPlaylist));
     }
 
     // plays the song from the MediaPlayer class
@@ -51,6 +62,20 @@ public class Controller {
         } else {
             audioPlayer2.playAudio();
             setChannelTwoVolume(latestVolume2);
+        }
+    }
+
+    public void nextSong(int channel) { //TODO: Update GUI with Waveforms and names etc
+        if (playlistSongPaths != null) {
+            if (!(currentSongInPlaylist >= playlistSongPaths.size() - 1)) {
+                currentSongInPlaylist++;
+                setSong(channel, playlistSongPaths.get(currentSongInPlaylist));
+            } else {
+                frame.userMessage(Alert.AlertType.INFORMATION, "Playlist Finished, Skip now Random");
+                playlistSongPaths = null;
+            }
+        } else {
+            setSong(channel, playlistManager.randomSong());
         }
     }
 

@@ -7,14 +7,17 @@ import model.Playlist;
 import view.MainFrame;
 
 import java.io.*;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Random;
 
 public class PlaylistManager {
   ObservableList<String> songsGUI = FXCollections.observableArrayList();
   ObservableList<String> playlistsGUI = FXCollections.observableArrayList();
   ArrayList<Playlist> playlists = new ArrayList<>();
   File dataDestinationFile;
+  Random randomSongPicker = new Random();
   MainFrame frame;
 
   public PlaylistManager(MainFrame frame) {
@@ -154,6 +157,11 @@ public class PlaylistManager {
     for (int j = 0; j < selectedItems.size(); j++) {
       playlist.removeSong(selectedItems.get(j));
     }
+  }
+
+  public String randomSong() {
+    System.out.println(songsGUI.size());
+    return songsGUI.get(randomSongPicker.nextInt(0, songsGUI.size()));
   }
 
   public ObservableList<String> getSongsGUI() {

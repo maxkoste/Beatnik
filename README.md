@@ -18,7 +18,7 @@ Welcome to **Beatnik**, your next-generation DJ software for seamless mixing, be
    git clone https://github.com/maxkoste/Beatnik.git
    ```
 
-## Running the Application with Gradle
+## Running the Application with Gradle (Terminal)
 1. Navigate to the project directory:
    ```sh
    cd /path/to/your/project
@@ -38,4 +38,24 @@ Welcome to **Beatnik**, your next-generation DJ software for seamless mixing, be
    ./gradlew run  # On macOS/Linux
    gradlew.bat run # On Windows
    ```
+## Running the Application with Gradle (IntelliJ)
+1. Open the project in IntelliJ.
+2. Press the Gradle tab on the right of the program and ensure Gradle tasks have loaded (Gradle should be installed and enabled by default).
+3. Press the drop-down menu by the "run" button, and select "Edit Configurations...".
+4. Press the "+" symbol to add a new Gradle configuration, and enter the following into the run section:
+```
+   app:build run
+   ```
+5. Press the "ok" button and launch the application.
 
+## Could not run Application (Windows)
+The **TarsosDSP** dependency automatically ensures a required file called **FFMPEG** is downloaded on your computer, however, 
+some Windows users have settings which prevent this from occurring properly. To remedy this issue, follow this guide;
+1. Download and extract the latest **FFMPEG** file for your version of Windows from this website:
+   ```
+   https://www.gyan.dev/ffmpeg/builds/
+   ```
+2. Search for System Environment Variables or Path in your Windows search bar to find the "Edit the system environment variables" page in your control panel.
+3. Navigate to the "advanced" tab and press "Environment Variables" at the bottom.
+4. Open the Path variable and add a new Path that leads to the FFMPEG's bin folder.
+5. Your program should now run properly!
