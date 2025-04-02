@@ -104,18 +104,14 @@ public class Controller {
         }
         setChannelOneVolume(latestVolume1);
         setChannelTwoVolume(latestVolume2);
+    }
 
     public void setTreble(float trebleCutoff){
-        audioPlayer.setTreble(trebleCutoff);
+        //audioPlayer.setTreble(trebleCutoff);
     }
     
     public void setBass(float bassCutoff){
-        audioPlayer.setBass(bassCutoff);
-    }
-
-    public void setMasterVolume(float volume) {
-        audioPlayer.setVolume(volume);
-
+        //audioPlayer.setBass(bassCutoff);
     }
 
     public void moveFile(File sourceFile, String destinationPath) throws IOException {

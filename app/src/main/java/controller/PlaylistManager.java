@@ -7,7 +7,6 @@ import model.Playlist;
 import view.MainFrame;
 
 import java.io.*;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
@@ -76,7 +75,8 @@ public class PlaylistManager {
     playlistsGUI.add("New Playlist");
     for (int i = 0; i < playlists.size(); i++) {
       playlistsGUI.add(playlists.get(i).getName());
-=======
+    }
+  }
 
     public void addSongsFromResources() {
         File[] files = new File("src/main/resources/songs/").getAbsoluteFile().listFiles();
@@ -87,14 +87,7 @@ public class PlaylistManager {
         }
     }
 
-    public ObservableList<String> getPlaylistSongs(String name) {
-        Playlist playlist = findPlaylist(name);
-        ObservableList<String> songs = FXCollections.observableArrayList();
-        HashSet<String> songPaths = playlist.getSongPaths();
-        songs.addAll(songPaths);
-        return songs;
-    }
-
+    /*
     public void updatePlaylistGUI() {
         playlistsGUI.clear(); // TODO: Maybe better way of keeping a playlist "clean"
         playlistsGUI.add("New Playlist");
@@ -103,6 +96,8 @@ public class PlaylistManager {
             playlistsGUI.add(playlists.get(i).getName());
         }
     }
+
+     */
 
     public void createNewPlaylist(String name, ObservableList<Integer> songIndices) {
         HashSet<String> songPaths = new HashSet<>();
@@ -159,14 +154,10 @@ public class PlaylistManager {
     }
 
 
-  public String randomSong() {
-    System.out.println(songsGUI.size());
-    return songsGUI.get(randomSongPicker.nextInt(0, songsGUI.size()));
-  }
-
-  public ObservableList<String> getSongsGUI() {
-    return songsGUI;
-  }
+    public String randomSong() {
+      System.out.println(songsGUI.size());
+      return songsGUI.get(randomSongPicker.nextInt(0, songsGUI.size()));
+    }
 
     public void deletePlaylist(String playlistName) { // TODO: Remove from .dat
         if (frame.userConfirm("Are you sure you want to delete " + playlistName + "?")) {
@@ -181,9 +172,7 @@ public class PlaylistManager {
         }
     }
 
-    public void removeSongsFromPlaylist(String playlistName, ObservableList<String> selectedItems) { // TODO: Playlist
-                                                                                                     // finder method
-                                                                                                     // for code-reuse
+    public void removeSongsFromPlaylist(String playlistName, ObservableList<String> selectedItems) { // Playlist finder method for code-reuse
         Playlist playlist = findPlaylist(playlistName);
         for (int j = 0; j < selectedItems.size(); j++) {
             playlist.removeSong(selectedItems.get(j));
