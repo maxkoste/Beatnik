@@ -9,32 +9,74 @@ import view.MainFrame;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Random;
 
 public class PlaylistManager {
-    ObservableList<String> songsGUI = FXCollections.observableArrayList();
-    ObservableList<String> playlistsGUI = FXCollections.observableArrayList();
-    ArrayList<Playlist> playlists = new ArrayList<>();
-    File dataDestinationFile;
-    MainFrame frame;
 
-    public PlaylistManager(MainFrame frame) {
-        this.frame = frame;
-        dataDestinationFile = new File("src/main/resources/data.dat").getAbsoluteFile();
-    }
+  ObservableList<String> songsGUI = FXCollections.observableArrayList();
+  ObservableList<String> playlistsGUI = FXCollections.observableArrayList();
+  ArrayList<Playlist> playlists = new ArrayList<>();
+  File dataDestinationFile;
+  Random randomSongPicker = new Random();
+  MainFrame frame;
 
-    public void savePlaylistData() { // TODO: Maybe redo to only save relevant playlist. Downside = find way to not
-                                     // overwrite file on new call.
-        try (FileOutputStream fos = new FileOutputStream(dataDestinationFile);
-                BufferedOutputStream bos = new BufferedOutputStream(fos);
-                ObjectOutputStream oos = new ObjectOutputStream(bos)) {
-            oos.writeInt(playlists.size());
-            for (int i = 0; i < playlists.size(); i++) {
-                oos.writeObject(playlists.get(i));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+  public PlaylistManager(MainFrame frame) {
+    this.frame = frame;
+    dataDestinationFile = new File("src/main/resources/data.dat").getAbsoluteFile();
+  }
+
+  public void savePlaylistData() { //TODO: Maybe redo to only save relevant playlist. Downside = find way to not overwrite file on new call.
+    try (FileOutputStream fos = new FileOutputStream(dataDestinationFile);
+         BufferedOutputStream bos = new BufferedOutputStream(fos); ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+      oos.writeInt(playlists.size());
+      for (int i = 0; i < playlists.size(); i++) {
+        oos.writeObject(playlists.get(i));
+      }
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+
     }
+  }
+
+  public void loadPlaylistData() { // TODO: Exception handling
+    try (FileInputStream fis = new FileInputStream(dataDestinationFile);
+         BufferedInputStream bis = new BufferedInputStream(fis); ObjectInputStream ois = new ObjectInputStream(bis)) {
+
+      int playlistAmount = ois.readInt();
+      for (int i = 0; i < playlistAmount; i++) {
+        playlists.add((Playlist) ois.readObject());
+      }
+    } catch (IOException | ClassNotFoundException e) {
+      System.out.println("No Playlists Found or data.dat file Corrupted");
+    }
+    updatePlaylistGUI();
+    frame.selectPlaylistIndex(0);
+  }
+
+  public Playlist findPlaylist(String playlistName) { //UTILITY
+    for (int i = 0; i < playlists.size(); i++) {
+      if (playlists.get(i).getName().equals(playlistName)) {
+        return playlists.get(i);
+      }
+    }
+    return null;
+  }
+
+  public ObservableList<String> getPlaylistSongs(String name) {
+    Playlist playlist = findPlaylist(name);
+    ObservableList<String> songs = FXCollections.observableArrayList();
+    HashSet<String> songPaths = playlist.getSongPaths();
+    songs.addAll(songPaths);
+    return songs;
+  }
+
+  public void updatePlaylistGUI() {
+    playlistsGUI.clear(); //TODO: Maybe better way of keeping a playlist "clean"
+    playlistsGUI.add("New Playlist");
+    for (int i = 0; i < playlists.size(); i++) {
+      playlistsGUI.add(playlists.get(i).getName());
+    }
+  }
 
     public void addSongsFromResources() {
         File[] files = new File("src/main/resources/songs/").getAbsoluteFile().listFiles();
@@ -45,39 +87,7 @@ public class PlaylistManager {
         }
     }
 
-    public void loadPlaylistData() { // TODO: Exception handling
-        System.out.println(dataDestinationFile);
-        try (FileInputStream fis = new FileInputStream(dataDestinationFile);
-                BufferedInputStream bis = new BufferedInputStream(fis);
-                ObjectInputStream ois = new ObjectInputStream(bis)) {
-
-            int playlistAmount = ois.readInt();
-            for (int i = 0; i < playlistAmount; i++) {
-                playlists.add((Playlist) ois.readObject());
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("No Playlists Found or data.dat file Corrupted");
-        }
-        updatePlaylistGUI();
-    }
-
-    public Playlist findPlaylist(String playlistName) { // UTILITY
-        for (int i = 0; i < playlists.size(); i++) {
-            if (playlists.get(i).getName().equals(playlistName)) {
-                return playlists.get(i);
-            }
-        }
-        return null;
-    }
-
-    public ObservableList<String> getPlaylistSongs(String name) {
-        Playlist playlist = findPlaylist(name);
-        ObservableList<String> songs = FXCollections.observableArrayList();
-        HashSet<String> songPaths = playlist.getSongPaths();
-        songs.addAll(songPaths);
-        return songs;
-    }
-
+    /*
     public void updatePlaylistGUI() {
         playlistsGUI.clear(); // TODO: Maybe better way of keeping a playlist "clean"
         playlistsGUI.add("New Playlist");
@@ -86,6 +96,8 @@ public class PlaylistManager {
             playlistsGUI.add(playlists.get(i).getName());
         }
     }
+
+     */
 
     public void createNewPlaylist(String name, ObservableList<Integer> songIndices) {
         HashSet<String> songPaths = new HashSet<>();
@@ -141,6 +153,12 @@ public class PlaylistManager {
         return playlistName;
     }
 
+
+    public String randomSong() {
+      System.out.println(songsGUI.size());
+      return songsGUI.get(randomSongPicker.nextInt(0, songsGUI.size()));
+    }
+
     public void deletePlaylist(String playlistName) { // TODO: Remove from .dat
         if (frame.userConfirm("Are you sure you want to delete " + playlistName + "?")) {
             for (int i = 0; i < playlists.size(); i++) {
@@ -154,9 +172,7 @@ public class PlaylistManager {
         }
     }
 
-    public void removeSongsFromPlaylist(String playlistName, ObservableList<String> selectedItems) { // TODO: Playlist
-                                                                                                     // finder method
-                                                                                                     // for code-reuse
+    public void removeSongsFromPlaylist(String playlistName, ObservableList<String> selectedItems) { // Playlist finder method for code-reuse
         Playlist playlist = findPlaylist(playlistName);
         for (int j = 0; j < selectedItems.size(); j++) {
             playlist.removeSong(selectedItems.get(j));
