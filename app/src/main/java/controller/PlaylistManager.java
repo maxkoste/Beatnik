@@ -44,7 +44,6 @@ public class PlaylistManager {
   }
 
   public void loadPlaylistData() { // TODO: Exception handling
-    System.out.println(dataDestinationFile);
     try (FileInputStream fis = new FileInputStream(dataDestinationFile);
          BufferedInputStream bis = new BufferedInputStream(fis); ObjectInputStream ois = new ObjectInputStream(bis)) {
 
@@ -56,6 +55,7 @@ public class PlaylistManager {
       System.out.println("No Playlists Found or data.dat file Corrupted");
     }
     updatePlaylistGUI();
+    frame.selectPlaylistIndex(0);
   }
 
   public Playlist findPlaylist(String playlistName) { //UTILITY
@@ -79,7 +79,6 @@ public class PlaylistManager {
     playlistsGUI.clear(); //TODO: Maybe better way of keeping a playlist "clean"
     playlistsGUI.add("New Playlist");
     for (int i = 0; i < playlists.size(); i++) {
-      System.out.println(playlists.get(i).getName());
       playlistsGUI.add(playlists.get(i).getName());
     }
   }

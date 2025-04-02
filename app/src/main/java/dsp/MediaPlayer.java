@@ -118,7 +118,7 @@ public class MediaPlayer {
 
     public void setSong(String filepath) {
         this.currentSongFilePath = filepath;
-        setVolume(100.0f); // Set initial volume to maximum
+        //setVolume(100.0f); // Set initial volume to maximum
     }
 
     public void setEffect(dsp.Effects.AudioEffect effect) {
