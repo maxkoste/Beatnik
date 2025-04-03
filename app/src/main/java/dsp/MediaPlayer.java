@@ -50,8 +50,8 @@ public class MediaPlayer {
             String filePath = new File(resourceUrl.toURI()).getAbsolutePath();
             System.out.println("Loading audio file from: " + filePath);
 
-            bassEqualizer.setFilePath(filePath);
-            trebleEqualizer.setFilePath(filePath);
+            // bassEqualizer.setFilePath(filePath);
+            // trebleEqualizer.setFilePath(filePath);
             
             // Use AudioDispatcherFactory with the actual file path
             playbackDispatcher = AudioDispatcherFactory.fromPipe(filePath, 44100, 4096, 0);
