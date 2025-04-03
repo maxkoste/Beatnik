@@ -44,6 +44,17 @@ public class Equalizer implements AudioProcessor {
 
     @Override
     public boolean process(AudioEvent audioEvent) {
+        //Try this with the gain because then i know that i can manually tinker with the audio-buffer
+        // float[] audioFloatBuffer = audioEvent.getFloatBuffer();
+        // for (int i = audioEvent.getOverlap(); i < audioFloatBuffer.length; i++) {
+        //     float newValue = (float)(audioFloatBuffer[i] * gain);
+        //     if (newValue > 1.0f){
+        //         newValue = 1.0f;
+        //     } else if (newValue < -1.0f){
+        //         newValue = -1.0f;
+        //     }
+        //     audioFloatBuffer[i] = newValue;
+        // }
         return true;
     }
 
