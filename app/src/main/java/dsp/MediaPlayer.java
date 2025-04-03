@@ -60,7 +60,7 @@ public class MediaPlayer {
 
             // Add volume control first - set initial volume to 1.0 (100%)
             // TODO: Should this be done here? Initial volume being so high seems risky.
-            volumeProcessor = new GainProcessor(1.0f);
+            volumeProcessor = new GainProcessor(0.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
 
             // Add equalizers in sequence (bass first, then treble)
