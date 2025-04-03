@@ -11,7 +11,7 @@ public class Equalizer implements AudioProcessor {
     private final float sampleRate;
     private BandPass bandPassFilter;
     private GainProcessor gainProcessor;
-    private double gain; // in dB
+    private float gain; // in dB
     private float centerFrequency;
     private float bandwidth;
     private AudioDispatcher dispatcher;
@@ -37,7 +37,7 @@ public class Equalizer implements AudioProcessor {
     }
 
     //Set the gain for the specified frequencies of the EQ
-    public void setGain(double gainDb) {
+    public void setGain(float gainDb) {
         this.gain = gainDb;
         //float gainLinear = (float) Math.pow(10.0, gainDb / 20.0); // Convert dB to linear gain
         gainProcessor.setGain(gainDb);
