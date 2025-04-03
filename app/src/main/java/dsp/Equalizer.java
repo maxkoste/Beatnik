@@ -4,7 +4,6 @@ import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.filters.BandPass;
-import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.GainProcessor;
 
 public class Equalizer implements AudioProcessor {
@@ -14,14 +13,12 @@ public class Equalizer implements AudioProcessor {
     private float gain; // in dB
     private float centerFrequency;
     private float bandwidth;
-    private AudioDispatcher dispatcher;
-    private String filePath;
 
-    public Equalizer(float sampleRate, float bandWidth, float frequency, String filePath) {
+    public Equalizer(float sampleRate, float bandWidth, float frequency  ) {
         this.sampleRate = sampleRate;
         this.centerFrequency = frequency;
         this.bandwidth = bandWidth;
-        this.gain = 0.0f; // 0 dB by default
+        this.gain = 1.0f; // 0 dB by default
         //this.gainProcessor = new GainProcessor(1.0f); // Start with unity gain
         updateFilter();
     }
@@ -38,26 +35,47 @@ public class Equalizer implements AudioProcessor {
 
     //Set the gain for the specified frequencies of the EQ
     public void setGain(float gainDb) {
-        this.gain = gainDb;
-        //float gainLinear = (float) Math.pow(10.0, gainDb / 20.0); // Convert dB to linear gain
-        gainProcessor.setGain(gainDb);
+        float scaledDb = (gainDb - 50) * 0.12f;  // This maps 0-100 to +/-6dB
+    
+        // Convert dB to linear gain
+        float gainLinear = (float) Math.pow(10.0, scaledDb / 20.0);
+        
+        System.out.println("Bass Knob: " + gainDb + " dB value: " + scaledDb + " Linear gain: " + gainLinear);
+        this.gain = gainLinear;
     }
 
     @Override
     public boolean process(AudioEvent audioEvent) {
         /*
-         * Attempting a manual processing of the audio-buffer to bypass the creation of a 
-         * gainprocessor and hopefully make it faster.
+         * First apply the bandPass filter to isolate the target frequencies,
+         * then apply gain only to those frequencies.
+         * 
          */
         float[] audioFloatBuffer = audioEvent.getFloatBuffer();
+
+        // Create a copy of the original buffer for mixing
+        float[] originalBuffer = audioFloatBuffer.clone();
+        
+        // Apply bandpass filter
+        bandPassFilter.process(audioEvent);
+        
+        // Apply gain and mix with original signal
         for (int i = audioEvent.getOverlap(); i < audioFloatBuffer.length; i++) {
-            float newValue = (float)(audioFloatBuffer[i] * gain);
-            if (newValue > 1.0f){
-                newValue = 1.0f;
-            } else if (newValue < -1.0f){
-                newValue = -1.0f;
+            // Mix filtered signal with gain and original signal
+            float filteredSignal = audioFloatBuffer[i] * gain;
+            float originalSignal = originalBuffer[i] - audioFloatBuffer[i];
+            
+            // Mix the signals 
+            float mixedSignal = (filteredSignal + originalSignal);
+            
+            // Clip to prevent distortion
+            if (mixedSignal > 1.0f) {
+                mixedSignal = 1.0f;
+            } else if (mixedSignal < -1.0f) {
+                mixedSignal = -1.0f;
             }
-            audioFloatBuffer[i] = newValue;
+            
+            audioFloatBuffer[i] = mixedSignal;
         }
         return true;
     }
