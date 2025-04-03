@@ -119,6 +119,10 @@ public class MediaPlayer {
             gainProcessor.setGain(mix);
         }
     }
+    
+    public AudioDispatcher getAudioDispatcher(){
+        return playbackDispatcher;
+    }
 
     public void setSong(String filepath) {
         this.isPlaying = false;
