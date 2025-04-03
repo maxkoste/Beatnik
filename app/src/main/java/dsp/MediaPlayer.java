@@ -26,7 +26,7 @@ public class MediaPlayer {
     public MediaPlayer() {
         effectChain = new EffectChain();
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
-        bassEqualizer = new Equalizer(44100, 200, 80 );    // 100Hz center, 20kHz bandwidth
+        bassEqualizer = new Equalizer(44100, 50, 80 );    // 100Hz center, 20kHz bandwidth
         trebleEqualizer = new Equalizer(44100, 4000, 10000 ); // 10kHz center, 20kHz bandwidth
     }
 
