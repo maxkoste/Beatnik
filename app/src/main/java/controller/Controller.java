@@ -1,5 +1,9 @@
 package controller;
 
+import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.AudioEvent;
+import be.tarsos.dsp.AudioProcessor;
+import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
@@ -7,6 +11,10 @@ import view.MainFrame;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import dsp.MediaPlayer;
 
@@ -16,7 +24,8 @@ public class Controller {
     MediaPlayer audioPlayer2;
     MainFrame frame;
     PlaylistManager playlistManager;
-    String currentSong;
+    TimerThreadOne timerThreadOne;
+    TimerThreadTwo timerThreadTwo;
     ObservableList<String> playlistSongPaths; //TODO: Find way of alerting Controller when a song has naturally finished playing
     int currentPosInPlaylist;
     float masterModifier = 0.5F;
@@ -24,10 +33,14 @@ public class Controller {
     float crossfaderModifier2 = 1.0F;
     float latestVolume1 = 50.0F;
     float latestVolume2 = 50.0F;
+    AudioDispatcher dispatcherOne;
+    AudioDispatcher dispatcherTwo;
 
     public Controller(Stage primaryStage) {
         audioPlayer1 = new MediaPlayer();
         audioPlayer2 = new MediaPlayer();
+        timerThreadOne = new TimerThreadOne();
+        timerThreadTwo = new TimerThreadTwo();
         frame = new MainFrame(this);
         playlistManager = new PlaylistManager(frame);
         frame.registerPlaylistManager(playlistManager);
@@ -38,6 +51,8 @@ public class Controller {
         frame.start(primaryStage);
         playlistManager.addSongsFromResources();
         playlistManager.loadPlaylistData();
+        timerThreadOne.start();
+        timerThreadTwo.start();
     }
 
     public void setSong(int channel, String songPath) {
@@ -47,7 +62,7 @@ public class Controller {
             audioPlayer2.setSong(songPath);
         }
         playSong(channel);
-        currentSong = songPath;
+        frame.setWaveformAudioData(extract(songPath), channel); //TODO: Gör till metod i controller
     }
 
     public void startPlaylist(int channel, int selectedIndex, ObservableList<String> songPaths) {
@@ -61,9 +76,11 @@ public class Controller {
         if (channel == 1) {
             audioPlayer1.playAudio();
             setChannelOneVolume(latestVolume1);
+            dispatcherOne = audioPlayer1.getAudioDispatcher();
         } else {
             audioPlayer2.playAudio();
             setChannelTwoVolume(latestVolume2);
+            dispatcherTwo = audioPlayer2.getAudioDispatcher();
         }
     }
 
@@ -134,7 +151,52 @@ public class Controller {
         System.out.println("File moved into the songsGUI folder");
     }
 
-    public String getCurrentSong() {
-        return currentSong;
+    private List<Float> extract (String filePath) {
+        List<Float> audioSamples = new ArrayList<>();
+        try {
+            String path = new File("src/main/resources/songs/" + filePath).getAbsolutePath();
+            AudioDispatcher audioDataGetter = AudioDispatcherFactory.fromPipe(path, 44100, 4096, 0);
+            audioDataGetter.addAudioProcessor(new AudioProcessor() {
+                @Override
+                public boolean process(AudioEvent audioEvent) {
+                    for (float sample : audioEvent.getFloatBuffer()) {
+                        audioSamples.add(sample);
+                    }
+                    return true;
+                }
+                @Override
+                public void processingFinished() {
+                    System.out.println("File extracted");
+                }
+            });
+            audioDataGetter.run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return audioSamples;
+    }
+
+    public class TimerThreadOne extends Thread {
+        public void run() {
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    frame.updateWaveformOne(dispatcherOne.secondsProcessed());
+                }
+            }, 15000, 3);
+        }
+    }
+
+    public class TimerThreadTwo extends Thread {
+        public void run() {
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    frame.updateWaveformTwo(dispatcherTwo.secondsProcessed());
+                }
+            }, 15000, 3);
+        }
     }
 }

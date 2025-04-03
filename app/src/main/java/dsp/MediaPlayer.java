@@ -162,4 +162,8 @@ public class MediaPlayer {
             e.printStackTrace();
         }
     }
+
+    public AudioDispatcher getAudioDispatcher() {
+        return playbackDispatcher;
+    }
 }

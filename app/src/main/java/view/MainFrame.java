@@ -27,8 +27,6 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.List;
 
-import dsp.WaveForm;
-
 
 public class MainFrame implements EventHandler<ActionEvent> {
   AnchorPane primaryPane;
@@ -45,7 +43,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
   Controller controller;
   PlaylistManager playlistManager;
   TextArea channelOneContainer;
+  WaveFormCanvas waveformOne;
   TextArea channelTwoContainer;
+  WaveFormCanvas waveformTwo;
   Button switchChannelOne;
   Button switchChannelTwo;
   double screenHeight;
@@ -126,10 +126,18 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(channelOneContainer, 75.0);
     AnchorPane.setLeftAnchor(channelOneContainer, (((screenWidth / 2)) - ((screenWidth / 2) / 2)));
 
+    waveformOne = new WaveFormCanvas(screenWidth / 2, 75);
+    AnchorPane.setTopAnchor(waveformOne, 75.0);
+    AnchorPane.setLeftAnchor(waveformOne, (screenWidth - waveformOne.getWidth()) / 2);
+
     channelTwoContainer = new TextArea(); // Temporary implementation
     channelTwoContainer.setPrefSize(screenWidth / 2, 75.0);
     AnchorPane.setTopAnchor(channelTwoContainer, (75.0 * 2));
     AnchorPane.setLeftAnchor(channelTwoContainer, (((screenWidth / 2)) - ((screenWidth / 2) / 2)));
+
+    waveformTwo = new WaveFormCanvas(screenWidth / 2, 75);
+    AnchorPane.setTopAnchor(waveformTwo, 75.0 * 2);
+    AnchorPane.setLeftAnchor(waveformTwo, (screenWidth - waveformTwo.getWidth()) / 2);
 
     Button channelOnePlayPause = new Button();
     channelOnePlayPause.setPrefSize(30.0, 75.0);
@@ -159,7 +167,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane.setTopAnchor(channelTwoSkip, 150.0);
     AnchorPane.setLeftAnchor(channelTwoSkip, ((((screenWidth / 2)) + ((screenWidth / 2) / 2))));
 
-    primaryPane.getChildren().addAll(channelOneContainer, channelTwoContainer,
+    primaryPane.getChildren().addAll(channelOneContainer, channelTwoContainer, waveformOne, waveformTwo,
         channelOnePlayPause, channelTwoPlayPause, channelOneSkip, channelTwoSkip);
   }
 
@@ -428,14 +436,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
         String currentSong = songSelector.getSelectedItem();
         controller.setSong(1, currentSong);
         channelOneContainer.setText("Song loaded: " + currentSong); // TODO: Replace with song/playlist info-label
-
-        primaryPane.getChildren().removeIf(node -> node instanceof WaveFormCanvas);
-
-        List<Float> waveformSamples = WaveForm.extract(currentSong);
-        WaveFormCanvas waveform = new WaveFormCanvas(waveformSamples, screenWidth / 2, 75);
-        AnchorPane.setTopAnchor(waveform, 75.0);
-        AnchorPane.setLeftAnchor(waveform, (screenWidth - waveform.getWidth()) / 2);
-        primaryPane.getChildren().add(waveform);
       } else {
         controller.setSong(2, songSelector.getSelectedItem());
         channelTwoContainer.setText("Song loaded: " + songSelector.getSelectedItem());
@@ -568,4 +568,17 @@ public class MainFrame implements EventHandler<ActionEvent> {
     this.playlistManager = playlistManager;
   }
 
+  public void setWaveformAudioData(List<Float> originalAudioData, int channel) {
+    if (channel == 1) {
+      waveformOne.setOriginalAudioData(originalAudioData);
+    } else waveformTwo.setOriginalAudioData(originalAudioData);
+  }
+
+  public void updateWaveformOne(float currentSecond) {
+    waveformOne.update(currentSecond);
+  }
+
+  public void updateWaveformTwo(float currentSecond) {
+    waveformTwo.update(currentSecond);
+  }
 }
