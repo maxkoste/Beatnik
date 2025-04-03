@@ -29,7 +29,7 @@ public class Equalizer implements AudioProcessor {
 
     //Set the gain for the specified frequencies of the EQ
     public void setGain(float gainDb) {
-        float scaledDb = (gainDb - 50) * 0.18f;  // This maps 0-100 to +/-6dB
+        float scaledDb = (gainDb - 50) * 0.24f;  // This maps 0-100 to +/-12dB
     
         // Convert dB to linear gain
         float gainLinear = (float) Math.pow(10.0, scaledDb / 20.0);
