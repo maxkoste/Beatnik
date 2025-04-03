@@ -18,17 +18,11 @@ public class Equalizer implements AudioProcessor {
         this.sampleRate = sampleRate;
         this.centerFrequency = frequency;
         this.bandwidth = bandWidth;
-        this.gain = 1.0f; // 0 dB by default
+        this.gain = 0.0f; // 0 dB by default
         //this.gainProcessor = new GainProcessor(1.0f); // Start with unity gain
         updateFilter();
     }
     
-    // public void setFilePath(String filePath){
-    //     this.dispatcher = AudioDispatcherFactory.fromPipe(filePath, 44100, 4096, 0);
-    //     this.filePath = filePath;
-    //     this.dispatcher.addAudioProcessor(gainProcessor);
-    // }
-
     public void updateFilter() {
         bandPassFilter = new BandPass(centerFrequency, bandwidth, sampleRate);
     }

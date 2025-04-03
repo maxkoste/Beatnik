@@ -224,8 +224,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
     CircularSlider channelOneBass = new CircularSlider(9, false);
     channelOneBass.valueProperty().addListener((observable, oldValue, newValue) -> {
       float bassCutoff = newValue.floatValue();
-      // Scale value from 0–270 to 0–8000
-      float bass = (bassCutoff / 270) * 8000;
+      // Scale value from 0–270 to 0–100
+      float bass = (bassCutoff / 270) * 100;
       controller.setBass1(bass);
       System.out.println("Bass Knob Ch 1: " + bass);
     });
@@ -235,8 +235,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
     CircularSlider channelTwoBass = new CircularSlider(9, false);
     channelTwoBass.valueProperty().addListener((observable, oldValue, newValue) -> {
       float bassCutoff = newValue.floatValue();
-      // Scale value from 0–270 to 0–8000
-      float bass = (bassCutoff / 270) * 8000;
+      // Scale value from 0–270 to 0–100
+      float bass = (bassCutoff / 270) * 100;
       controller.setBass2(bass);
       System.out.println("Bass Knob Ch 2: " + bass);
     });
