@@ -108,20 +108,20 @@ public class Controller {
         setChannelTwoVolume(latestVolume2);
     }
 
-    public void setTreble1(float trebleCutoff){
-        audioPlayer1.setTreble(trebleCutoff);
+    public void setTreble1(float trebleGain){
+        audioPlayer1.setTreble(trebleGain);
     }
 
-    public void setTreble2(float trebleCutoff){
-        audioPlayer2.setTreble(trebleCutoff);
+    public void setTreble2(float trebleGain){
+        audioPlayer2.setTreble(trebleGain);
     }
     
-    public void setBass1(float bassCutoff){
-        audioPlayer1.setBass(bassCutoff);
+    public void setBass1(float bassGain){
+        audioPlayer1.setBass(bassGain);
     }
 
-    public void setBass2(float bassCutoff){
-        audioPlayer2.setBass(bassCutoff);
+    public void setBass2(float bassGain){
+        audioPlayer2.setBass(bassGain);
     }
 
     public void moveFile(File sourceFile, String destinationPath) throws IOException {
