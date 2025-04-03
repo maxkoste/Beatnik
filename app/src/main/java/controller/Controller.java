@@ -34,12 +34,12 @@ public class Controller {
         //audioPlayer.testEqualizer();
     }
 
-    public void setTreble(float trebleCutoff){
-        audioPlayer.setTreble(trebleCutoff);
+    public void setTreble(float trebleGain){
+        audioPlayer.setTreble(trebleGain);
     }
     
-    public void setBass(float bassCutoff){
-        audioPlayer.setBass(bassCutoff);
+    public void setBass(float bassGain){
+        audioPlayer.setBass(bassGain);
     }
 
     public void setMasterVolume(float volume) {

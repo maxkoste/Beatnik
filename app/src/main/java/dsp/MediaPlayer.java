@@ -26,8 +26,8 @@ public class MediaPlayer {
     public MediaPlayer() {
         effectChain = new EffectChain();
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
-        bassEqualizer = new Equalizer(44100, 20000, 100, null);    // 100Hz center, 20kHz bandwidth
-        trebleEqualizer = new Equalizer(44100, 20000, 10000, null); // 10kHz center, 20kHz bandwidth
+        bassEqualizer = new Equalizer(44100, 4000, 100, null);    // 100Hz center, 20kHz bandwidth
+        trebleEqualizer = new Equalizer(44100, 4000, 10000, null); // 10kHz center, 20kHz bandwidth
     }
 
     public void setUp() {
@@ -66,20 +66,6 @@ public class MediaPlayer {
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
             
-            // Add effect chain processor
-            playbackDispatcher.addAudioProcessor(new AudioProcessor() {
-                @Override
-                public boolean process(AudioEvent audioEvent) {
-                    effectChain.process(audioEvent.getFloatBuffer());
-                    return true;
-                }
-
-                @Override
-                public void processingFinished() {
-                    System.out.println("Processing finished..");
-                }
-            });
-
             // Add audio player for final output
             AudioPlayer audioPlayer = new AudioPlayer(format);
             playbackDispatcher.addAudioProcessor(audioPlayer);
