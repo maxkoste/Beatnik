@@ -43,7 +43,6 @@ public class Equalizer implements AudioProcessor {
         /*
          * First apply the bandPass filter to isolate the target frequencies,
          * then apply gain only to those frequencies.
-         * 
          */
         float[] audioFloatBuffer = audioEvent.getFloatBuffer();
 

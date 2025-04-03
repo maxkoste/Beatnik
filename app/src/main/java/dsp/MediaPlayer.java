@@ -49,10 +49,7 @@ public class MediaPlayer {
 
             String filePath = new File(resourceUrl.toURI()).getAbsolutePath();
             System.out.println("Loading audio file from: " + filePath);
-
-            // bassEqualizer.setFilePath(filePath);
-            // trebleEqualizer.setFilePath(filePath);
-            
+           
             // Use AudioDispatcherFactory with the actual file path
             playbackDispatcher = AudioDispatcherFactory.fromPipe(filePath, 44100, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
@@ -132,38 +129,5 @@ public class MediaPlayer {
 
     public void setEffect(dsp.Effects.AudioEffect effect) {
         effectChain.setEffect(effect);
-    }
-
-    // Test method for equalizer
-    public void testEqualizer() {
-        try {
-            // Set up a test song
-            //setSong("test.wav");
-            
-            // Start playing
-            playAudio();
-            
-            // Wait for 2 seconds
-            Thread.sleep(5000);
-            
-            // Test bass boost
-            System.out.println("Testing bass boost...");
-            bassEqualizer.setGain(6.0f); // +6 dB boost
-            
-            // Wait another 2 seconds
-            Thread.sleep(2000);
-            
-            // Test treble boost
-            System.out.println("Testing treble boost...");
-            trebleEqualizer.setGain(6.0f); // +6 dB boost
-            
-        } catch (InterruptedException e) {
-            System.err.println("Test interrupted: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    public AudioDispatcher getAudioDispatcher() {
-        return playbackDispatcher;
     }
 }
