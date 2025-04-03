@@ -223,9 +223,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     CircularSlider channelOneBass = new CircularSlider(9, false);
     channelOneBass.valueProperty().addListener((observable, oldValue, newValue) -> {
-      float bassCutoff = newValue.floatValue();
-      // Scale value from 0–270 to 0–100
-      float bass = (bassCutoff / 270) * 100;
+      float bassGain = newValue.floatValue();
+      // Scale value from 0–270 to 0–100dB
+      float bass = (bassGain / 270) * 100;
       controller.setBass1(bass);
       System.out.println("Bass Knob Ch 1: " + bass);
     });
@@ -234,27 +234,33 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     CircularSlider channelTwoBass = new CircularSlider(9, false);
     channelTwoBass.valueProperty().addListener((observable, oldValue, newValue) -> {
-      float bassCutoff = newValue.floatValue();
-      // Scale value from 0–270 to 0–100
-      float bass = (bassCutoff / 270) * 100;
-      controller.setBass2(bass);
-      System.out.println("Bass Knob Ch 2: " + bass);
+      float bassGain = newValue.floatValue();
+      // Scale value from 0–270 to 0–100dB
+      bassGain = (bassGain / 270) * 100;
+      controller.setBass2(bassGain);
+      System.out.println("Bass Knob Ch 2: " + bassGain);
     });
     AnchorPane.setTopAnchor(channelTwoBass, (screenHeight / 1.87));
     AnchorPane.setLeftAnchor(channelTwoBass, (screenWidth / 1.442) - 25);
 
     CircularSlider channelOneTreble = new CircularSlider(9, false);
     channelOneTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
-      double volume = newValue.doubleValue();
-      System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
+      //Scale the value from 0-270 to 0-100dB
+      float trebleGain = newValue.floatValue();
+      trebleGain = (trebleGain / 270) * 100;
+      controller.setTreble1(trebleGain);
+      System.out.println("volume: " + ((int) (Math.ceil(trebleGain / 2.7))));
     });
     AnchorPane.setTopAnchor(channelOneTreble, (screenHeight / 1.87) -75);
     AnchorPane.setLeftAnchor(channelOneTreble, (screenWidth / 3.275) -25);
 
     CircularSlider channelTwoTreble = new CircularSlider(9, false);
     channelTwoTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
-      double volume = newValue.doubleValue();
-      System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
+      float trebleGain = newValue.floatValue();
+      //Scale the value from 0-270 to 0-100dB
+      trebleGain = (trebleGain / 270) * 100;
+      controller.setTreble2(trebleGain);  
+      System.out.println("volume: " + ((int) (Math.ceil(trebleGain / 2.7))));
     });
     AnchorPane.setTopAnchor(channelTwoTreble, (screenHeight / 1.87) -75);
     AnchorPane.setLeftAnchor(channelTwoTreble, (screenWidth / 1.442) - 25);
