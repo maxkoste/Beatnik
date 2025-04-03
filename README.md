@@ -9,6 +9,7 @@ Welcome to **Beatnik**, your next-generation DJ software for seamless mixing, be
 
 ## Technologies Used
 - **Java** for core development
+- **Gradle** for dependancies and building the project
 - **JavaFX** for the graphical user interface
 - **TarsosDSP** for audio processing
 
