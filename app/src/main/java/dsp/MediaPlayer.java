@@ -17,16 +17,17 @@ public class MediaPlayer {
     private String currentSongFilePath;
     private GainProcessor volumeProcessor;
     private EffectChain effectChain;
-    private Equalizer equalizer;
+    private Equalizer bassEqualizer;
+    private Equalizer trebleEqualizer;
     private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
     private boolean isPlaying;
     private float currentTime;
     
-
     public MediaPlayer() {
         effectChain = new EffectChain();
-        // Initialize equalizer with standard frequencies (100Hz for bass, 10kHz for treble)
-        equalizer = new Equalizer(44100,20000 , 0);
+        // Initialize equalizers with wide bandwidths to simulate shelf behavior
+        bassEqualizer = new Equalizer(44100, 50, 80 );    // 100Hz center, 20kHz bandwidth
+        trebleEqualizer = new Equalizer(44100, 4000, 10000 ); // 10kHz center, 20kHz bandwidth
     }
 
     public void setUp() {
@@ -49,6 +50,9 @@ public class MediaPlayer {
             String filePath = new File(resourceUrl.toURI()).getAbsolutePath();
             System.out.println("Loading audio file from: " + filePath);
 
+            // bassEqualizer.setFilePath(filePath);
+            // trebleEqualizer.setFilePath(filePath);
+            
             // Use AudioDispatcherFactory with the actual file path
             playbackDispatcher = AudioDispatcherFactory.fromPipe(filePath, 44100, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
@@ -59,23 +63,10 @@ public class MediaPlayer {
             volumeProcessor = new GainProcessor(1.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
 
-            // Add equalizer processor
-            playbackDispatcher.addAudioProcessor(equalizer);
+            // Add equalizers in sequence (bass first, then treble)
+            playbackDispatcher.addAudioProcessor(bassEqualizer);
+            playbackDispatcher.addAudioProcessor(trebleEqualizer);
             
-            // Add effect chain processor
-            playbackDispatcher.addAudioProcessor(new AudioProcessor() {
-                @Override
-                public boolean process(AudioEvent audioEvent) {
-                    effectChain.process(audioEvent.getFloatBuffer());
-                    return true;
-                }
-
-                @Override
-                public void processingFinished() {
-                    System.out.println("Processing finished..");
-                }
-            });
-
             // Add audio player for final output
             AudioPlayer audioPlayer = new AudioPlayer(format);
             playbackDispatcher.addAudioProcessor(audioPlayer);
@@ -114,13 +105,14 @@ public class MediaPlayer {
         }
     }
     
-    public void setTreble(float trebleCutoff){
-        equalizer.setTrebleCutoff(trebleCutoff);
+    public void setTreble(float trebleGain) {
+        trebleEqualizer.setGain(trebleGain);
     }
 
-    public void setBass(float bassCutoff){
-        equalizer.setBassCutoff(bassCutoff);
+    public void setBass(float bassGain) {
+        bassEqualizer.setGain(bassGain);
     }
+
     // Set the effect mix between 0.0f and 1.0f, 0.0f is dry only, 1.0f is wet only
     // 0.5f is equal mix of dry and wet not implemented yet...
     public void setEffectMix(float mix) { // 0.0f to 1.0f
@@ -141,7 +133,6 @@ public class MediaPlayer {
     public void setEffect(dsp.Effects.AudioEffect effect) {
         effectChain.setEffect(effect);
     }
-    
 
     // Test method for equalizer
     public void testEqualizer() {
@@ -157,8 +148,14 @@ public class MediaPlayer {
             
             // Test bass boost
             System.out.println("Testing bass boost...");
-            equalizer.setBassCutoff(800);
-           
+            bassEqualizer.setGain(6.0f); // +6 dB boost
+            
+            // Wait another 2 seconds
+            Thread.sleep(2000);
+            
+            // Test treble boost
+            System.out.println("Testing treble boost...");
+            trebleEqualizer.setGain(6.0f); // +6 dB boost
             
         } catch (InterruptedException e) {
             System.err.println("Test interrupted: " + e.getMessage());
