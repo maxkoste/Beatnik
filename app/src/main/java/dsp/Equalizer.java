@@ -32,10 +32,8 @@ public class Equalizer implements AudioProcessor {
         float scaledDb = (gainDb - 50) * 0.24f;  // This maps 0-100 to +/-12dB
     
         // Convert dB to linear gain
-        float gainLinear = (float) Math.pow(10.0, scaledDb / 20.0);
-        
-        System.out.println("Bass Knob: " + gainDb + " dB value: " + scaledDb + " Linear gain: " + gainLinear);
-        this.gain = gainLinear;
+
+        this.gain = (float) Math.pow(10.0, scaledDb / 20.0);
     }
 
     @Override

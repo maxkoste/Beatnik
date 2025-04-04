@@ -9,6 +9,7 @@ import be.tarsos.dsp.GainProcessor;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
+import controller.Controller;
 
 //This class is responsible for playing the audio, and its volume
 public class MediaPlayer {
@@ -22,7 +23,7 @@ public class MediaPlayer {
     private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
     private boolean isPlaying;
     private float currentTime;
-    
+
     public MediaPlayer() {
         effectChain = new EffectChain();
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
