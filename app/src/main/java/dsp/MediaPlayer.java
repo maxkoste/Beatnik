@@ -16,7 +16,6 @@ public class MediaPlayer {
     private GainProcessor gainProcessor;
     private String currentSongFilePath;
     private GainProcessor volumeProcessor;
-    private EffectChain effectChain;
     private Equalizer bassEqualizer;
     private Equalizer trebleEqualizer;
     private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
@@ -24,7 +23,6 @@ public class MediaPlayer {
     private float currentTime;
     
     public MediaPlayer() {
-        effectChain = new EffectChain();
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
         bassEqualizer = new Equalizer(44100, 50, 80 );    // 80Hz center, 50Hz bandwidth
         trebleEqualizer = new Equalizer(44100, 5000, 7000 ); // 7khz center, 5kHz bandwidth
@@ -131,7 +129,4 @@ public class MediaPlayer {
         //setVolume(100.0f); // Set initial volume to maximum
     }
 
-    public void setEffect(dsp.Effects.AudioEffect effect) {
-        effectChain.setEffect(effect);
-    }
 }
