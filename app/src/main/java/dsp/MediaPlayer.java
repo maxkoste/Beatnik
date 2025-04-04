@@ -6,9 +6,11 @@ import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.GainProcessor;
+import be.tarsos.dsp.effects.DelayEffect;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
+import dsp.Effects.Delay;
 
 //This class is responsible for playing the audio, and its volume
 public class MediaPlayer {
@@ -21,11 +23,16 @@ public class MediaPlayer {
     private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
     private boolean isPlaying;
     private float currentTime;
+    private Delay delay;
+    private DelayEffect delayEffect;
     
     public MediaPlayer() {
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
         bassEqualizer = new Equalizer(44100, 50, 80 );    // 80Hz center, 50Hz bandwidth
         trebleEqualizer = new Equalizer(44100, 5000, 7000 ); // 7khz center, 5kHz bandwidth
+        
+        delay = new Delay(0.4, 6, 44100);
+        delayEffect = new DelayEffect(0.5, 5, 44100)
     }
 
     public void setUp() {
@@ -62,6 +69,8 @@ public class MediaPlayer {
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
             
+            playbackDispatcher.addAudioProcessor(delay);
+
             // Add audio player for final output
             AudioPlayer audioPlayer = new AudioPlayer(format);
             playbackDispatcher.addAudioProcessor(audioPlayer);
