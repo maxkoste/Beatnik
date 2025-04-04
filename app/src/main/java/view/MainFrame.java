@@ -235,7 +235,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
       // Scale value from 0–270 to 0–100dB
       float bass = (bassGain / 270) * 100;
       controller.setBass1(bass);
-      System.out.println("Bass Knob Ch 1: " + bass);
     });
     AnchorPane.setTopAnchor(channelOneBass, (screenHeight / 1.87));
     AnchorPane.setLeftAnchor(channelOneBass,(screenWidth / 3.275) -25);
@@ -246,7 +245,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
       // Scale value from 0–270 to 0–100dB
       bassGain = (bassGain / 270) * 100;
       controller.setBass2(bassGain);
-      System.out.println("Bass Knob Ch 2: " + bassGain);
     });
     AnchorPane.setTopAnchor(channelTwoBass, (screenHeight / 1.87));
     AnchorPane.setLeftAnchor(channelTwoBass, (screenWidth / 1.442) - 25);
@@ -257,7 +255,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
       float trebleGain = newValue.floatValue();
       trebleGain = (trebleGain / 270) * 100;
       controller.setTreble1(trebleGain);
-      System.out.println("volume: " + ((int) (Math.ceil(trebleGain / 2.7))));
     });
     AnchorPane.setTopAnchor(channelOneTreble, (screenHeight / 1.87) -75);
     AnchorPane.setLeftAnchor(channelOneTreble, (screenWidth / 3.275) -25);
@@ -268,7 +265,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
       //Scale the value from 0-270 to 0-100dB
       trebleGain = (trebleGain / 270) * 100;
       controller.setTreble2(trebleGain);  
-      System.out.println("volume: " + ((int) (Math.ceil(trebleGain / 2.7))));
     });
     AnchorPane.setTopAnchor(channelTwoTreble, (screenHeight / 1.87) -75);
     AnchorPane.setLeftAnchor(channelTwoTreble, (screenWidth / 1.442) - 25);
@@ -276,7 +272,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
     CircularSlider channelOneSpeed = new CircularSlider(9, false);
     channelOneSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
-      System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
     });
     AnchorPane.setTopAnchor(channelOneSpeed, ((screenHeight / 1.87) - 150));
     AnchorPane.setLeftAnchor(channelOneSpeed, (screenWidth / 3.275) - 25);
@@ -284,7 +279,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
     CircularSlider channelTwoSpeed = new CircularSlider(9, false);
     channelTwoSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
       double volume = newValue.doubleValue();
-      System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
     });
     AnchorPane.setTopAnchor(channelTwoSpeed, ((screenHeight / 1.87) - 150));
     AnchorPane.setLeftAnchor(channelTwoSpeed, ((screenWidth / 1.442) - 25));
@@ -568,7 +562,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     this.playlistManager = playlistManager;
   }
 
-  public void setWaveformAudioData(List<Float> originalAudioData, int channel) {
+  public void setWaveformAudioData(float[] originalAudioData, int channel) {
     if (channel == 1) {
       waveformOne.setOriginalAudioData(originalAudioData);
     } else waveformTwo.setOriginalAudioData(originalAudioData);
