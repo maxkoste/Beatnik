@@ -9,6 +9,7 @@ import be.tarsos.dsp.GainProcessor;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
+import dsp.Effects.Delay;
 import controller.Controller;
 
 //This class is responsible for playing the audio, and its volume
@@ -17,18 +18,18 @@ public class MediaPlayer {
     private GainProcessor gainProcessor;
     private String currentSongFilePath;
     private GainProcessor volumeProcessor;
-    private EffectChain effectChain;
     private Equalizer bassEqualizer;
     private Equalizer trebleEqualizer;
     private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
     private boolean isPlaying;
     private float currentTime;
+    private Delay delayEffect;
 
     public MediaPlayer() {
-        effectChain = new EffectChain();
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
-        bassEqualizer = new Equalizer(44100, 50, 80 );    // 80Hz center, 50Hz bandwidth
+        bassEqualizer = new Equalizer(44100, 80, 80 );    // 80Hz center, 50Hz bandwidth
         trebleEqualizer = new Equalizer(44100, 5000, 7000 ); // 7khz center, 5kHz bandwidth
+        delayEffect = new Delay(0.5, 0.6, 44100);
     }
 
     public void setUp() {
@@ -56,12 +57,12 @@ public class MediaPlayer {
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
             System.out.println("Audio format: " + format.toString());
 
-            // Add volume control first - set initial volume to 1.0 (100%)
-            // TODO: Should this be done here? Initial volume being so high seems risky.
+            //Add volume controll first 
             volumeProcessor = new GainProcessor(0.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
 
             // Add equalizers in sequence (bass first, then treble)
+            playbackDispatcher.addAudioProcessor(delayEffect);
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
             
@@ -111,28 +112,33 @@ public class MediaPlayer {
         bassEqualizer.setGain(bassGain);
     }
 
-    // Set the effect mix between 0.0f and 1.0f, 0.0f is dry only, 1.0f is wet only
-    // 0.5f is equal mix of dry and wet not implemented yet...
+    /**
+     * set the effect-mix of the delay
+     * needs to be a value between 0.0-1.0f
+     * When mix = 0 100% dry signal
+     * when mix = 1 100% wet signal
+     * when mix = 0.5 50% wet 50% dry
+     * @param mix
+     */
     public void setEffectMix(float mix) { // 0.0f to 1.0f
-        // TODO: Implement this
         this.effectMix = mix;
-        if (gainProcessor != null) {
-            gainProcessor.setGain(mix);
+        if (delayEffect != null) {
+            delayEffect.setMix(mix);
         }
     }
-    
+    /**
+     * @return the audio dispatcher responsible for playing and processing the audio.
+     */
     public AudioDispatcher getAudioDispatcher(){
         return playbackDispatcher;
     }
-
+    /**
+     * @param filepath filepath to the audio that will be loaded into the playback dispatcher
+     */
     public void setSong(String filepath) {
         this.isPlaying = false;
         this.currentSongFilePath = filepath;
         this.currentTime = 0;
-        //setVolume(100.0f); // Set initial volume to maximum
     }
 
-    public void setEffect(dsp.Effects.AudioEffect effect) {
-        effectChain.setEffect(effect);
-    }
 }
