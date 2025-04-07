@@ -58,8 +58,7 @@ public class MediaPlayer {
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
             System.out.println("Audio format: " + format.toString());
 
-            // Add volume control first - set initial volume to 1.0 (100%)
-            // TODO: Should this be done here? Initial volume being so high seems risky.
+            //Add volume controll first 
             volumeProcessor = new GainProcessor(0.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
 
