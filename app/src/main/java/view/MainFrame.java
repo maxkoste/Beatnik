@@ -227,7 +227,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         });
         AnchorPane.setTopAnchor(channelTwoVolume, (screenHeight / 1.635));
         AnchorPane.setLeftAnchor(channelTwoVolume, ((screenWidth / 1.453) - (channelOneVolume.getPrefWidth() / 2)));
-
+        
         CircularSlider channelOneBass = new CircularSlider(9, false);
         channelOneBass.valueProperty().addListener((observable, oldValue, newValue) -> {
             float bassGain = newValue.floatValue();

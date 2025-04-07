@@ -10,7 +10,6 @@ import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
 import dsp.Effects.Delay;
-import be.tarsos.dsp.effects.DelayEffect;
 import controller.Controller;
 
 //This class is responsible for playing the audio, and its volume
