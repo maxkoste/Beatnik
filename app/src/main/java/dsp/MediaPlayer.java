@@ -29,7 +29,7 @@ public class MediaPlayer {
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
         bassEqualizer = new Equalizer(44100, 80, 80 );    // 80Hz center, 50Hz bandwidth
         trebleEqualizer = new Equalizer(44100, 5000, 7000 ); // 7khz center, 5kHz bandwidth
-        delayEffect = new Delay(0.5, 0.9, 44100);
+        delayEffect = new Delay(0.5, 0.6, 44100);
     }
 
     public void setUp() {
@@ -63,9 +63,9 @@ public class MediaPlayer {
             playbackDispatcher.addAudioProcessor(volumeProcessor);
 
             // Add equalizers in sequence (bass first, then treble)
+            playbackDispatcher.addAudioProcessor(delayEffect);
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
-            playbackDispatcher.addAudioProcessor(delayEffect);
             
             // Add audio player for final output
             AudioPlayer audioPlayer = new AudioPlayer(format);

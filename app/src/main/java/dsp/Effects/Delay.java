@@ -28,7 +28,10 @@ public class Delay implements AudioProcessor {
         setEchoLength(echoLength);
         applyNewEchoLength();
     }
-
+    /**
+     * Acts as the mix but not sure if this is how i want to use it...
+     * @param newDecay
+     */
     public void setDecay(double newDecay) {
         this.decay = (float) newDecay;
     }
@@ -84,15 +87,11 @@ public class Delay implements AudioProcessor {
             float drySignal = audioFloatBuffer[i];
             float wetSignal = echoBuffer[position] * decay;
 
-            //old implementation without the mix
-            //audioFloatBuffer[i] = audioFloatBuffer[i] + echoBuffer[position] * decay;
+            audioFloatBuffer[i] = audioFloatBuffer[i] + echoBuffer[position] * decay;
             // store the sample in the buffer;
-            //echoBuffer[position] = audioFloatBuffer[i];
+            echoBuffer[position] = audioFloatBuffer[i];
             audioFloatBuffer[i] = (1.0f - mix) * drySignal + mix * (drySignal + wetSignal);
 
-            //Store the sample in the buffer
-            echoBuffer[position] = drySignal;
-            
             position++;
         }
 
