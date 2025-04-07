@@ -67,7 +67,6 @@ public class Delay implements AudioProcessor {
      * @param mix
      */
     public void setMix(float mix){
-        //clamp mix value between 0 and 1
         this.mix = mix;
     }
 
