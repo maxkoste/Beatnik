@@ -234,7 +234,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
             // Scale value from 0–270 to 0–100dB
             float bass = (bassGain / 270) * 100;
             controller.setBass1(bass);
-            System.out.println("Bass Knob Ch 1: " + bass);
         });
         AnchorPane.setTopAnchor(channelOneBass, (screenHeight / 1.87));
         AnchorPane.setLeftAnchor(channelOneBass, (screenWidth / 3.275) - 25);
@@ -245,7 +244,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
             // Scale value from 0–270 to 0–100dB
             bassGain = (bassGain / 270) * 100;
             controller.setBass2(bassGain);
-            System.out.println("Bass Knob Ch 2: " + bassGain);
         });
         AnchorPane.setTopAnchor(channelTwoBass, (screenHeight / 1.87));
         AnchorPane.setLeftAnchor(channelTwoBass, (screenWidth / 1.442) - 25);
@@ -256,7 +254,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
             float trebleGain = newValue.floatValue();
             trebleGain = (trebleGain / 270) * 100;
             controller.setTreble1(trebleGain);
-            System.out.println("volume: " + ((int) (Math.ceil(trebleGain / 2.7))));
+
         });
         AnchorPane.setTopAnchor(channelOneTreble, (screenHeight / 1.87) - 75);
         AnchorPane.setLeftAnchor(channelOneTreble, (screenWidth / 3.275) - 25);
@@ -584,7 +582,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         this.playlistManager = playlistManager;
     }
 
-    public void setWaveformAudioData(List<Float> originalAudioData, int channel) {
+    public void setWaveformAudioData(float[] originalAudioData, int channel) {
         if (channel == 1) {
             waveformOne.setOriginalAudioData(originalAudioData);
         } else

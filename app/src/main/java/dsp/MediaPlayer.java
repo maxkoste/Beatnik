@@ -11,6 +11,7 @@ import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
 import dsp.Effects.Delay;
 import be.tarsos.dsp.effects.DelayEffect;
+import controller.Controller;
 
 //This class is responsible for playing the audio, and its volume
 public class MediaPlayer {
@@ -24,7 +25,7 @@ public class MediaPlayer {
     private boolean isPlaying;
     private float currentTime;
     private Delay delayEffect;
-    
+
     public MediaPlayer() {
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
         bassEqualizer = new Equalizer(44100, 80, 80 );    // 80Hz center, 50Hz bandwidth

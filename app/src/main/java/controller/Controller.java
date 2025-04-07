@@ -62,7 +62,7 @@ public class Controller {
             audioPlayer2.setSong(songPath);
         }
         playSong(channel);
-        frame.setWaveformAudioData(extract(songPath), channel); //TODO: Gör till metod i controller
+        frame.setWaveformAudioData(extract(songPath), channel);
     }
 
     public void startPlaylist(int channel, int selectedIndex, ObservableList<String> songPaths) {
@@ -84,7 +84,7 @@ public class Controller {
         }
     }
 
-    public void nextSong(int channel) { //TODO: Update GUI with Waveforms and names etc
+    public void nextSong(int channel) { //TODO: Update GUI with names etc
         if (playlistSongPaths != null) {
             if (!(currentPosInPlaylist >= playlistSongPaths.size() - 1)) {
                 currentPosInPlaylist++;
@@ -163,7 +163,7 @@ public class Controller {
         System.out.println("File moved into the songsGUI folder");
     }
 
-    private List<Float> extract (String filePath) {
+    private float[] extract (String filePath) { //TODO: Collect all fileData att app launch
         List<Float> audioSamples = new ArrayList<>();
         try {
             String path = new File("src/main/resources/songs/" + filePath).getAbsolutePath();
@@ -185,7 +185,11 @@ public class Controller {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return audioSamples;
+        float[] audioSamplesFinal = new float[audioSamples.size()];
+        for (int i = 0; i < audioSamples.size(); i++) {
+            audioSamplesFinal[i] = audioSamples.get(i);
+        }
+        return audioSamplesFinal;
     }
 
     public class TimerThreadOne extends Thread {
@@ -194,9 +198,11 @@ public class Controller {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    frame.updateWaveformOne(dispatcherOne.secondsProcessed());
+                    if (dispatcherOne != null) {
+                        frame.updateWaveformOne(dispatcherOne.secondsProcessed());
+                    }
                 }
-            }, 15000, 3);
+            }, 0, 4);
         }
     }
 
@@ -206,9 +212,11 @@ public class Controller {
             timer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    frame.updateWaveformTwo(dispatcherTwo.secondsProcessed());
+                    if (dispatcherTwo != null) {
+                        frame.updateWaveformTwo(dispatcherTwo.secondsProcessed());
+                    }
                 }
-            }, 15000, 3);
+            }, 0, 4);
         }
     }
 }
