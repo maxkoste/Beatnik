@@ -141,6 +141,18 @@ public class Controller {
         audioPlayer2.setBass(bassGain);
     }
 
+    /**
+    * set the mix value of the effect
+    * 0 = 100% dry signal (no effect)
+    * 1 = 100% effect signal (only effect)
+    * all the effects should be applied on both audio-signals 
+    * @param mix float value between 0-1f
+    */ 
+    public void setEffectMix(float mix){
+        audioPlayer1.setEffectMix(mix);
+        audioPlayer2.setEffectMix(mix);
+    }
+
     public void moveFile(File sourceFile, String destinationPath) throws IOException {
         System.out.println("File move attempt");
         File desinationFile = new File(destinationPath);

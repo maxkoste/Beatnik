@@ -6,11 +6,11 @@ import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.GainProcessor;
+import be.tarsos.dsp.effects.DelayEffect;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
 import dsp.Effects.Delay;
-import be.tarsos.dsp.effects.DelayEffect;
 
 //This class is responsible for playing the audio, and its volume
 public class MediaPlayer {
@@ -23,13 +23,13 @@ public class MediaPlayer {
     private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
     private boolean isPlaying;
     private float currentTime;
-    private Delay delayEffect;
+    private Delay delay;
+    private DelayEffect delayEffect;
     
     public MediaPlayer() {
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
         bassEqualizer = new Equalizer(44100, 80, 80 );    // 80Hz center, 50Hz bandwidth
         trebleEqualizer = new Equalizer(44100, 5000, 7000 ); // 7khz center, 5kHz bandwidth
-        delayEffect = new Delay(0.5, 0.9, 44100);
     }
 
     public void setUp() {
@@ -65,7 +65,6 @@ public class MediaPlayer {
             // Add equalizers in sequence (bass first, then treble)
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
-            playbackDispatcher.addAudioProcessor(delayEffect);
             
             // Add audio player for final output
             AudioPlayer audioPlayer = new AudioPlayer(format);
@@ -113,29 +112,20 @@ public class MediaPlayer {
         bassEqualizer.setGain(bassGain);
     }
 
-    /**
-     * set the effect-mix of the delay
-     * needs to be a value between 0.0-1.0f
-     * When mix = 0 100% dry signal
-     * when mix = 1 100% wet signal
-     * when mix = 0.5 50% wet 50% dry
-     * @param mix
-     */
+    // Set the effect mix between 0.0f and 1.0f, 0.0f is dry only, 1.0f is wet only
+    // 0.5f is equal mix of dry and wet not implemented yet...
     public void setEffectMix(float mix) { // 0.0f to 1.0f
+        // TODO: Implement this
         this.effectMix = mix;
-        if (delayEffect != null) {
-            delayEffect.setMix(mix);
+        if (gainProcessor != null) {
+            gainProcessor.setGain(mix);
         }
     }
-    /**
-     * @return the audio dispatcher responsible for playing and processing the audio.
-     */
+    
     public AudioDispatcher getAudioDispatcher(){
         return playbackDispatcher;
     }
-    /**
-     * @param filepath filepath to the audio that will be loaded into the playback dispatcher
-     */
+
     public void setSong(String filepath) {
         this.isPlaying = false;
         this.currentSongFilePath = filepath;
