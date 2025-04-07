@@ -254,6 +254,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
             float trebleGain = newValue.floatValue();
             trebleGain = (trebleGain / 270) * 100;
             controller.setTreble1(trebleGain);
+
         });
         AnchorPane.setTopAnchor(channelOneTreble, (screenHeight / 1.87) - 75);
         AnchorPane.setLeftAnchor(channelOneTreble, (screenWidth / 3.275) - 25);
@@ -264,6 +265,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
             // Scale the value from 0-270 to 0-100dB
             trebleGain = (trebleGain / 270) * 100;
             controller.setTreble2(trebleGain);
+            System.out.println("volume: " + ((int) (Math.ceil(trebleGain / 2.7))));
         });
         AnchorPane.setTopAnchor(channelTwoTreble, (screenHeight / 1.87) - 75);
         AnchorPane.setLeftAnchor(channelTwoTreble, (screenWidth / 1.442) - 25);
@@ -271,6 +273,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         CircularSlider channelOneSpeed = new CircularSlider(9, false);
         channelOneSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
             double volume = newValue.doubleValue();
+            System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
         });
         AnchorPane.setTopAnchor(channelOneSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelOneSpeed, (screenWidth / 3.275) - 25);
@@ -278,6 +281,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         CircularSlider channelTwoSpeed = new CircularSlider(9, false);
         channelTwoSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
             double volume = newValue.doubleValue();
+            System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
         });
         AnchorPane.setTopAnchor(channelTwoSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelTwoSpeed, ((screenWidth / 1.442) - 25));
@@ -305,8 +309,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private void initializeZoneFour() {
         CircularSlider effectIntensity = new CircularSlider(9, false);
         effectIntensity.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double volume = newValue.doubleValue();
-            System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
+            float volume = newValue.floatValue();
+            float mixValue = volume / 270.0f;
+            mixValue = Math.max(0.0f, Math.min(1.0f, mixValue));
+            controller.setEffectMix(mixValue);
         });
         AnchorPane.setTopAnchor(effectIntensity, screenHeight / 10);
         AnchorPane.setLeftAnchor(effectIntensity, screenWidth / 1.15);
