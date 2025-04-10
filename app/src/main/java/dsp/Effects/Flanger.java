@@ -27,38 +27,29 @@ public class Flanger implements AudioProcessor {
         float[] audioFloatBuffer = audioEvent.getFloatBuffer();
         int overlap = audioEvent.getOverlap();
 
-        // Divide f by two, to counter rectifier below, which
-        // doubles the frequency
         double twoPIf = 2 * Math.PI * lfoFrequency / 2.0;
         double time = audioEvent.getTimeStamp(); // in seconds
         double timeStep = 1.0 / sampleRate; // also in seconds
 
         for (int i = overlap; i < audioFloatBuffer.length; i++) {
 
-            // Calculate the LFO delay value with a sine wave:
             double lfoValue = (flangerBuffer.length - 1) * Math.sin(twoPIf * time);
-            // add a time step, each iteration
             time += timeStep;
 
-            // Make the delay a positive integer
             int delay = (int) (Math.round(Math.abs(lfoValue)));
 
-            // store the current sample in the delay buffer;
             if (writePosition >= flangerBuffer.length) {
                 writePosition = 0;
             }
             flangerBuffer[writePosition] = audioFloatBuffer[i];
 
-            // find out the position to read the delayed sample:
             int readPosition = writePosition - delay;
             if (readPosition < 0) {
                 readPosition += flangerBuffer.length;
             }
 
-            // increment the write-position
             writePosition++;
 
-            // Output is the input summed with the value at the delayed flanger
             audioFloatBuffer[i] = dry * audioFloatBuffer[i] + wet * flangerBuffer[readPosition];
         }
         return true;
