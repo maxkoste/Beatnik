@@ -29,8 +29,8 @@ public class MediaPlayer {
 
     public MediaPlayer() {
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
-        bassEqualizer = new Equalizer(44100, 80, 80 );    // 80Hz center, 50Hz bandwidth
-        trebleEqualizer = new Equalizer(44100, 5000, 7000 ); // 7khz center, 5kHz bandwidth
+        bassEqualizer = new Equalizer(44100, 80, 80); // 80Hz center, 50Hz bandwidth
+        trebleEqualizer = new Equalizer(44100, 5000, 7000); // 7khz center, 5kHz bandwidth
         delayEffect = new Delay(0.5, 0.6, 44100);
     }
 
@@ -53,22 +53,22 @@ public class MediaPlayer {
 
             String filePath = new File(resourceUrl.toURI()).getAbsolutePath();
             System.out.println("Loading audio file from: " + filePath);
-           
+
             // Use AudioDispatcherFactory with the actual file path
             playbackDispatcher = AudioDispatcherFactory.fromPipe(filePath, 44100, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
             System.out.println("Audio format: " + format.toString());
 
-            //Add volume controll first 
+            // Add volume controll first
             volumeProcessor = new GainProcessor(0.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
 
-            //Add effects-processing
+            // Add effects-processing
             playbackDispatcher.addAudioProcessor(delayEffect);
             playbackDispatcher.addAudioProcessor(flangerEffect);
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
-            
+
             // Add audio player for final output
             AudioPlayer audioPlayer = new AudioPlayer(format);
             playbackDispatcher.addAudioProcessor(audioPlayer);
@@ -106,7 +106,7 @@ public class MediaPlayer {
             volumeProcessor.setGain(gain);
         }
     }
-    
+
     public void setTreble(float trebleGain) {
         trebleEqualizer.setGain(trebleGain);
     }
@@ -121,34 +121,35 @@ public class MediaPlayer {
      * When mix = 0 100% dry signal
      * when mix = 1 100% wet signal
      * when mix = 0.5 50% wet 50% dry
+     * 
      * @param mix
      */
-    public void setEffectMix(float mix, String effectType) { // 0.0f to 1.0f
-        this.effectMix = mix;
-        switch (effectType) {
-            case "delay":
-            if (delayEffect != null) {
-                delayEffect.setMix(mix);
-            }
-                break;
-            case "flanger":
+    public void setDelayEffectMix(float mix) { // 0.0f to 1.0f
+        if (delayEffect != null) {
+            delayEffect.setMix(mix);
+        }
+    }
 
-            if (flangerEffect != null){
-                flangerEffect.setWet(mix);
-            }
-                break;
-            default:
-                break;
+    /**
+     * Same as delay...
+     * @param mix
+     */
+    public void setFlangerEffectMix(float mix){
+        if (flangerEffect != null){
+            flangerEffect.setWet(mix);
         }
     }
     /**
-     * @return the audio dispatcher responsible for playing and processing the audio.
+     * @return the audio dispatcher responsible for playing and processing the
+     *         audio.
      */
-    public AudioDispatcher getAudioDispatcher(){
+    public AudioDispatcher getAudioDispatcher() {
         return playbackDispatcher;
     }
+
     /**
-     * @param filepath filepath to the audio that will be loaded into the playback dispatcher
+     * @param filepath filepath to the audio that will be loaded into the playback
+     *                 dispatcher
      */
     public void setSong(String filepath) {
         this.isPlaying = false;
