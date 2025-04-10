@@ -312,7 +312,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
             float volume = newValue.floatValue();
             float mixValue = volume / 270.0f;
             mixValue = Math.max(0.0f, Math.min(1.0f, mixValue));
-            controller.setEffectMix(mixValue);
+            controller.setEffectMix(mixValue, "delay");
         });
         AnchorPane.setTopAnchor(effectIntensity, screenHeight / 10);
         AnchorPane.setLeftAnchor(effectIntensity, screenWidth / 1.15);

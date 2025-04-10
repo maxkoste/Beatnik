@@ -149,10 +149,11 @@ public class Controller {
     * 1 = 100% effect signal (only effect)
     * all the effects should be applied on both audio-signals 
     * @param mix float value between 0-1f
+    * @param effectType indicating the effect being applied.
     */ 
-    public void setEffectMix(float mix){
-        audioPlayer1.setEffectMix(mix);
-        audioPlayer2.setEffectMix(mix);
+    public void setEffectMix(float mix, String effectType){
+        audioPlayer1.setEffectMix(mix , "delay");
+        audioPlayer2.setEffectMix(mix, "delay");
     }
 
     public void moveFile(File sourceFile, String destinationPath) throws IOException {

@@ -10,6 +10,7 @@ import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
 import dsp.Effects.Delay;
+import dsp.Effects.Flanger;
 import controller.Controller;
 
 //This class is responsible for playing the audio, and its volume
@@ -24,6 +25,7 @@ public class MediaPlayer {
     private boolean isPlaying;
     private float currentTime;
     private Delay delayEffect;
+    private Flanger flangerEffect;
 
     public MediaPlayer() {
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
@@ -61,8 +63,9 @@ public class MediaPlayer {
             volumeProcessor = new GainProcessor(0.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
 
-            // Add equalizers in sequence (bass first, then treble)
+            //Add effects-processing
             playbackDispatcher.addAudioProcessor(delayEffect);
+            playbackDispatcher.addAudioProcessor(flangerEffect);
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
             
@@ -120,10 +123,22 @@ public class MediaPlayer {
      * when mix = 0.5 50% wet 50% dry
      * @param mix
      */
-    public void setEffectMix(float mix) { // 0.0f to 1.0f
+    public void setEffectMix(float mix, String effectType) { // 0.0f to 1.0f
         this.effectMix = mix;
-        if (delayEffect != null) {
-            delayEffect.setMix(mix);
+        switch (effectType) {
+            case "delay":
+            if (delayEffect != null) {
+                delayEffect.setMix(mix);
+            }
+                break;
+            case "flanger":
+
+            if (flangerEffect != null){
+                flangerEffect.setWet(mix);
+            }
+                break;
+            default:
+                break;
         }
     }
     /**
