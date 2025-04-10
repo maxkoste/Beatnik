@@ -2,6 +2,7 @@ package dsp.Effects;
 
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
+
 public class Flanger implements AudioProcessor {
 
     private float[] flangerBuffer;
