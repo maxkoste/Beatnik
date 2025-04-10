@@ -47,6 +47,9 @@ public class Controller {
         startUp(primaryStage);
     }
 
+    public void hello() {
+      System.out.println("whats going on here buddy !"); 
+    }
     public void startUp(Stage primaryStage) {
         frame.start(primaryStage);
         playlistManager.addSongsFromResources();
@@ -97,7 +100,6 @@ public class Controller {
             setSong(channel, playlistManager.randomSong());
         }
     }
-
 
     public void setChannelOneVolume(float volume) {
         audioPlayer1.setVolume((volume * masterModifier) * crossfaderModifier1);
