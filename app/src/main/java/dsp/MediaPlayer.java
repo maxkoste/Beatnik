@@ -26,11 +26,11 @@ public class MediaPlayer {
     private float currentTime;
     private Delay delayEffect;
     private Flanger flangerEffect;
-
+    private int defaultLength = 20;
     public MediaPlayer() {
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
         bassEqualizer = new Equalizer(44100, 80, 80); // 80Hz center, 50Hz bandwidth
-        flangerEffect  = new Flanger(10, 0, 44100, 30);
+        flangerEffect  = new Flanger(0.0002, 0, 44100, 3);
         trebleEqualizer = new Equalizer(44100, 5000, 7000); // 7khz center, 5kHz bandwidth
         delayEffect = new Delay(0.5, 0.6, 44100);
     }
