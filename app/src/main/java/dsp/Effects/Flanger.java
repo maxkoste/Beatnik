@@ -36,7 +36,6 @@ public class Flanger implements AudioProcessor {
         for (int i = overlap; i < audioFloatBuffer.length; i++) {
 
             // Calculate the LFO delay value with a sine wave:
-            // fix by hans bickel
             double lfoValue = (flangerBuffer.length - 1) * Math.sin(twoPIf * time);
             // add a time step, each iteration
             time += timeStep;
