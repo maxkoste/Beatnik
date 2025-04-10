@@ -18,7 +18,6 @@ import java.util.TimerTask;
 
 import dsp.MediaPlayer;
 
-
 public class Controller {
     MediaPlayer audioPlayer1;
     MediaPlayer audioPlayer2;
@@ -26,7 +25,8 @@ public class Controller {
     PlaylistManager playlistManager;
     TimerThreadOne timerThreadOne;
     TimerThreadTwo timerThreadTwo;
-    ObservableList<String> playlistSongPaths; //TODO: Find way of alerting Controller when a song has naturally finished playing
+    ObservableList<String> playlistSongPaths; // TODO: Find way of alerting Controller when a song has naturally
+                                              // finished playing
     int currentPosInPlaylist;
     float masterModifier = 0.5F;
     float crossfaderModifier1 = 1.0F;
@@ -35,6 +35,7 @@ public class Controller {
     float latestVolume2 = 50.0F;
     AudioDispatcher dispatcherOne;
     AudioDispatcher dispatcherTwo;
+    String currentEffect;
 
     public Controller(Stage primaryStage) {
         audioPlayer1 = new MediaPlayer();
@@ -44,12 +45,10 @@ public class Controller {
         frame = new MainFrame(this);
         playlistManager = new PlaylistManager(frame);
         frame.registerPlaylistManager(playlistManager);
+        this.currentEffect = "delay"; 
         startUp(primaryStage);
     }
 
-    public void hello() {
-      System.out.println("whats going on here buddy !"); 
-    }
     public void startUp(Stage primaryStage) {
         frame.start(primaryStage);
         playlistManager.addSongsFromResources();
@@ -69,7 +68,7 @@ public class Controller {
     }
 
     public void startPlaylist(int channel, int selectedIndex, ObservableList<String> songPaths) {
-        playlistSongPaths = songPaths; //TODO: Make into a queue or smth? Might not be needed.
+        playlistSongPaths = songPaths; // TODO: Make into a queue or smth? Might not be needed.
         currentPosInPlaylist = selectedIndex;
         setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
     }
@@ -87,7 +86,36 @@ public class Controller {
         }
     }
 
-    public void nextSong(int channel) { //TODO: Update GUI with names etc
+    public void setEffect(int effectSelectorValue) {
+        /**
+         * 0 = 1 delay
+         * 68 = 2 Flanger
+         * 135 = 3
+         * 204 = 4
+         * 270 = 5
+         */
+        switch (effectSelectorValue) {
+            case 0:
+                this.currentEffect = "delay";
+                break;
+            case 68:
+                this.currentEffect = "flanger";
+                break;
+            case 135:
+                System.out.println("Effect nr 3");
+                break;
+            case 204:
+                System.out.println("Effect nr 4 ");
+                break;
+            case 270:
+                System.out.println("Effect nr 5");
+                break;
+            default:
+                System.out.println("Something went wrong...");
+        }
+    }
+
+    public void nextSong(int channel) { // TODO: Update GUI with names etc
         if (playlistSongPaths != null) {
             if (!(currentPosInPlaylist >= playlistSongPaths.size() - 1)) {
                 currentPosInPlaylist++;
@@ -111,7 +139,7 @@ public class Controller {
         latestVolume2 = volume;
     }
 
-    public void setMasterVolume(float masterModifier) { //TODO: Kan vara långsamt
+    public void setMasterVolume(float masterModifier) { // TODO: Kan vara långsamt
         this.masterModifier = masterModifier;
         setChannelOneVolume(latestVolume1);
         setChannelTwoVolume(latestVolume2);
@@ -127,32 +155,44 @@ public class Controller {
         setChannelTwoVolume(latestVolume2);
     }
 
-    public void setTreble1(float trebleGain){
+    public void setTreble1(float trebleGain) {
         audioPlayer1.setTreble(trebleGain);
     }
 
-    public void setTreble2(float trebleGain){
+    public void setTreble2(float trebleGain) {
         audioPlayer2.setTreble(trebleGain);
     }
-    
-    public void setBass1(float bassGain){
+
+    public void setBass1(float bassGain) {
         audioPlayer1.setBass(bassGain);
     }
 
-    public void setBass2(float bassGain){
+    public void setBass2(float bassGain) {
         audioPlayer2.setBass(bassGain);
     }
 
     /**
-    * set the mix value of the effect
-    * 0 = 100% dry signal (no effect)
-    * 1 = 100% effect signal (only effect)
-    * all the effects should be applied on both audio-signals 
-    * @param mix float value between 0-1f
-    */ 
-    public void setEffectMix(float mix){
-        audioPlayer1.setEffectMix(mix);
-        audioPlayer2.setEffectMix(mix);
+     * set the mix value of the effect
+     * 0 = 100% dry signal (no effect)
+     * 1 = 100% effect signal (only effect)
+     * all the effects should be applied on both audio-signals
+     * 
+     * @param mix        float value between 0-1f
+     * @param effectType indicating the effect being applied.
+     */
+    public void setEffectMix(float mix) {
+        switch (this.currentEffect) {
+            case "delay":
+                audioPlayer1.setDelayEffectMix(mix);
+                audioPlayer2.setDelayEffectMix(mix);
+                break;
+            case "flanger":
+                audioPlayer1.setFlangerEffectMix(mix);
+                audioPlayer2.setFlangerEffectMix(mix);
+                break;
+            default:
+                break;
+        }
     }
 
     public void moveFile(File sourceFile, String destinationPath) throws IOException {
@@ -165,7 +205,7 @@ public class Controller {
         System.out.println("File moved into the songsGUI folder");
     }
 
-    private float[] extract (String filePath) { //TODO: Collect all fileData att app launch
+    private float[] extract(String filePath) { // TODO: Collect all fileData att app launch
         List<Float> audioSamples = new ArrayList<>();
         try {
             String path = new File("src/main/resources/songs/" + filePath).getAbsolutePath();
@@ -178,6 +218,7 @@ public class Controller {
                     }
                     return true;
                 }
+
                 @Override
                 public void processingFinished() {
                     System.out.println("File extracted");

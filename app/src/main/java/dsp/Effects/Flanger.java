@@ -3,7 +3,6 @@ package dsp.Effects;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 
-//This class represents the Flanger implementation
 public class Flanger implements AudioProcessor {
 
     private float[] flangerBuffer;
@@ -49,6 +48,7 @@ public class Flanger implements AudioProcessor {
             }
 
             writePosition++;
+
             audioFloatBuffer[i] = dry * audioFloatBuffer[i] + wet * flangerBuffer[readPosition];
         }
         return true;
