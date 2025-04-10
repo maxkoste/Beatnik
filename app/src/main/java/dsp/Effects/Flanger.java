@@ -3,7 +3,7 @@ package dsp.Effects;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 
-//This class represents the pahser implementation
+//This class represents the Flanger implementation
 public class Flanger implements AudioProcessor {
 
     private float[] flangerBuffer;
