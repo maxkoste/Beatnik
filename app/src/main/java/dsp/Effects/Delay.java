@@ -1,5 +1,4 @@
 package dsp.Effects;
-
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 
