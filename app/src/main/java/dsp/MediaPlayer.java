@@ -9,6 +9,9 @@ import be.tarsos.dsp.GainProcessor;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
+import dsp.Effects.Delay;
+import dsp.Effects.Flanger;
+import controller.Controller;
 
 //This class is responsible for playing the audio, and its volume
 public class MediaPlayer {
@@ -16,13 +19,20 @@ public class MediaPlayer {
     private GainProcessor gainProcessor;
     private String currentSongFilePath;
     private GainProcessor volumeProcessor;
-    private EffectChain effectChain;
+    private Equalizer bassEqualizer;
+    private Equalizer trebleEqualizer;
     private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
     private boolean isPlaying;
     private float currentTime;
-
+    private Delay delayEffect;
+    private Flanger flangerEffect;
+    private int defaultLength = 20;
     public MediaPlayer() {
-        effectChain = new EffectChain();
+        // Initialize equalizers with wide bandwidths to simulate shelf behavior
+        bassEqualizer = new Equalizer(44100, 80, 80); // 80Hz center, 50Hz bandwidth
+        flangerEffect  = new Flanger(0.0002, 0, 44100, 3);
+        trebleEqualizer = new Equalizer(44100, 5000, 7000); // 7khz center, 5kHz bandwidth
+        delayEffect = new Delay(0.5, 0.6, 44100);
     }
 
     public void setUp() {
@@ -50,23 +60,15 @@ public class MediaPlayer {
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
             System.out.println("Audio format: " + format.toString());
 
-            // Add volume control first - set initial volume to 1.0 (100%)
-            volumeProcessor = new GainProcessor(1.0f);
+            // Add volume controll first
+            volumeProcessor = new GainProcessor(0.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
 
-            // Add effect chain processor
-            playbackDispatcher.addAudioProcessor(new AudioProcessor() {
-                @Override
-                public boolean process(AudioEvent audioEvent) {
-                    effectChain.process(audioEvent.getFloatBuffer());
-                    return true;
-                }
-
-                @Override
-                public void processingFinished() {
-                    System.out.println("Processing finished..");
-                }
-            });
+            // Add effects-processing
+            playbackDispatcher.addAudioProcessor(delayEffect);
+            playbackDispatcher.addAudioProcessor(flangerEffect);
+            playbackDispatcher.addAudioProcessor(bassEqualizer);
+            playbackDispatcher.addAudioProcessor(trebleEqualizer);
 
             // Add audio player for final output
             AudioPlayer audioPlayer = new AudioPlayer(format);
@@ -106,22 +108,54 @@ public class MediaPlayer {
         }
     }
 
-    // Set the effect mix between 0.0f and 1.0f, 0.0f is dry only, 1.0f is wet only
-    // 0.5f is equal mix of dry and wet not implemented yet...
-    public void setEffectMix(float mix) { // 0.0f to 1.0f
-        // TODO: Implement this
-        this.effectMix = mix;
-        if (gainProcessor != null) {
-            gainProcessor.setGain(mix);
+    public void setTreble(float trebleGain) {
+        trebleEqualizer.setGain(trebleGain);
+    }
+
+    public void setBass(float bassGain) {
+        bassEqualizer.setGain(bassGain);
+    }
+
+    /**
+     * set the effect-mix of the delay
+     * needs to be a value between 0.0-1.0f
+     * When mix = 0 100% dry signal
+     * when mix = 1 100% wet signal
+     * when mix = 0.5 50% wet 50% dry
+     * 
+     * @param mix
+     */
+    public void setDelayEffectMix(float mix) { // 0.0f to 1.0f
+        if (delayEffect != null) {
+            delayEffect.setMix(mix);
         }
     }
 
-    public void setSong(String filepath) {
-        this.currentSongFilePath = filepath;
-        setVolume(100.0f); // Set initial volume to maximum
+    /**
+     * Same as delay...
+     * @param mix
+     */
+    public void setFlangerEffectMix(float mix){
+        if (flangerEffect != null){
+            flangerEffect.setWet(mix);
+        }
+    }
+    /**
+     * @return the audio dispatcher responsible for playing and processing the
+     *         audio.
+     */
+    public AudioDispatcher getAudioDispatcher() {
+        return playbackDispatcher;
     }
 
-    public void setEffect(dsp.Effects.AudioEffect effect) {
-        effectChain.setEffect(effect);
+    /**
+     * @param filepath filepath to the audio that will be loaded into the playback
+     *                 dispatcher
+     */
+    public void setSong(String filepath) {
+        this.isPlaying = false;
+        this.currentSongFilePath = filepath;
+        this.currentTime = 0;
     }
+
 }
