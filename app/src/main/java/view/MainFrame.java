@@ -7,6 +7,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.geometry.VerticalDirection;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -49,6 +50,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
     Button switchChannelTwo;
     double screenHeight;
     double screenWidth;
+    ProgressBar audioIndicatorOne;
+    ProgressBar audioIndicatorTwo;
     
     public MainFrame(Controller controller) {
         this.controller = controller;
@@ -115,6 +118,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         });
         AnchorPane.setTopAnchor(cueVolume, screenHeight / 1.25);
         AnchorPane.setLeftAnchor(cueVolume, screenWidth / 10);
+
 
         primaryPane.getChildren().addAll(songsButton, quantize, cueVolume);
     }
@@ -286,24 +290,25 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelTwoSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelTwoSpeed, ((screenWidth / 1.442) - 25));
 
-        ScrollBar channelOneVolumeIndicator = new ScrollBar(); // Temporary implementation
-        channelOneVolumeIndicator.setPrefSize(10.0, 300.0);
-        channelOneVolumeIndicator.setOrientation(Orientation.VERTICAL);
-        AnchorPane.setTopAnchor(channelOneVolumeIndicator, (screenHeight - 500));
-        AnchorPane.setLeftAnchor(channelOneVolumeIndicator,
-                ((screenWidth / 2) - 150) - (channelOneVolumeIndicator.getPrefWidth() / 2));
+        audioIndicatorOne = new ProgressBar(0);
+        audioIndicatorOne.setPrefHeight(200);
+        audioIndicatorOne.setPrefWidth(10);
+        audioIndicatorOne.setRotate(0);
+        AnchorPane.setTopAnchor(audioIndicatorOne, (screenHeight - 500));
+        AnchorPane.setLeftAnchor(audioIndicatorOne, ((screenWidth / 2) - 150) - (audioIndicatorOne.getPrefWidth() / 2));
 
-        ScrollBar channelTwoVolumeIndicator = new ScrollBar(); // Temporary implementation
-        channelTwoVolumeIndicator.setPrefSize(10.0, 300.0);
-        channelTwoVolumeIndicator.setOrientation(Orientation.VERTICAL);
-        AnchorPane.setTopAnchor(channelTwoVolumeIndicator, (screenHeight - 500));
-        AnchorPane.setLeftAnchor(channelTwoVolumeIndicator,
-                ((screenWidth / 2) + 150) - (channelOneVolumeIndicator.getPrefWidth() / 2));
+        audioIndicatorTwo = new ProgressBar(0);
+        audioIndicatorTwo.setPrefHeight(200);
+        audioIndicatorTwo.setPrefWidth(10);
+        audioIndicatorTwo.setRotate(0);
+        AnchorPane.setTopAnchor(audioIndicatorTwo, (screenHeight - 500));
+        AnchorPane.setLeftAnchor(audioIndicatorTwo, ((screenWidth / 2) + 150) - (audioIndicatorTwo.getPrefWidth() / 2));
+
+
 
         primaryPane.getChildren().addAll(crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
                 channelTwoVolume, channelOneBass, channelTwoBass, channelOneTreble, channelTwoTreble, channelOneSpeed,
-                channelTwoSpeed,
-                channelOneVolumeIndicator, channelTwoVolumeIndicator);
+                channelTwoSpeed, audioIndicatorOne, audioIndicatorTwo);
     }
 
     private void initializeZoneFour() {
@@ -595,5 +600,15 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     public void updateWaveformTwo(float currentSecond) {
         waveformTwo.update(currentSecond);
+    }
+
+    public void updateAudioIndicatorOne(double rms) {
+        double level = Math.min(rms * 10, 1.0);
+        audioIndicatorOne.setProgress(level);
+    }
+
+    public void updateAudioIndicatorTwo(double rms) {
+        double level = Math.min(rms * 10, 1.0);
+        audioIndicatorOne.setProgress(level);
     }
 }
