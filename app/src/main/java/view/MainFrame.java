@@ -17,6 +17,9 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -50,6 +53,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
     Button switchChannelTwo;
     double screenHeight;
     double screenWidth;
+    private Circle[] auIndicatorCirclesOne = new Circle[10];
+    private Circle[] auIndicatorCirclesTwo = new Circle[10];
     ProgressBar audioIndicatorOne;
     ProgressBar audioIndicatorTwo;
     
@@ -290,25 +295,35 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelTwoSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelTwoSpeed, ((screenWidth / 1.442) - 25));
 
-        audioIndicatorOne = new ProgressBar(0);
-        audioIndicatorOne.setPrefHeight(200);
-        audioIndicatorOne.setPrefWidth(10);
-        audioIndicatorOne.setRotate(0);
-        AnchorPane.setTopAnchor(audioIndicatorOne, (screenHeight - 500));
-        AnchorPane.setLeftAnchor(audioIndicatorOne, ((screenWidth / 2) - 150) - (audioIndicatorOne.getPrefWidth() / 2));
+        VBox audioIndicatorOne = new VBox(2);
+        audioIndicatorOne.setPrefHeight(100);
+        audioIndicatorOne.setLayoutX(100);
+        audioIndicatorOne.setLayoutY(75);
+        audioIndicatorOne.setAlignment(Pos.BOTTOM_CENTER);
 
-        audioIndicatorTwo = new ProgressBar(0);
-        audioIndicatorTwo.setPrefHeight(200);
-        audioIndicatorTwo.setPrefWidth(10);
-        audioIndicatorTwo.setRotate(0);
-        AnchorPane.setTopAnchor(audioIndicatorTwo, (screenHeight - 500));
-        AnchorPane.setLeftAnchor(audioIndicatorTwo, ((screenWidth / 2) + 150) - (audioIndicatorTwo.getPrefWidth() / 2));
+        for (int audioIndex = 0; audioIndex < auIndicatorCirclesOne.length; audioIndex++) {
+            Circle dot = new Circle(5);
+            dot.setFill(Color.LIGHTGRAY);
+            auIndicatorCirclesOne[audioIndex] = dot;
+            audioIndicatorOne.getChildren().add(dot);
+        }
 
+        VBox audioIndicatorTwo = new VBox(2);
+        audioIndicatorTwo.setPrefHeight(100);
+        audioIndicatorTwo.setLayoutX(100);
+        audioIndicatorTwo.setLayoutY(150);
+        audioIndicatorTwo.setAlignment(Pos.BOTTOM_CENTER);
 
+        for (int audioIndex = 0; audioIndex < auIndicatorCirclesTwo.length; audioIndex++) {
+            Circle dot = new Circle(5);
+            dot.setFill(Color.GREEN);
+            auIndicatorCirclesTwo[audioIndex] = dot;
+            audioIndicatorTwo.getChildren().add(dot);
+        }
 
         primaryPane.getChildren().addAll(crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
                 channelTwoVolume, channelOneBass, channelTwoBass, channelOneTreble, channelTwoTreble, channelOneSpeed,
-                channelTwoSpeed, audioIndicatorOne, audioIndicatorTwo);
+                channelTwoSpeed, audioIndicatorOne, audioIndicatorTwo, audioIndicatorOne, audioIndicatorTwo);
     }
 
     private void initializeZoneFour() {
@@ -603,8 +618,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
     }
 
     public void updateAudioIndicatorOne(double rms) {
-        double level = Math.min(rms * 10, 1.0);
-        audioIndicatorOne.setProgress(level);
+        int totalDots = auIndicatorCirclesOne.length;
+        int activeDots = (int) Math.round(Math.min(rms * totalDots * 1.2, totalDots));
+
     }
 
     public void updateAudioIndicatorTwo(double rms) {
