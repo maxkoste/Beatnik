@@ -633,6 +633,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
     }
 
     public void updateWaveformTwo(float currentSecond) {
-        waveformTwo.update(currentSecond);
+        waveformTwo.update(currentSecond); //thing
     }
 }
