@@ -55,8 +55,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
     double screenWidth;
     private Circle[] auIndicatorCirclesOne = new Circle[10];
     private Circle[] auIndicatorCirclesTwo = new Circle[10];
-    ProgressBar audioIndicatorOne;
-    ProgressBar audioIndicatorTwo;
     
     public MainFrame(Controller controller) {
         this.controller = controller;
@@ -297,8 +295,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         VBox audioIndicatorOne = new VBox(2);
         audioIndicatorOne.setPrefHeight(100);
-        audioIndicatorOne.setLayoutX(100);
-        audioIndicatorOne.setLayoutY(75);
+        audioIndicatorOne.setLayoutX((screenWidth / 2) - 200);
+        audioIndicatorOne.setLayoutY(screenHeight / 2);
         audioIndicatorOne.setAlignment(Pos.BOTTOM_CENTER);
 
         for (int audioIndex = 0; audioIndex < auIndicatorCirclesOne.length; audioIndex++) {
@@ -310,8 +308,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         VBox audioIndicatorTwo = new VBox(2);
         audioIndicatorTwo.setPrefHeight(100);
-        audioIndicatorTwo.setLayoutX(100);
-        audioIndicatorTwo.setLayoutY(150);
+        audioIndicatorTwo.setLayoutX((screenWidth / 2) + 200);
+        audioIndicatorTwo.setLayoutY(screenHeight / 2);
         audioIndicatorTwo.setAlignment(Pos.BOTTOM_CENTER);
 
         for (int audioIndex = 0; audioIndex < auIndicatorCirclesTwo.length; audioIndex++) {
@@ -323,7 +321,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         primaryPane.getChildren().addAll(crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
                 channelTwoVolume, channelOneBass, channelTwoBass, channelOneTreble, channelTwoTreble, channelOneSpeed,
-                channelTwoSpeed, audioIndicatorOne, audioIndicatorTwo, audioIndicatorOne, audioIndicatorTwo);
+                channelTwoSpeed, audioIndicatorOne, audioIndicatorTwo);
     }
 
     private void initializeZoneFour() {
@@ -621,10 +619,42 @@ public class MainFrame implements EventHandler<ActionEvent> {
         int totalDots = auIndicatorCirclesOne.length;
         int activeDots = (int) Math.round(Math.min(rms * totalDots * 1.2, totalDots));
 
+        for (int i = 0; i < totalDots; i++) {
+            if (activeDots > i) {
+                if (5 > i) {
+                    auIndicatorCirclesOne[i].setFill(Color.GREEN);
+                }
+                else if (8 > i) {
+                    auIndicatorCirclesOne[i].setFill(Color.YELLOW);
+                }
+                else {
+                    auIndicatorCirclesOne[i].setFill(Color.RED);
+                }
+            }
+            else {
+                auIndicatorCirclesOne[i].setFill(Color.GRAY);
+            }
+        }
     }
 
     public void updateAudioIndicatorTwo(double rms) {
-        double level = Math.min(rms * 10, 1.0);
-        audioIndicatorOne.setProgress(level);
+        int totalDots = auIndicatorCirclesTwo.length;
+        int activeDots = (int) Math.round(Math.min(rms * totalDots * 1.2, totalDots));
+
+        for (int i = 0; i < totalDots; i++) {
+            if (activeDots > i) {
+                if (5 > i) {
+                    auIndicatorCirclesTwo[i].setFill(Color.GREEN);
+                }
+                else if (8 > i) {
+                    auIndicatorCirclesTwo[i].setFill(Color.YELLOW);
+                }
+                else {
+                    auIndicatorCirclesTwo[i].setFill(Color.RED);
+                }
+            } else {
+                auIndicatorCirclesTwo[i].setFill(Color.GRAY);
+            }
+        }
     }
 }
