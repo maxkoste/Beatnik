@@ -1,4 +1,5 @@
 package view;
+
 import javafx.application.Platform;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -15,7 +16,7 @@ public class WaveFormCanvas extends Canvas {
     private int originalAudioDataSize;
     private final float tenFloatSeconds = 438097.051598F;
     private final float floatSecond = 43809.7051598F;
-    private final int snippetLength = Math.round(tenFloatSeconds*2);
+    private final int snippetLength = Math.round(tenFloatSeconds * 2);
 
     public WaveFormCanvas(double width, double height) {
         super(width, height);

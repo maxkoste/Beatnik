@@ -48,7 +48,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     Button switchChannelTwo;
     double screenHeight;
     double screenWidth;
-
+    
     public MainFrame(Controller controller) {
         this.controller = controller;
     }
@@ -234,7 +234,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         });
         AnchorPane.setTopAnchor(channelTwoVolume, (screenHeight / 1.635));
         AnchorPane.setLeftAnchor(channelTwoVolume, ((screenWidth / 1.453) - (channelOneVolume.getPrefWidth() / 2)));
-        
+
         CircularSlider channelOneBass = new CircularSlider(9, false);
         channelOneBass.valueProperty().addListener((observable, oldValue, newValue) -> {
             float bassGain = newValue.floatValue();
@@ -354,8 +354,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         CircularSlider effectSelector = new CircularSlider(5, true);
         effectSelector.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double volume = newValue.doubleValue();
-            System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
+            int effectSelectorValue = newValue.intValue();
+            controller.setEffect(effectSelectorValue);
         });
         AnchorPane.setTopAnchor(effectSelector, (screenHeight / 2));
         AnchorPane.setLeftAnchor(effectSelector, (screenWidth / 1.15));

@@ -10,6 +10,7 @@ import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
 import dsp.Effects.Delay;
+import dsp.Effects.Flanger;
 import controller.Controller;
 
 //This class is responsible for playing the audio, and its volume
@@ -24,11 +25,13 @@ public class MediaPlayer {
     private boolean isPlaying;
     private float currentTime;
     private Delay delayEffect;
-
+    private Flanger flangerEffect;
+    private int defaultLength = 20;
     public MediaPlayer() {
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
-        bassEqualizer = new Equalizer(44100, 80, 80 );    // 80Hz center, 50Hz bandwidth
-        trebleEqualizer = new Equalizer(44100, 5000, 7000 ); // 7khz center, 5kHz bandwidth
+        bassEqualizer = new Equalizer(44100, 80, 80); // 80Hz center, 50Hz bandwidth
+        flangerEffect  = new Flanger(0.0002, 0, 44100, 3);
+        trebleEqualizer = new Equalizer(44100, 5000, 7000); // 7khz center, 5kHz bandwidth
         delayEffect = new Delay(0.5, 0.6, 44100);
     }
 
@@ -51,21 +54,22 @@ public class MediaPlayer {
 
             String filePath = new File(resourceUrl.toURI()).getAbsolutePath();
             System.out.println("Loading audio file from: " + filePath);
-           
+
             // Use AudioDispatcherFactory with the actual file path
             playbackDispatcher = AudioDispatcherFactory.fromPipe(filePath, 44100, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
             System.out.println("Audio format: " + format.toString());
 
-            //Add volume controll first 
+            // Add volume controll first
             volumeProcessor = new GainProcessor(0.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
 
-            // Add equalizers in sequence (bass first, then treble)
+            // Add effects-processing
             playbackDispatcher.addAudioProcessor(delayEffect);
+            playbackDispatcher.addAudioProcessor(flangerEffect);
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
-            
+
             // Add audio player for final output
             AudioPlayer audioPlayer = new AudioPlayer(format);
             playbackDispatcher.addAudioProcessor(audioPlayer);
@@ -103,7 +107,7 @@ public class MediaPlayer {
             volumeProcessor.setGain(gain);
         }
     }
-    
+
     public void setTreble(float trebleGain) {
         trebleEqualizer.setGain(trebleGain);
     }
@@ -118,22 +122,35 @@ public class MediaPlayer {
      * When mix = 0 100% dry signal
      * when mix = 1 100% wet signal
      * when mix = 0.5 50% wet 50% dry
+     * 
      * @param mix
      */
-    public void setEffectMix(float mix) { // 0.0f to 1.0f
-        this.effectMix = mix;
+    public void setDelayEffectMix(float mix) { // 0.0f to 1.0f
         if (delayEffect != null) {
             delayEffect.setMix(mix);
         }
     }
+
     /**
-     * @return the audio dispatcher responsible for playing and processing the audio.
+     * Same as delay...
+     * @param mix
      */
-    public AudioDispatcher getAudioDispatcher(){
-        return playbackDispatcher;
+    public void setFlangerEffectMix(float mix){
+        if (flangerEffect != null){
+            flangerEffect.setWet(mix);
+        }
     }
     /**
-     * @param filepath filepath to the audio that will be loaded into the playback dispatcher
+     * @return the audio dispatcher responsible for playing and processing the
+     *         audio.
+     */
+    public AudioDispatcher getAudioDispatcher() {
+        return playbackDispatcher;
+    }
+
+    /**
+     * @param filepath filepath to the audio that will be loaded into the playback
+     *                 dispatcher
      */
     public void setSong(String filepath) {
         this.isPlaying = false;
