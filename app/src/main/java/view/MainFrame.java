@@ -299,10 +299,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         audioIndicatorOne.setLayoutY(screenHeight / 2);
         audioIndicatorOne.setAlignment(Pos.BOTTOM_CENTER);
 
-        for (int audioIndex = 0; audioIndex < auIndicatorCirclesOne.length; audioIndex++) {
+        for (int i = auIndicatorCirclesOne.length - 1; i >= 0; i--) {
             Circle dot = new Circle(10);
             dot.setFill(Color.LIGHTGRAY);
-            auIndicatorCirclesOne[audioIndex] = dot;
+            auIndicatorCirclesOne[i] = dot;
             audioIndicatorOne.getChildren().add(dot);
         }
 
@@ -312,10 +312,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         audioIndicatorTwo.setLayoutY(screenHeight / 2);
         audioIndicatorTwo.setAlignment(Pos.BOTTOM_CENTER);
 
-        for (int audioIndex = 0; audioIndex < auIndicatorCirclesTwo.length; audioIndex++) {
+        for (int i = auIndicatorCirclesTwo.length - 1; i >= 0; i--) {
             Circle dot = new Circle(10);
             dot.setFill(Color.LIGHTGRAY);
-            auIndicatorCirclesTwo[audioIndex] = dot;
+            auIndicatorCirclesTwo[i] = dot;
             audioIndicatorTwo.getChildren().add(dot);
         }
 
@@ -618,15 +618,15 @@ public class MainFrame implements EventHandler<ActionEvent> {
     public void updateAudioIndicatorOne(double rms) {
 
         int totalDots = auIndicatorCirclesOne.length;
-        int activeDots = (int) Math.round(Math.min(rms * totalDots * 1.2, totalDots));
+        int activeDots = (int) Math.round(Math.min(rms * totalDots * 5, totalDots));
 
         for (int i = 0; i < totalDots; i++) {
             if (activeDots > i) {
                 if (5 > i) {
-                    auIndicatorCirclesOne[i].setFill(Color.GREEN);
+                    auIndicatorCirclesOne[i].setFill(Color.LIGHTGREEN);
                 }
                 else if (8 > i) {
-                    auIndicatorCirclesOne[i].setFill(Color.YELLOW);
+                    auIndicatorCirclesOne[i].setFill(Color.GOLD);
                 }
                 else {
                     auIndicatorCirclesOne[i].setFill(Color.RED);
@@ -641,15 +641,15 @@ public class MainFrame implements EventHandler<ActionEvent> {
     public void updateAudioIndicatorTwo(double rms) {
 
         int totalDots = auIndicatorCirclesTwo.length;
-        int activeDots = (int) Math.round(Math.min(rms * totalDots * 1.2, totalDots));
+        int activeDots = (int) Math.round(Math.min(rms * totalDots * 5, totalDots));
 
         for (int i = 0; i < totalDots; i++) {
             if (activeDots > i) {
                 if (5 > i) {
-                    auIndicatorCirclesTwo[i].setFill(Color.GREEN);
+                    auIndicatorCirclesTwo[i].setFill(Color.LIGHTGREEN);
                 }
                 else if (8 > i) {
-                    auIndicatorCirclesTwo[i].setFill(Color.YELLOW);
+                    auIndicatorCirclesTwo[i].setFill(Color.GOLD);
                 }
                 else {
                     auIndicatorCirclesTwo[i].setFill(Color.RED);
