@@ -45,7 +45,7 @@ public class Controller {
         frame = new MainFrame(this);
         playlistManager = new PlaylistManager(frame);
         frame.registerPlaylistManager(playlistManager);
-        this.currentEffect = "delay"; 
+        this.currentEffect = "delay";
         startUp(primaryStage);
     }
 
