@@ -293,28 +293,28 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelTwoSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelTwoSpeed, ((screenWidth / 1.442) - 25));
 
-        VBox audioIndicatorOne = new VBox(2);
+        VBox audioIndicatorOne = new VBox(8);
         audioIndicatorOne.setPrefHeight(100);
         audioIndicatorOne.setLayoutX((screenWidth / 2) - 200);
         audioIndicatorOne.setLayoutY(screenHeight / 2);
         audioIndicatorOne.setAlignment(Pos.BOTTOM_CENTER);
 
         for (int audioIndex = 0; audioIndex < auIndicatorCirclesOne.length; audioIndex++) {
-            Circle dot = new Circle(5);
+            Circle dot = new Circle(10);
             dot.setFill(Color.LIGHTGRAY);
             auIndicatorCirclesOne[audioIndex] = dot;
             audioIndicatorOne.getChildren().add(dot);
         }
 
-        VBox audioIndicatorTwo = new VBox(2);
+        VBox audioIndicatorTwo = new VBox(8);
         audioIndicatorTwo.setPrefHeight(100);
         audioIndicatorTwo.setLayoutX((screenWidth / 2) + 200);
         audioIndicatorTwo.setLayoutY(screenHeight / 2);
         audioIndicatorTwo.setAlignment(Pos.BOTTOM_CENTER);
 
         for (int audioIndex = 0; audioIndex < auIndicatorCirclesTwo.length; audioIndex++) {
-            Circle dot = new Circle(5);
-            dot.setFill(Color.GREEN);
+            Circle dot = new Circle(10);
+            dot.setFill(Color.LIGHTGRAY);
             auIndicatorCirclesTwo[audioIndex] = dot;
             audioIndicatorTwo.getChildren().add(dot);
         }
@@ -616,6 +616,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     }
 
     public void updateAudioIndicatorOne(double rms) {
+
         int totalDots = auIndicatorCirclesOne.length;
         int activeDots = (int) Math.round(Math.min(rms * totalDots * 1.2, totalDots));
 
@@ -638,6 +639,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     }
 
     public void updateAudioIndicatorTwo(double rms) {
+
         int totalDots = auIndicatorCirclesTwo.length;
         int activeDots = (int) Math.round(Math.min(rms * totalDots * 1.2, totalDots));
 

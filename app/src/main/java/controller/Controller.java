@@ -80,12 +80,16 @@ public class Controller {
             audioPlayer1.playAudio();
             setChannelOneVolume(latestVolume1);
             dispatcherOne = audioPlayer1.getAudioDispatcher();
-            volumeIndicator(dispatcherOne, channel);
-        } else {
+            if (dispatcherOne != null) {
+                volumeIndicator(dispatcherOne, channel);
+            }
+        } else if (channel == 2) {
             audioPlayer2.playAudio();
             setChannelTwoVolume(latestVolume2);
             dispatcherTwo = audioPlayer2.getAudioDispatcher();
+            if (dispatcherTwo != null) {
             volumeIndicator(dispatcherTwo, channel);
+            }
         }
     }
 
