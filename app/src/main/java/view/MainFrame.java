@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Optional;
-import java.util.List;
 
 public class MainFrame implements EventHandler<ActionEvent> {
     AnchorPane primaryPane;
@@ -53,9 +52,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
     Button switchChannelTwo;
     double screenHeight;
     double screenWidth;
+
     private Circle[] auIndicatorCirclesOne = new Circle[10];
     private Circle[] auIndicatorCirclesTwo = new Circle[10];
-    
+
     public MainFrame(Controller controller) {
         this.controller = controller;
     }
@@ -114,6 +114,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(quantize, (screenHeight / 2));
         AnchorPane.setLeftAnchor(quantize, (screenWidth / 10));
 
+        Label quantizeLabel = new Label("Quantizer");
+        AnchorPane.setTopAnchor(quantizeLabel, screenHeight / 1.76);
+        AnchorPane.setLeftAnchor(quantizeLabel, screenWidth / 10.1);
+
         CircularSlider cueVolume = new CircularSlider(9, false);
         cueVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
             double volume = newValue.doubleValue();
@@ -122,8 +126,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(cueVolume, screenHeight / 1.25);
         AnchorPane.setLeftAnchor(cueVolume, screenWidth / 10);
 
+        Label cueVolumeLabel = new Label("Cue Volume");
+        AnchorPane.setTopAnchor(cueVolumeLabel, screenHeight / 1.15);
+        AnchorPane.setLeftAnchor(cueVolumeLabel, screenWidth / 10.7);
 
-        primaryPane.getChildren().addAll(songsButton, quantize, cueVolume);
+        primaryPane.getChildren().addAll(songsButton, quantize, quantizeLabel, cueVolume, cueVolumeLabel);
     }
 
     private void initializeZoneTwo() {
@@ -245,6 +252,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelOneBass, (screenHeight / 1.87));
         AnchorPane.setLeftAnchor(channelOneBass, (screenWidth / 3.275) - 25);
 
+        Label bassLabelOne = new Label("B");
+        AnchorPane.setTopAnchor(bassLabelOne, (screenHeight / 1.8));
+        AnchorPane.setLeftAnchor(bassLabelOne, (screenWidth / 3.3));
+
         CircularSlider channelTwoBass = new CircularSlider(9, false);
         channelTwoBass.valueProperty().addListener((observable, oldValue, newValue) -> {
             float bassGain = newValue.floatValue();
@@ -254,6 +265,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         });
         AnchorPane.setTopAnchor(channelTwoBass, (screenHeight / 1.87));
         AnchorPane.setLeftAnchor(channelTwoBass, (screenWidth / 1.442) - 25);
+
+        Label bassLabelTwo = new Label("B");
+        AnchorPane.setTopAnchor(bassLabelTwo, (screenHeight / 1.8));
+        AnchorPane.setLeftAnchor(bassLabelTwo, (screenWidth / 1.446));
 
         CircularSlider channelOneTreble = new CircularSlider(9, false);
         channelOneTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -266,6 +281,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelOneTreble, (screenHeight / 1.87) - 75);
         AnchorPane.setLeftAnchor(channelOneTreble, (screenWidth / 3.275) - 25);
 
+        Label trebleLabelOne = new Label("T");
+        AnchorPane.setTopAnchor(trebleLabelOne, (screenHeight / 1.8) - 75);
+        AnchorPane.setLeftAnchor(trebleLabelOne, (screenWidth / 3.3));
+
         CircularSlider channelTwoTreble = new CircularSlider(9, false);
         channelTwoTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
             float trebleGain = newValue.floatValue();
@@ -277,6 +296,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelTwoTreble, (screenHeight / 1.87) - 75);
         AnchorPane.setLeftAnchor(channelTwoTreble, (screenWidth / 1.442) - 25);
 
+        Label trebleLabelTwo = new Label("T");
+        AnchorPane.setTopAnchor(trebleLabelTwo, (screenHeight / 1.8) - 75);
+        AnchorPane.setLeftAnchor(trebleLabelTwo, (screenWidth / 1.446));
+
         CircularSlider channelOneSpeed = new CircularSlider(9, false);
         channelOneSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
             double volume = newValue.doubleValue();
@@ -285,6 +308,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelOneSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelOneSpeed, (screenWidth / 3.275) - 25);
 
+        Label speedLabelOne = new Label("S");
+        AnchorPane.setTopAnchor(speedLabelOne, (screenHeight / 1.8) - 150);
+        AnchorPane.setLeftAnchor(speedLabelOne, (screenWidth / 3.3));
+
         CircularSlider channelTwoSpeed = new CircularSlider(9, false);
         channelTwoSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
             double volume = newValue.doubleValue();
@@ -292,6 +319,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         });
         AnchorPane.setTopAnchor(channelTwoSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelTwoSpeed, ((screenWidth / 1.442) - 25));
+
 
         VBox audioIndicatorOne = new VBox(8);
         audioIndicatorOne.setPrefHeight(100);
@@ -305,6 +333,18 @@ public class MainFrame implements EventHandler<ActionEvent> {
             auIndicatorCirclesOne[i] = dot;
             audioIndicatorOne.getChildren().add(dot);
         }
+
+        Label speedLabelTwo = new Label("S");
+        AnchorPane.setTopAnchor(speedLabelTwo, (screenHeight / 1.8) - 150);
+        AnchorPane.setLeftAnchor(speedLabelTwo, (screenWidth / 1.446));
+
+        ScrollBar channelOneVolumeIndicator = new ScrollBar(); // Temporary implementation
+        channelOneVolumeIndicator.setPrefSize(10.0, 300.0);
+        channelOneVolumeIndicator.setOrientation(Orientation.VERTICAL);
+        AnchorPane.setTopAnchor(channelOneVolumeIndicator, (screenHeight - 500));
+        AnchorPane.setLeftAnchor(channelOneVolumeIndicator,
+                ((screenWidth / 2) - 150) - (channelOneVolumeIndicator.getPrefWidth() / 2));
+
 
         VBox audioIndicatorTwo = new VBox(8);
         audioIndicatorTwo.setPrefHeight(100);
@@ -320,8 +360,12 @@ public class MainFrame implements EventHandler<ActionEvent> {
         }
 
         primaryPane.getChildren().addAll(crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
-                channelTwoVolume, channelOneBass, channelTwoBass, channelOneTreble, channelTwoTreble, channelOneSpeed,
-                channelTwoSpeed, audioIndicatorOne, audioIndicatorTwo);
+
+                channelTwoVolume, channelOneBass, bassLabelOne, channelTwoBass, bassLabelTwo, channelOneTreble,
+                trebleLabelOne,
+                channelTwoTreble, trebleLabelTwo, channelOneSpeed, speedLabelOne, channelTwoSpeed, speedLabelTwo,
+                channelOneVolumeIndicator, channelTwoVolumeIndicator);
+
     }
 
     private void initializeZoneFour() {
@@ -335,6 +379,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(effectIntensity, screenHeight / 10);
         AnchorPane.setLeftAnchor(effectIntensity, screenWidth / 1.15);
 
+        Label effectIntensityLabel = new Label("Effect Intensity");
+        AnchorPane.setTopAnchor(effectIntensityLabel, screenHeight / 6);
+        AnchorPane.setLeftAnchor(effectIntensityLabel, screenWidth / 1.163);
+
         CircularSlider effectSelector = new CircularSlider(5, true);
         effectSelector.valueProperty().addListener((observable, oldValue, newValue) -> {
             int effectSelectorValue = newValue.intValue();
@@ -342,6 +390,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         });
         AnchorPane.setTopAnchor(effectSelector, (screenHeight / 2));
         AnchorPane.setLeftAnchor(effectSelector, (screenWidth / 1.15));
+
+        Label delay = new Label("Delay");
+        AnchorPane.setTopAnchor(delay, (screenHeight / 2));
+        AnchorPane.setLeftAnchor(delay, (screenWidth / 1.18));
 
         Slider masterVolume = new Slider();
         masterVolume.setPrefSize(10, 150);
@@ -364,7 +416,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setLeftAnchor(masterVolumeLabel,
                 ((screenWidth / 1.15) - (masterVolumeLabel.getPrefWidth() / 2)) + 25);
 
-        primaryPane.getChildren().addAll(effectIntensity, effectSelector, masterVolume, masterVolumeLabel);
+        primaryPane.getChildren().addAll(effectIntensity, effectIntensityLabel, effectSelector, delay, masterVolume,
+                masterVolumeLabel);
     }
 
     public void initializeSongsPane() {
@@ -612,7 +665,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     }
 
     public void updateWaveformTwo(float currentSecond) {
-        waveformTwo.update(currentSecond);
+        waveformTwo.update(currentSecond); // thing
     }
 
     public void updateAudioIndicatorOne(double rms) {

@@ -1,9 +1,11 @@
 package dsp.Effects;
+
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 
 /**
- * This class represents the delay effect. Has to be made custom to support mixing
+ * This class represents the delay effect. Has to be made custom to support
+ * mixing
  * dry and wet signal.
  */
 public class Delay implements AudioProcessor {
@@ -17,18 +19,20 @@ public class Delay implements AudioProcessor {
 
     /**
      * @param echoLength in seconds
-     * @param decay the decay of the echo, a value between 0 and 1
+     * @param decay      the decay of the echo, a value between 0 and 1
      * @param sampleRate sample rate in hertz (the same as the audio!)
      */
     public Delay(double echoLength, double decay, double sampleRate) {
         this.sampleRate = sampleRate;
-        this.mix = 0.0f; //initialize effect with 100% dry signal
+        this.mix = 0.0f; // initialize effect with 100% dry signal
         setDecay(decay);
         setEchoLength(echoLength);
         applyNewEchoLength();
     }
+
     /**
      * Acts as the mix but not sure if this is how i want to use it...
+     * 
      * @param newDecay
      */
     public void setDecay(double newDecay) {
@@ -63,9 +67,10 @@ public class Delay implements AudioProcessor {
      * When mix = 0 100% dry signal
      * when mix = 1 100% wet signal
      * when mix = 0.5 50% wet 50% dry
+     * 
      * @param mix
      */
-    public void setMix(float mix){
+    public void setMix(float mix) {
         this.mix = mix;
     }
 
