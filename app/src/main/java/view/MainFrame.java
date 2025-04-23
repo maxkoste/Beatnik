@@ -48,7 +48,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     Button switchChannelTwo;
     double screenHeight;
     double screenWidth;
-    
+
     public MainFrame(Controller controller) {
         this.controller = controller;
     }
@@ -332,7 +332,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
                 ((screenWidth / 2) + 150) - (channelOneVolumeIndicator.getPrefWidth() / 2));
 
         primaryPane.getChildren().addAll(crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
-                channelTwoVolume, channelOneBass, bassLabelOne, channelTwoBass, bassLabelTwo, channelOneTreble, trebleLabelOne,
+                channelTwoVolume, channelOneBass, bassLabelOne, channelTwoBass, bassLabelTwo, channelOneTreble,
+                trebleLabelOne,
                 channelTwoTreble, trebleLabelTwo, channelOneSpeed, speedLabelOne, channelTwoSpeed, speedLabelTwo,
                 channelOneVolumeIndicator, channelTwoVolumeIndicator);
     }
@@ -385,7 +386,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setLeftAnchor(masterVolumeLabel,
                 ((screenWidth / 1.15) - (masterVolumeLabel.getPrefWidth() / 2)) + 25);
 
-        primaryPane.getChildren().addAll(effectIntensity, effectIntensityLabel,  effectSelector, delay, masterVolume, masterVolumeLabel);
+        primaryPane.getChildren().addAll(effectIntensity, effectIntensityLabel, effectSelector, delay, masterVolume,
+                masterVolumeLabel);
     }
 
     public void initializeSongsPane() {
@@ -633,6 +635,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
     }
 
     public void updateWaveformTwo(float currentSecond) {
-        waveformTwo.update(currentSecond); //thing
+        waveformTwo.update(currentSecond); // thing
     }
 }
