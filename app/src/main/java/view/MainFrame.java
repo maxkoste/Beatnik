@@ -320,7 +320,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelTwoSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelTwoSpeed, ((screenWidth / 1.442) - 25));
 
-
         VBox audioIndicatorOne = new VBox(8);
         audioIndicatorOne.setPrefHeight(100);
         audioIndicatorOne.setLayoutX((screenWidth / 2) - 200);
@@ -355,8 +354,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
                 channelTwoVolume, channelOneBass, bassLabelOne, channelTwoBass, bassLabelTwo, channelOneTreble,
                 trebleLabelOne,
-                channelTwoTreble, trebleLabelTwo, channelOneSpeed, speedLabelOne, channelTwoSpeed, speedLabelTwo
-                );
+                channelTwoTreble, trebleLabelTwo, channelOneSpeed, speedLabelOne, channelTwoSpeed, speedLabelTwo,
+                audioIndicatorOne, audioIndicatorTwo);
 
     }
 
@@ -669,15 +668,12 @@ public class MainFrame implements EventHandler<ActionEvent> {
             if (activeDots > i) {
                 if (5 > i) {
                     auIndicatorCirclesOne[i].setFill(Color.LIGHTGREEN);
-                }
-                else if (8 > i) {
+                } else if (8 > i) {
                     auIndicatorCirclesOne[i].setFill(Color.GOLD);
-                }
-                else {
+                } else {
                     auIndicatorCirclesOne[i].setFill(Color.RED);
                 }
-            }
-            else {
+            } else {
                 auIndicatorCirclesOne[i].setFill(Color.GRAY);
             }
         }
@@ -692,11 +688,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
             if (activeDots > i) {
                 if (5 > i) {
                     auIndicatorCirclesTwo[i].setFill(Color.LIGHTGREEN);
-                }
-                else if (8 > i) {
+                } else if (8 > i) {
                     auIndicatorCirclesTwo[i].setFill(Color.GOLD);
-                }
-                else {
+                } else {
                     auIndicatorCirclesTwo[i].setFill(Color.RED);
                 }
             } else {
