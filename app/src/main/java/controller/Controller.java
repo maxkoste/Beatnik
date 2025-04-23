@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import javafx.application.Platform;
 
 import dsp.MediaPlayer;
 
@@ -45,7 +46,7 @@ public class Controller {
         frame = new MainFrame(this);
         playlistManager = new PlaylistManager(frame);
         frame.registerPlaylistManager(playlistManager);
-        this.currentEffect = "delay"; 
+        this.currentEffect = "delay";
         startUp(primaryStage);
     }
 
@@ -79,10 +80,16 @@ public class Controller {
             audioPlayer1.playAudio();
             setChannelOneVolume(latestVolume1);
             dispatcherOne = audioPlayer1.getAudioDispatcher();
-        } else {
+            if (dispatcherOne != null) {
+                volumeIndicator(dispatcherOne, channel);
+            }
+        } else if (channel == 2) {
             audioPlayer2.playAudio();
             setChannelTwoVolume(latestVolume2);
             dispatcherTwo = audioPlayer2.getAudioDispatcher();
+            if (dispatcherTwo != null) {
+            volumeIndicator(dispatcherTwo, channel);
+            }
         }
     }
 
@@ -233,6 +240,35 @@ public class Controller {
             audioSamplesFinal[i] = audioSamples.get(i);
         }
         return audioSamplesFinal;
+    }
+
+        private void volumeIndicator (AudioDispatcher dispatcher, int channel) {
+        dispatcher.addAudioProcessor(new AudioProcessor() {
+            public boolean process(AudioEvent audioEvent) {
+                float[] buffer = audioEvent.getFloatBuffer();
+                double rms = 0; //rms = root mean square
+                for (float sample : buffer) {
+                    rms += sample * sample;
+                }
+
+                rms = Math.sqrt(rms/buffer.length);
+                final double completeRms = rms;
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (channel == 1) {
+                            frame.updateAudioIndicatorOne(completeRms);
+                        }
+                        else if (channel == 2) {
+                            frame.updateAudioIndicatorTwo(completeRms);
+                        }
+                    }
+                });
+                return true;
+            }
+            @Override
+            public void processingFinished() {}
+        });
     }
 
     public class TimerThreadOne extends Thread {

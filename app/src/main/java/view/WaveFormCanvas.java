@@ -40,7 +40,7 @@ public class WaveFormCanvas extends Canvas {
             float[] audioSnippet = new float[snippetLength];
 
             int insertStart = Math.max(0, -startingPoint); // if startingPoint is negative, insert later
-            for (int i = audioDataStart; i < audioDataEnd; i++) {
+            for (int i = audioDataStart; i < audioDataEnd; i ++) {
                 audioSnippet[insertStart + i - audioDataStart] = originalAudioData[i];
             }
 
