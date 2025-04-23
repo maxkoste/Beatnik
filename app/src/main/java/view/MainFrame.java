@@ -338,14 +338,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(speedLabelTwo, (screenHeight / 1.8) - 150);
         AnchorPane.setLeftAnchor(speedLabelTwo, (screenWidth / 1.446));
 
-        ScrollBar channelOneVolumeIndicator = new ScrollBar(); // Temporary implementation
-        channelOneVolumeIndicator.setPrefSize(10.0, 300.0);
-        channelOneVolumeIndicator.setOrientation(Orientation.VERTICAL);
-        AnchorPane.setTopAnchor(channelOneVolumeIndicator, (screenHeight - 500));
-        AnchorPane.setLeftAnchor(channelOneVolumeIndicator,
-                ((screenWidth / 2) - 150) - (channelOneVolumeIndicator.getPrefWidth() / 2));
-
-
         VBox audioIndicatorTwo = new VBox(8);
         audioIndicatorTwo.setPrefHeight(100);
         audioIndicatorTwo.setLayoutX((screenWidth / 2) + 200);
@@ -363,8 +355,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
                 channelTwoVolume, channelOneBass, bassLabelOne, channelTwoBass, bassLabelTwo, channelOneTreble,
                 trebleLabelOne,
-                channelTwoTreble, trebleLabelTwo, channelOneSpeed, speedLabelOne, channelTwoSpeed, speedLabelTwo,
-                channelOneVolumeIndicator, channelTwoVolumeIndicator);
+                channelTwoTreble, trebleLabelTwo, channelOneSpeed, speedLabelOne, channelTwoSpeed, speedLabelTwo
+                );
 
     }
 
