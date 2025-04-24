@@ -13,7 +13,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -102,7 +101,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
     }
 
     /**
-     * Handles shutdown and closes resources in the controller before exiting
+     * Closes resources in the controller before exiting
+     * 
      * @param primaryStage
      */
     private void onClose(Stage primaryStage) {
@@ -507,12 +507,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
         playlistStage.showAndWait();
     }
 
-    // TODO: Redo Waveform-creation to be initialized in Zone 2, allow it to be
-    // blank when no song is active.
-    // TODO: Place Waveform in a separate pane like SplitPane which is then attached
-    // with anchorPane.
-    // TODO: Make Waveform instance variable so that it can be cleared without
-    // instanceof.
     public void handleSongSelection(MouseEvent mouseEvent) {
         if (mouseEvent.getClickCount() == 2) {
             if (channelOneActive) {
