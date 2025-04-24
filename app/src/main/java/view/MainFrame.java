@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -96,6 +97,18 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         playlistStage.setScene(songsScene);
         playlistStage.initModality(Modality.APPLICATION_MODAL);
+
+        onClose(primaryStage);
+    }
+
+    /**
+     * Handles shutdown and closes resources in the controller before exiting
+     * @param primaryStage
+     */
+    private void onClose(Stage primaryStage) {
+        primaryStage.setOnCloseRequest(event -> {
+            controller.shutDown();
+        });
     }
 
     private void initializeZoneOne() {

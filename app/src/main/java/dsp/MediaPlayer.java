@@ -46,14 +46,7 @@ public class MediaPlayer {
 
             System.out.println("Sampling this file in the: songs/" + currentSongFilePath);
 
-            // Get the resource URL and convert it to a file path
-            java.net.URL resourceUrl = getClass().getClassLoader().getResource("songs/" + currentSongFilePath);
-            if (resourceUrl == null) {
-                System.err.println("Error: Could not find audio file in resources!");
-                return;
-            }
-
-            String filePath = new File(resourceUrl.toURI()).getAbsolutePath();
+            String filePath = new File("src/main/resources/songs/" + currentSongFilePath).getAbsolutePath();
             System.out.println("Loading audio file from: " + filePath);
 
             // Use AudioDispatcherFactory with the actual file path
@@ -81,6 +74,19 @@ public class MediaPlayer {
             System.err.println("Error setting up audio: " + e.getMessage());
             e.printStackTrace();
         }
+    } 
+    /**
+     * Closing all the streams and stopping any playback of audio
+     */
+    public void shutDown(){
+        if (playbackDispatcher != null) {
+            System.out.println("Shutting down audioDispatcher");
+            playbackDispatcher.stop();
+            playbackDispatcher = null;
+        }
+        isPlaying = false;
+        currentTime = 0;
+        System.out.println("Audio Shutdown Complete");
     }
 
     // plays the song from the MediaPlayer class
