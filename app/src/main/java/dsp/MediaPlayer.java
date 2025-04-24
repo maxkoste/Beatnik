@@ -21,12 +21,10 @@ public class MediaPlayer {
     private GainProcessor volumeProcessor;
     private Equalizer bassEqualizer;
     private Equalizer trebleEqualizer;
-    private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
     private boolean isPlaying;
     private float currentTime;
     private Delay delayEffect;
     private Flanger flangerEffect;
-    private int defaultLength = 20;
 
     public MediaPlayer() {
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
