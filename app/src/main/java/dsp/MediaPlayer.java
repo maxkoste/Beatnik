@@ -74,6 +74,19 @@ public class MediaPlayer {
             System.err.println("Error setting up audio: " + e.getMessage());
             e.printStackTrace();
         }
+    } 
+    /**
+     * Closing all the streams and stopping any playback of audio
+     */
+    public void shutDown(){
+        if (playbackDispatcher != null) {
+            System.out.println("Shutting down audioDispatcher");
+            playbackDispatcher.stop();
+            playbackDispatcher = null;
+        }
+        isPlaying = false;
+        currentTime = 0;
+        System.out.println("Audio Shutdown Complete");
     }
 
     // plays the song from the MediaPlayer class
