@@ -76,7 +76,7 @@ public class MediaPlayer {
         }
     } 
     /**
-     * Closing all the streams and stopping any playback of audio
+     * Closing stream and stopping any playback of audio
      */
     public void shutDown(){
         if (playbackDispatcher != null) {
