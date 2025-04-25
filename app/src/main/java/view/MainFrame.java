@@ -91,8 +91,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
         songsScene = new Scene(songsPane, 400, 400);
         playlistsScene = new Scene(playlistsPane, 400, 400);
         
-        Image flowers = new Image("flowers.JPG"); // Add icon
-        primaryStage.getIcons().add(flowers);
+        Image logo = new Image("beatnik-logo.png"); // Add icon
+        primaryStage.getIcons().add(logo);
         primaryStage.setScene(primaryScene); // Finalize window to be shown
         primaryScene.getStylesheets().add("styles.css");
         primaryStage.show();
