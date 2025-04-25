@@ -2,6 +2,8 @@ package view;
 
 import controller.Controller;
 import controller.PlaylistManager;
+import javafx.beans.Observable;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
@@ -88,10 +90,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         songsScene = new Scene(songsPane, 400, 400);
         playlistsScene = new Scene(playlistsPane, 400, 400);
-
+        
         Image flowers = new Image("flowers.JPG"); // Add icon
         primaryStage.getIcons().add(flowers);
         primaryStage.setScene(primaryScene); // Finalize window to be shown
+        primaryScene.getStylesheets().add("styles.css");
         primaryStage.show();
 
         playlistStage.setScene(songsScene);
@@ -395,8 +398,12 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(effectSelector, (screenHeight / 2));
         AnchorPane.setLeftAnchor(effectSelector, (screenWidth / 1.15));
 
-        Label delay = new Label("Delay");
-        AnchorPane.setTopAnchor(delay, (screenHeight / 2));
+        Label flanger = new Label("Echo");
+        AnchorPane.setTopAnchor(flanger, (screenHeight /1.90 ));
+        AnchorPane.setLeftAnchor(flanger, (screenWidth / 1.18));
+
+        Label delay = new Label("Flanger");
+        AnchorPane.setTopAnchor(delay, (screenHeight /2 ));
         AnchorPane.setLeftAnchor(delay, (screenWidth / 1.18));
 
         Slider masterVolume = new Slider();
@@ -420,7 +427,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setLeftAnchor(masterVolumeLabel,
                 ((screenWidth / 1.15) - (masterVolumeLabel.getPrefWidth() / 2)) + 25);
 
-        primaryPane.getChildren().addAll(effectIntensity, effectIntensityLabel, effectSelector, delay, masterVolume,
+        primaryPane.getChildren().addAll(effectIntensity, effectIntensityLabel, effectSelector, delay, flanger,
+                masterVolume,
                 masterVolumeLabel);
     }
 
