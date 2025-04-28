@@ -30,30 +30,33 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class MainFrame implements EventHandler<ActionEvent> {
-    AnchorPane primaryPane;
-    BorderPane songsPane;
-    BorderPane playlistsPane;
-    Stage playlistStage;
-    Scene songsScene;
-    Scene playlistsScene;
-    MultipleSelectionModel<String> songSelector;
-    SelectionModel<String> playlistSelector;
-    ListView<String> currentPlaylist;
-    MultipleSelectionModel<String> playlistSongSelector;
-    Boolean channelOneActive = true;
-    Controller controller;
-    PlaylistManager playlistManager;
-    TextArea channelOneContainer;
-    WaveFormCanvas waveformOne;
-    TextArea channelTwoContainer;
-    WaveFormCanvas waveformTwo;
-    Button switchChannelOne;
-    Button switchChannelTwo;
-    double screenHeight;
-    double screenWidth;
+    private AnchorPane primaryPane;
+    private BorderPane songsPane;
+    private BorderPane playlistsPane;
+    private Stage playlistStage;
+    private Scene songsScene;
+    private Scene playlistsScene;
+    private MultipleSelectionModel<String> songSelector;
+    private SelectionModel<String> playlistSelector;
+    private ListView<String> currentPlaylist;
+    private MultipleSelectionModel<String> playlistSongSelector;
+    private Boolean channelOneActive = true;
+    private Controller controller;
+    private PlaylistManager playlistManager;
+    private TextArea channelOneContainer;
+    private WaveFormCanvas waveformOne;
+    private TextArea channelTwoContainer;
+    private WaveFormCanvas waveformTwo;
+    private Button switchChannelOne;
+    private Button switchChannelTwo;
+    private double screenHeight;
+    private double screenWidth;
+    private Map<String, Float> effectIntensityMap;
 
     private Circle[] auIndicatorCirclesOne = new Circle[10];
     private Circle[] auIndicatorCirclesTwo = new Circle[10];
@@ -90,7 +93,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         songsScene = new Scene(songsPane, 400, 400);
         playlistsScene = new Scene(playlistsPane, 400, 400);
-        
+
         Image logo = new Image("beatnik-logo.png"); // Add icon
         primaryStage.getIcons().add(logo);
         primaryStage.setScene(primaryScene); // Finalize window to be shown
@@ -211,7 +214,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setLeftAnchor(channelTwoSkip, ((((screenWidth / 2)) + ((screenWidth / 2) / 2))));
 
         primaryPane.getChildren().addAll(channelOneContainer, channelTwoContainer, waveformOne, waveformTwo,
-                channelOnePlayPause, channelTwoPlayPause, channelOneTrackCue, channelTwoTrackCue, channelOneSkip, channelTwoSkip);
+                channelOnePlayPause, channelTwoPlayPause, channelOneTrackCue, channelTwoTrackCue, channelOneSkip,
+                channelTwoSkip);
     }
 
     private void initializeZoneThree() {
@@ -391,6 +395,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     private void initializeZoneFour() {
         CircularSlider effectIntensity = new CircularSlider(9, false);
+        effectIntensity.setAngle(0.0); //Cant update the knobs for some reason...
         effectIntensity.valueProperty().addListener((observable, oldValue, newValue) -> {
             float volume = newValue.floatValue();
             float mixValue = volume / 270.0f;
@@ -406,18 +411,23 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         CircularSlider effectSelector = new CircularSlider(5, true);
         effectSelector.valueProperty().addListener((observable, oldValue, newValue) -> {
+
             int effectSelectorValue = newValue.intValue();
             controller.setEffect(effectSelectorValue);
+
+            float savedMix = controller.getCurrentEffectMix();
+            float knobValue = savedMix * 270.0f;
+            effectIntensity.setValue(knobValue);
         });
         AnchorPane.setTopAnchor(effectSelector, (screenHeight / 2));
         AnchorPane.setLeftAnchor(effectSelector, (screenWidth / 1.15));
 
         Label flanger = new Label("Echo");
-        AnchorPane.setTopAnchor(flanger, (screenHeight /1.90 ));
+        AnchorPane.setTopAnchor(flanger, (screenHeight / 1.90));
         AnchorPane.setLeftAnchor(flanger, (screenWidth / 1.18));
 
         Label delay = new Label("Flanger");
-        AnchorPane.setTopAnchor(delay, (screenHeight /2 ));
+        AnchorPane.setTopAnchor(delay, (screenHeight / 2));
         AnchorPane.setLeftAnchor(delay, (screenWidth / 1.18));
 
         Slider masterVolume = new Slider();

@@ -12,7 +12,9 @@ import view.MainFrame;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import javafx.application.Platform;
@@ -20,25 +22,31 @@ import javafx.application.Platform;
 import dsp.MediaPlayer;
 
 public class Controller {
-    MediaPlayer audioPlayer1;
-    MediaPlayer audioPlayer2;
-    MainFrame frame;
-    PlaylistManager playlistManager;
-    TimerThreadOne timerThreadOne;
-    TimerThreadTwo timerThreadTwo;
-    ObservableList<String> playlistSongPaths; // TODO: Find way of alerting Controller when a song has naturally
+    private MediaPlayer audioPlayer1;
+    private MediaPlayer audioPlayer2;
+    private MainFrame frame;
+    private PlaylistManager playlistManager;
+    private TimerThreadOne timerThreadOne;
+    private TimerThreadTwo timerThreadTwo;
+    private ObservableList<String> playlistSongPaths; // TODO: Find way of alerting Controller when a song has naturally
                                               // finished playing
-    int currentPosInPlaylist;
-    float masterModifier = 0.5F;
-    float crossfaderModifier1 = 1.0F;
-    float crossfaderModifier2 = 1.0F;
-    float latestVolume1 = 50.0F;
-    float latestVolume2 = 50.0F;
-    AudioDispatcher dispatcherOne;
-    AudioDispatcher dispatcherTwo;
-    String currentEffect;
+    private int currentPosInPlaylist;
+    private float masterModifier = 0.5F;
+    private float crossfaderModifier1 = 1.0F;
+    private float crossfaderModifier2 = 1.0F;
+    private float latestVolume1 = 50.0F;
+    private float latestVolume2 = 50.0F;
+    private AudioDispatcher dispatcherOne;
+    private AudioDispatcher dispatcherTwo;
+    private String currentEffect;
+    private Map<String, Float> effectIntensityMap;
 
     public Controller(Stage primaryStage) {
+
+        effectIntensityMap = new HashMap<String, Float>();
+        effectIntensityMap.put("delay", 0.0F);
+        effectIntensityMap.put("flanger", 0.0F);
+
         audioPlayer1 = new MediaPlayer();
         audioPlayer2 = new MediaPlayer();
         timerThreadOne = new TimerThreadOne();
@@ -57,15 +65,17 @@ public class Controller {
         timerThreadOne.start();
         timerThreadTwo.start();
     }
+
     /**
      * Method for cleaning up resources and stopping the playback of any audio
      */
-    public void shutDown(){
+    public void shutDown() {
         if (audioPlayer1 != null && audioPlayer2 != null) {
             audioPlayer2.shutDown();
             audioPlayer1.shutDown();
         }
     }
+
     public void setSong(int channel, String songPath) {
         if (channel == 1) {
             audioPlayer1.setSong(songPath);
@@ -96,7 +106,7 @@ public class Controller {
             setChannelTwoVolume(latestVolume2);
             dispatcherTwo = audioPlayer2.getAudioDispatcher();
             if (dispatcherTwo != null) {
-            volumeIndicator(dispatcherTwo, channel);
+                volumeIndicator(dispatcherTwo, channel);
             }
         }
     }
@@ -120,6 +130,7 @@ public class Controller {
          * 204 = 4
          * 270 = 5
          */
+
         switch (effectSelectorValue) {
             case 0:
                 this.currentEffect = "delay";
@@ -139,6 +150,10 @@ public class Controller {
             default:
                 System.out.println("Something went wrong...");
         }
+    }
+    
+    public float getCurrentEffectMix(){
+        return this.effectIntensityMap.getOrDefault(currentEffect, 0.0F);
     }
 
     public void nextSong(int channel) { // TODO: Update GUI with names etc
@@ -207,6 +222,9 @@ public class Controller {
      * @param effectType indicating the effect being applied.
      */
     public void setEffectMix(float mix) {
+        // Save the state
+        effectIntensityMap.put(currentEffect, mix);
+
         switch (this.currentEffect) {
             case "delay":
                 audioPlayer1.setDelayEffectMix(mix);
@@ -261,32 +279,33 @@ public class Controller {
         return audioSamplesFinal;
     }
 
-        private void volumeIndicator (AudioDispatcher dispatcher, int channel) {
+    private void volumeIndicator(AudioDispatcher dispatcher, int channel) {
         dispatcher.addAudioProcessor(new AudioProcessor() {
             public boolean process(AudioEvent audioEvent) {
                 float[] buffer = audioEvent.getFloatBuffer();
-                double rms = 0; //rms = root mean square
+                double rms = 0; // rms = root mean square
                 for (float sample : buffer) {
                     rms += sample * sample;
                 }
 
-                rms = Math.sqrt(rms/buffer.length);
+                rms = Math.sqrt(rms / buffer.length);
                 final double completeRms = rms;
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
                         if (channel == 1) {
                             frame.updateAudioIndicatorOne(completeRms);
-                        }
-                        else if (channel == 2) {
+                        } else if (channel == 2) {
                             frame.updateAudioIndicatorTwo(completeRms);
                         }
                     }
                 });
                 return true;
             }
+
             @Override
-            public void processingFinished() {}
+            public void processingFinished() {
+            }
         });
     }
 

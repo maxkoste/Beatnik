@@ -14,7 +14,7 @@ public class CircularSlider extends Control {
     private DoubleProperty value;
 
     public CircularSlider(int tickCount, boolean snapToTick) {
-        setAngle(0); // Set twice because of bad design, give me a break
+        setAngle(0.0); // Set twice because of bad design, give me a break
         setMin(0.0);
         setMax(270.0);
         setAngle(135.0); // Could be made into a parameter to allow custom start position
@@ -25,7 +25,7 @@ public class CircularSlider extends Control {
         return value.get();
     }
 
-    public final void setValue(double value) {
+    public void setValue(double value) {
         if (!this.valueProperty().isBound()) {
             this.valueProperty().set(value);
         }
