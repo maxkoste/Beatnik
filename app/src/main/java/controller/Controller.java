@@ -57,7 +57,15 @@ public class Controller {
         timerThreadOne.start();
         timerThreadTwo.start();
     }
-
+    /**
+     * Method for cleaning up resources and stopping the playback of any audio
+     */
+    public void shutDown(){
+        if (audioPlayer1 != null && audioPlayer2 != null) {
+            audioPlayer2.shutDown();
+            audioPlayer1.shutDown();
+        }
+    }
     public void setSong(int channel, String songPath) {
         if (channel == 1) {
             audioPlayer1.setSong(songPath);

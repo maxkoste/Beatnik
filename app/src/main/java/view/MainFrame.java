@@ -2,6 +2,8 @@ package view;
 
 import controller.Controller;
 import controller.PlaylistManager;
+import javafx.beans.Observable;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
@@ -88,14 +90,28 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         songsScene = new Scene(songsPane, 400, 400);
         playlistsScene = new Scene(playlistsPane, 400, 400);
-
-        Image flowers = new Image("flowers.JPG"); // Add icon
-        primaryStage.getIcons().add(flowers);
+        
+        Image logo = new Image("beatnik-logo.png"); // Add icon
+        primaryStage.getIcons().add(logo);
         primaryStage.setScene(primaryScene); // Finalize window to be shown
+        primaryScene.getStylesheets().add("styles.css");
         primaryStage.show();
 
         playlistStage.setScene(songsScene);
         playlistStage.initModality(Modality.APPLICATION_MODAL);
+
+        onClose(primaryStage);
+    }
+
+    /**
+     * Closes resources in the controller before exiting
+     * 
+     * @param primaryStage
+     */
+    private void onClose(Stage primaryStage) {
+        primaryStage.setOnCloseRequest(event -> {
+            controller.shutDown();
+        });
     }
 
     private void initializeZoneOne() {
@@ -396,8 +412,12 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(effectSelector, (screenHeight / 2));
         AnchorPane.setLeftAnchor(effectSelector, (screenWidth / 1.15));
 
-        Label delay = new Label("Delay");
-        AnchorPane.setTopAnchor(delay, (screenHeight / 2));
+        Label flanger = new Label("Echo");
+        AnchorPane.setTopAnchor(flanger, (screenHeight /1.90 ));
+        AnchorPane.setLeftAnchor(flanger, (screenWidth / 1.18));
+
+        Label delay = new Label("Flanger");
+        AnchorPane.setTopAnchor(delay, (screenHeight /2 ));
         AnchorPane.setLeftAnchor(delay, (screenWidth / 1.18));
 
         Slider masterVolume = new Slider();
@@ -421,7 +441,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setLeftAnchor(masterVolumeLabel,
                 ((screenWidth / 1.15) - (masterVolumeLabel.getPrefWidth() / 2)) + 25);
 
-        primaryPane.getChildren().addAll(effectIntensity, effectIntensityLabel, effectSelector, delay, masterVolume,
+        primaryPane.getChildren().addAll(effectIntensity, effectIntensityLabel, effectSelector, delay, flanger,
+                masterVolume,
                 masterVolumeLabel);
     }
 
@@ -508,12 +529,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
         playlistStage.showAndWait();
     }
 
-    // TODO: Redo Waveform-creation to be initialized in Zone 2, allow it to be
-    // blank when no song is active.
-    // TODO: Place Waveform in a separate pane like SplitPane which is then attached
-    // with anchorPane.
-    // TODO: Make Waveform instance variable so that it can be cleared without
-    // instanceof.
     public void handleSongSelection(MouseEvent mouseEvent) {
         if (mouseEvent.getClickCount() == 2) {
             if (channelOneActive) {

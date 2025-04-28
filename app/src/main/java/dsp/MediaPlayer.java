@@ -3,15 +3,12 @@ package dsp;
 import java.io.File;
 
 import be.tarsos.dsp.AudioDispatcher;
-import be.tarsos.dsp.AudioEvent;
-import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.GainProcessor;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
 import dsp.Effects.Delay;
 import dsp.Effects.Flanger;
-import controller.Controller;
 
 //This class is responsible for playing the audio, and its volume
 public class MediaPlayer {
@@ -21,12 +18,10 @@ public class MediaPlayer {
     private GainProcessor volumeProcessor;
     private Equalizer bassEqualizer;
     private Equalizer trebleEqualizer;
-    private float effectMix = 0.0f; // 0 = dry only, 1 = wet only not implemented yet...
     private boolean isPlaying;
     private float currentTime;
     private Delay delayEffect;
     private Flanger flangerEffect;
-    private int defaultLength = 20;
 
     public MediaPlayer() {
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
@@ -74,6 +69,20 @@ public class MediaPlayer {
             System.err.println("Error setting up audio: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Closing stream and stopping any playback of audio
+     */
+    public void shutDown() {
+        if (playbackDispatcher != null) {
+            System.out.println("Shutting down audioDispatcher");
+            playbackDispatcher.stop();
+            playbackDispatcher = null;
+        }
+        isPlaying = false;
+        currentTime = 0;
+        System.out.println("Audio Shutdown Complete");
     }
 
     // plays the song from the MediaPlayer class

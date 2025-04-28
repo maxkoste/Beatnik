@@ -1,0 +1,10 @@
+@font-face {
+    font-family: 'Orbitron';
+    src: url('Some_custom_font_goes_here.ttf'); 
+}
+
+.root {
+    -fx-font-family: "Arial";
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
