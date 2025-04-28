@@ -22,6 +22,8 @@ public class MediaPlayer {
     private float currentTime;
     private Delay delayEffect;
     private Flanger flangerEffect;
+    private String fullPath;
+    private Thread audioThread;
 
     public MediaPlayer() {
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
@@ -38,16 +40,13 @@ public class MediaPlayer {
                 playbackDispatcher.stop();
                 playbackDispatcher = null;
             }
-
-            System.out.println("Sampling this file in the: songs/" + currentSongFilePath);
-
-            String filePath = new File("src/main/resources/songs/" + currentSongFilePath).getAbsolutePath();
-            System.out.println("Loading audio file from: " + filePath);
+            // String filePath = new File("src/main/resources/songs/" +
+            // currentSongFilePath).getAbsolutePath();
 
             // Use AudioDispatcherFactory with the actual file path
-            playbackDispatcher = AudioDispatcherFactory.fromPipe(filePath, 44100, 4096, 0);
+            playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath, 44100, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
-            System.out.println("Audio format: " + format.toString());
+            // System.out.println("Audio format: " + format.toString());
 
             // Add volume controll first
             volumeProcessor = new GainProcessor(0.0f);
@@ -62,8 +61,8 @@ public class MediaPlayer {
             // Add audio player for final output
             AudioPlayer audioPlayer = new AudioPlayer(format);
             playbackDispatcher.addAudioProcessor(audioPlayer);
-
-            System.out.println("Setup complete..");
+            
+            playAudio();
 
         } catch (Exception e) {
             System.err.println("Error setting up audio: " + e.getMessage());
@@ -88,19 +87,38 @@ public class MediaPlayer {
     // plays the song from the MediaPlayer class
     public void playAudio() {
         if (!isPlaying) {
-            setUp();
-            System.out.println("Playing..");
+            //setUp();
+            //System.out.println("Playing..");
             playbackDispatcher.skip(currentTime);
-            Thread audioThread = new Thread(playbackDispatcher, "Playback thread");
+            this.audioThread = new Thread(playbackDispatcher, "Playback thread");
             audioThread.setPriority(Thread.MAX_PRIORITY); // Give audio thread high priority
             audioThread.start();
             isPlaying = true;
-        } else {
-            isPlaying = !isPlaying;
-            System.out.println("Stopping..");
+        // } else {
+        //     isPlaying = !isPlaying;
+        //     System.out.println("Stopping..");
+        //     currentTime = playbackDispatcher.secondsProcessed();
+        //     playbackDispatcher.stop();
+        }
+    }
+
+    public void pauseAudio() {
+        if (isPlaying) {
             currentTime = playbackDispatcher.secondsProcessed();
+            isPlaying = false;
+            
             playbackDispatcher.stop();
         }
+    }
+    
+    public void resumePlayback(){
+        if (isPlaying) {
+            //setUp();
+            playbackDispatcher.skip(currentTime);
+            isPlaying = true;
+
+            audioThread.notify();
+        } 
     }
 
     public void setVolume(float volume) {
@@ -158,9 +176,11 @@ public class MediaPlayer {
      *                 dispatcher
      */
     public void setSong(String filepath) {
-        this.isPlaying = false;
         this.currentSongFilePath = filepath;
+        this.fullPath = "src/main/resources/songs/" + filepath;
         this.currentTime = 0;
+        setUp();
+        this.isPlaying = true;
     }
 
     public void resetSong() {

@@ -29,7 +29,7 @@ public class Controller {
     private TimerThreadOne timerThreadOne;
     private TimerThreadTwo timerThreadTwo;
     private ObservableList<String> playlistSongPaths; // TODO: Find way of alerting Controller when a song has naturally
-                                              // finished playing
+    // finished playing
     private int currentPosInPlaylist;
     private float masterModifier = 0.5F;
     private float crossfaderModifier1 = 1.0F;
@@ -40,12 +40,18 @@ public class Controller {
     private AudioDispatcher dispatcherTwo;
     private String currentEffect;
     private Map<String, Float> effectIntensityMap;
+    private boolean isPlayingChannelOne;
+    private boolean isPlayingChannelTwo;
 
     public Controller(Stage primaryStage) {
-        //HashMap saves the state of the Effect-selector knob & the Effect-intensity knob from the GUI
+        // HashMap saves the state of the Effect-selector knob & the Effect-intensity
+        // knob from the GUI
         effectIntensityMap = new HashMap<String, Float>();
         effectIntensityMap.put("delay", 0.0F);
         effectIntensityMap.put("flanger", 0.0F);
+
+        isPlayingChannelOne = false;
+        isPlayingChannelTwo = false;
 
         audioPlayer1 = new MediaPlayer();
         audioPlayer2 = new MediaPlayer();
@@ -82,7 +88,7 @@ public class Controller {
         } else {
             audioPlayer2.setSong(songPath);
         }
-        playSong(channel);
+        //playSong(channel);
         frame.setWaveformAudioData(extract(songPath), channel);
     }
 
@@ -94,18 +100,30 @@ public class Controller {
 
     public void playSong(int channel) {
         if (channel == 1) {
-            audioPlayer1.playAudio();
-            setChannelOneVolume(latestVolume1);
-            dispatcherOne = audioPlayer1.getAudioDispatcher();
-            if (dispatcherOne != null) {
-                volumeIndicator(dispatcherOne, channel);
+            if (isPlayingChannelOne) {
+                audioPlayer1.pauseAudio();
+                isPlayingChannelOne = false;
+            } else {
+                audioPlayer1.resumePlayback();
+                setChannelOneVolume(latestVolume1);
+                dispatcherOne = audioPlayer1.getAudioDispatcher();
+                if (dispatcherOne != null) {
+                    volumeIndicator(dispatcherOne, channel);
+                }
+                isPlayingChannelOne = true;
             }
         } else if (channel == 2) {
-            audioPlayer2.playAudio();
-            setChannelTwoVolume(latestVolume2);
-            dispatcherTwo = audioPlayer2.getAudioDispatcher();
-            if (dispatcherTwo != null) {
-                volumeIndicator(dispatcherTwo, channel);
+            if (isPlayingChannelTwo) {
+                audioPlayer2.pauseAudio();
+                isPlayingChannelTwo = false;
+            } else {
+                audioPlayer2.resumePlayback();
+                setChannelTwoVolume(latestVolume2);
+                dispatcherTwo = audioPlayer2.getAudioDispatcher();
+                if (dispatcherTwo != null) {
+                    volumeIndicator(dispatcherTwo, channel);
+                }
+                isPlayingChannelTwo = true;
             }
         }
     }
@@ -150,8 +168,8 @@ public class Controller {
                 System.out.println("Something went wrong...");
         }
     }
-    
-    public float getCurrentEffectMix(){
+
+    public float getCurrentEffectMix() {
         return this.effectIntensityMap.getOrDefault(currentEffect, 0.0F);
     }
 
@@ -217,7 +235,7 @@ public class Controller {
      * 1 = 100% effect signal (only effect)
      * all the effects should be applied on both audio-signals
      * 
-     * @param mix        float value between 0-1f
+     * @param mix float value between 0-1f
      */
     public void setEffectMix(float mix) {
         // Save the state
