@@ -153,18 +153,32 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setLeftAnchor(waveformTwo, (screenWidth - waveformTwo.getWidth()) / 2);
 
         Button channelOnePlayPause = new Button();
-        channelOnePlayPause.setPrefSize(30.0, 75.0);
+        channelOnePlayPause.setPrefSize(30.0, 37.5);
         channelOnePlayPause.setText("⏯");
         channelOnePlayPause.setOnAction(this::handleChannelOnePlayPause);
         AnchorPane.setTopAnchor(channelOnePlayPause, 75.0);
         AnchorPane.setLeftAnchor(channelOnePlayPause, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
 
         Button channelTwoPlayPause = new Button();
-        channelTwoPlayPause.setPrefSize(30.0, 75.0);
+        channelTwoPlayPause.setPrefSize(30.0, 37.5);
         channelTwoPlayPause.setText("⏯");
         channelTwoPlayPause.setOnAction(this::handleChannelTwoPlayPause);
         AnchorPane.setTopAnchor(channelTwoPlayPause, 150.0);
         AnchorPane.setLeftAnchor(channelTwoPlayPause, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
+
+        Button channelOneTrackCue = new Button();
+        channelOneTrackCue.setPrefSize(30, 37.5);
+        channelOneTrackCue.setText("C");
+        channelOneTrackCue.setOnAction(this::handleChannelOneTrackCue);
+        AnchorPane.setTopAnchor(channelOneTrackCue, 112.5);
+        AnchorPane.setLeftAnchor(channelOneTrackCue, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
+
+        Button channelTwoTrackCue = new Button();
+        channelTwoTrackCue.setPrefSize(30, 37.5);
+        channelTwoTrackCue.setText("C");
+        channelTwoTrackCue.setOnAction(this::handleChannelTwoTrackCue);
+        AnchorPane.setTopAnchor(channelTwoTrackCue, 187.5);
+        AnchorPane.setLeftAnchor(channelTwoTrackCue, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
 
         Button channelOneSkip = new Button();
         channelOneSkip.setPrefSize(30.0, 75.0);
@@ -181,7 +195,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setLeftAnchor(channelTwoSkip, ((((screenWidth / 2)) + ((screenWidth / 2) / 2))));
 
         primaryPane.getChildren().addAll(channelOneContainer, channelTwoContainer, waveformOne, waveformTwo,
-                channelOnePlayPause, channelTwoPlayPause, channelOneSkip, channelTwoSkip);
+                channelOnePlayPause, channelTwoPlayPause, channelOneTrackCue, channelTwoTrackCue, channelOneSkip, channelTwoSkip);
     }
 
     private void initializeZoneThree() {
@@ -603,6 +617,14 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     private void handleChannelTwoPlayPause(ActionEvent actionEvent) {
         controller.playSong(2);
+    }
+
+    private void handleChannelOneTrackCue(ActionEvent actionEvent) {
+        controller.resetSong(1);
+    }
+
+    private void handleChannelTwoTrackCue(ActionEvent actionEvent) {
+        controller.resetSong(2);
     }
 
     public void handleChannelOneSkip(ActionEvent actionEvent) {

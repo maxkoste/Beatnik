@@ -154,4 +154,11 @@ public class MediaPlayer {
         this.currentTime = 0;
     }
 
+    public void resetSong() {
+        System.out.println("Resetting");
+        currentTime = 0;
+        isPlaying = false;
+        playAudio();
+        playAudio();
+    }
 }

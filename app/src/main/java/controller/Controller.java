@@ -93,6 +93,17 @@ public class Controller {
         }
     }
 
+    public void resetSong(int channel) {
+        if (channel == 1) {
+            audioPlayer1.resetSong();
+            playSong(1);
+        } else {
+            audioPlayer2.resetSong();
+            playSong(2);
+        }
+
+    }
+
     public void setEffect(int effectSelectorValue) {
         /**
          * 0 = 1 delay
