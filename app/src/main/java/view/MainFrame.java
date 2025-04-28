@@ -395,7 +395,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     private void initializeZoneFour() {
         CircularSlider effectIntensity = new CircularSlider(9, false);
-        effectIntensity.setAngle(0.0); //Cant update the knobs for some reason...
+        effectIntensity.updateAngle(0.0); //Starts of at 0 degrees  
         effectIntensity.valueProperty().addListener((observable, oldValue, newValue) -> {
             float volume = newValue.floatValue();
             float mixValue = volume / 270.0f;
@@ -414,10 +414,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
             int effectSelectorValue = newValue.intValue();
             controller.setEffect(effectSelectorValue);
-
+            //Gets the saved state of the selected effects mix settings and redraws the knob 
             float savedMix = controller.getCurrentEffectMix();
             float knobValue = savedMix * 270.0f;
-            effectIntensity.setValue(knobValue);
+            effectIntensity.updateAngle(knobValue);
         });
         AnchorPane.setTopAnchor(effectSelector, (screenHeight / 2));
         AnchorPane.setLeftAnchor(effectSelector, (screenWidth / 1.15));

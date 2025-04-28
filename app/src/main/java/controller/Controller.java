@@ -42,7 +42,7 @@ public class Controller {
     private Map<String, Float> effectIntensityMap;
 
     public Controller(Stage primaryStage) {
-
+        //HashMap saves the state of the Effect-selector knob & the Effect-intensity knob from the GUI
         effectIntensityMap = new HashMap<String, Float>();
         effectIntensityMap.put("delay", 0.0F);
         effectIntensityMap.put("flanger", 0.0F);
@@ -92,7 +92,6 @@ public class Controller {
         setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
     }
 
-    // plays the song from the MediaPlayer class
     public void playSong(int channel) {
         if (channel == 1) {
             audioPlayer1.playAudio();
@@ -219,7 +218,6 @@ public class Controller {
      * all the effects should be applied on both audio-signals
      * 
      * @param mix        float value between 0-1f
-     * @param effectType indicating the effect being applied.
      */
     public void setEffectMix(float mix) {
         // Save the state
