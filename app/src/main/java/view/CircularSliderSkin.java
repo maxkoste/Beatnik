@@ -78,7 +78,7 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
         drawKnob(newAngle);
     }
 
-    private void drawKnob(double angle) {
+    public void drawKnob(double angle) {
         gc.clearRect(0, 0, size, size);
         gc.setFill(Color.LIGHTGRAY);
         gc.fillOval(0, 0, size, size);

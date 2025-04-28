@@ -2,6 +2,8 @@ package view;
 
 import controller.Controller;
 import controller.PlaylistManager;
+import javafx.beans.Observable;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.NodeOrientation;
@@ -28,30 +30,33 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class MainFrame implements EventHandler<ActionEvent> {
-    AnchorPane primaryPane;
-    BorderPane songsPane;
-    BorderPane playlistsPane;
-    Stage playlistStage;
-    Scene songsScene;
-    Scene playlistsScene;
-    MultipleSelectionModel<String> songSelector;
-    SelectionModel<String> playlistSelector;
-    ListView<String> currentPlaylist;
-    MultipleSelectionModel<String> playlistSongSelector;
-    Boolean channelOneActive = true;
-    Controller controller;
-    PlaylistManager playlistManager;
-    TextArea channelOneContainer;
-    WaveFormCanvas waveformOne;
-    TextArea channelTwoContainer;
-    WaveFormCanvas waveformTwo;
-    Button switchChannelOne;
-    Button switchChannelTwo;
-    double screenHeight;
-    double screenWidth;
+    private AnchorPane primaryPane;
+    private BorderPane songsPane;
+    private BorderPane playlistsPane;
+    private Stage playlistStage;
+    private Scene songsScene;
+    private Scene playlistsScene;
+    private MultipleSelectionModel<String> songSelector;
+    private SelectionModel<String> playlistSelector;
+    private ListView<String> currentPlaylist;
+    private MultipleSelectionModel<String> playlistSongSelector;
+    private Boolean channelOneActive = true;
+    private Controller controller;
+    private PlaylistManager playlistManager;
+    private TextArea channelOneContainer;
+    private WaveFormCanvas waveformOne;
+    private TextArea channelTwoContainer;
+    private WaveFormCanvas waveformTwo;
+    private Button switchChannelOne;
+    private Button switchChannelTwo;
+    private double screenHeight;
+    private double screenWidth;
+    private Map<String, Float> effectIntensityMap;
 
     private Circle[] auIndicatorCirclesOne = new Circle[10];
     private Circle[] auIndicatorCirclesTwo = new Circle[10];
@@ -89,9 +94,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         songsScene = new Scene(songsPane, 400, 400);
         playlistsScene = new Scene(playlistsPane, 400, 400);
 
-        Image flowers = new Image("flowers.JPG"); // Add icon
-        primaryStage.getIcons().add(flowers);
+        Image logo = new Image("beatnik-logo.png"); // Add icon
+        primaryStage.getIcons().add(logo);
         primaryStage.setScene(primaryScene); // Finalize window to be shown
+        primaryScene.getStylesheets().add("styles.css");
         primaryStage.show();
 
         playlistStage.setScene(songsScene);
@@ -166,18 +172,32 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setLeftAnchor(waveformTwo, (screenWidth - waveformTwo.getWidth()) / 2);
 
         Button channelOnePlayPause = new Button();
-        channelOnePlayPause.setPrefSize(30.0, 75.0);
+        channelOnePlayPause.setPrefSize(30.0, 37.5);
         channelOnePlayPause.setText("⏯");
         channelOnePlayPause.setOnAction(this::handleChannelOnePlayPause);
         AnchorPane.setTopAnchor(channelOnePlayPause, 75.0);
         AnchorPane.setLeftAnchor(channelOnePlayPause, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
 
         Button channelTwoPlayPause = new Button();
-        channelTwoPlayPause.setPrefSize(30.0, 75.0);
+        channelTwoPlayPause.setPrefSize(30.0, 37.5);
         channelTwoPlayPause.setText("⏯");
         channelTwoPlayPause.setOnAction(this::handleChannelTwoPlayPause);
         AnchorPane.setTopAnchor(channelTwoPlayPause, 150.0);
         AnchorPane.setLeftAnchor(channelTwoPlayPause, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
+
+        Button channelOneTrackCue = new Button();
+        channelOneTrackCue.setPrefSize(30, 37.5);
+        channelOneTrackCue.setText("C");
+        channelOneTrackCue.setOnAction(this::handleChannelOneTrackCue);
+        AnchorPane.setTopAnchor(channelOneTrackCue, 112.5);
+        AnchorPane.setLeftAnchor(channelOneTrackCue, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
+
+        Button channelTwoTrackCue = new Button();
+        channelTwoTrackCue.setPrefSize(30, 37.5);
+        channelTwoTrackCue.setText("C");
+        channelTwoTrackCue.setOnAction(this::handleChannelTwoTrackCue);
+        AnchorPane.setTopAnchor(channelTwoTrackCue, 187.5);
+        AnchorPane.setLeftAnchor(channelTwoTrackCue, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
 
         Button channelOneSkip = new Button();
         channelOneSkip.setPrefSize(30.0, 75.0);
@@ -194,7 +214,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setLeftAnchor(channelTwoSkip, ((((screenWidth / 2)) + ((screenWidth / 2) / 2))));
 
         primaryPane.getChildren().addAll(channelOneContainer, channelTwoContainer, waveformOne, waveformTwo,
-                channelOnePlayPause, channelTwoPlayPause, channelOneSkip, channelTwoSkip);
+                channelOnePlayPause, channelTwoPlayPause, channelOneTrackCue, channelTwoTrackCue, channelOneSkip,
+                channelTwoSkip);
     }
 
     private void initializeZoneThree() {
@@ -374,6 +395,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     private void initializeZoneFour() {
         CircularSlider effectIntensity = new CircularSlider(9, false);
+        effectIntensity.updateAngle(0.0); //Starts of at 0 degrees  
         effectIntensity.valueProperty().addListener((observable, oldValue, newValue) -> {
             float volume = newValue.floatValue();
             float mixValue = volume / 270.0f;
@@ -389,13 +411,22 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         CircularSlider effectSelector = new CircularSlider(5, true);
         effectSelector.valueProperty().addListener((observable, oldValue, newValue) -> {
+
             int effectSelectorValue = newValue.intValue();
             controller.setEffect(effectSelectorValue);
+            //Gets the saved state of the selected effects mix settings and redraws the knob 
+            float savedMix = controller.getCurrentEffectMix();
+            float knobValue = savedMix * 270.0f;
+            effectIntensity.updateAngle(knobValue);
         });
         AnchorPane.setTopAnchor(effectSelector, (screenHeight / 2));
         AnchorPane.setLeftAnchor(effectSelector, (screenWidth / 1.15));
 
-        Label delay = new Label("Delay");
+        Label flanger = new Label("Echo");
+        AnchorPane.setTopAnchor(flanger, (screenHeight / 1.90));
+        AnchorPane.setLeftAnchor(flanger, (screenWidth / 1.18));
+
+        Label delay = new Label("Flanger");
         AnchorPane.setTopAnchor(delay, (screenHeight / 2));
         AnchorPane.setLeftAnchor(delay, (screenWidth / 1.18));
 
@@ -420,7 +451,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setLeftAnchor(masterVolumeLabel,
                 ((screenWidth / 1.15) - (masterVolumeLabel.getPrefWidth() / 2)) + 25);
 
-        primaryPane.getChildren().addAll(effectIntensity, effectIntensityLabel, effectSelector, delay, masterVolume,
+        primaryPane.getChildren().addAll(effectIntensity, effectIntensityLabel, effectSelector, delay, flanger,
+                masterVolume,
                 masterVolumeLabel);
     }
 
@@ -610,6 +642,14 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     private void handleChannelTwoPlayPause(ActionEvent actionEvent) {
         controller.playSong(2);
+    }
+
+    private void handleChannelOneTrackCue(ActionEvent actionEvent) {
+        controller.resetSong(1);
+    }
+
+    private void handleChannelTwoTrackCue(ActionEvent actionEvent) {
+        controller.resetSong(2);
     }
 
     public void handleChannelOneSkip(ActionEvent actionEvent) {

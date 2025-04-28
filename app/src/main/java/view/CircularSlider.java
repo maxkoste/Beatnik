@@ -12,20 +12,26 @@ public class CircularSlider extends Control {
     private DoubleProperty max;
     private DoubleProperty min;
     private DoubleProperty value;
+    private CircularSliderSkin skin;
 
     public CircularSlider(int tickCount, boolean snapToTick) {
-        setAngle(0); // Set twice because of bad design, give me a break
+        setAngle(0.0); // Set twice because of bad design, give me a break
         setMin(0.0);
         setMax(270.0);
         setAngle(135.0); // Could be made into a parameter to allow custom start position
-        setSkin(new CircularSliderSkin(this, tickCount, snapToTick));
+        this.skin = new CircularSliderSkin(this, tickCount, snapToTick);
+        setSkin(this.skin);
+    }
+    
+    public void updateAngle(double angle){
+        this.skin.drawKnob(angle);
     }
 
     public double getValue() {
         return value.get();
     }
 
-    public final void setValue(double value) {
+    public void setValue(double value) {
         if (!this.valueProperty().isBound()) {
             this.valueProperty().set(value);
         }
