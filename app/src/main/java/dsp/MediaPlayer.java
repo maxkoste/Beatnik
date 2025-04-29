@@ -29,6 +29,11 @@ public class MediaPlayer {
     private Thread audioThread;
     private final Object lock = new Object();
 
+    /**
+     * TODO: Dont hardcode the Sample rates. 
+     * Creates the audio processing objects
+     * Hardcoded values for sample rates 
+     */
     public MediaPlayer() {
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
         bassEqualizer = new Equalizer(44100, 80, 80); // 80Hz center, 50Hz bandwidth
