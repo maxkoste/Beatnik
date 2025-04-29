@@ -31,8 +31,9 @@ public class Delay implements AudioProcessor {
     }
 
     /**
-     * Acts as the mix but not sure if this is how i want to use it...
-     * 
+     * Sets the decay values for the delay
+     * imprecise casting to float from double . 
+     * Not relevant since it doesnt need to be super accurate.
      * @param newDecay
      */
     public void setDecay(double newDecay) {
@@ -103,6 +104,10 @@ public class Delay implements AudioProcessor {
         return true;
     }
 
+    /**
+     * is called when the processing on the stream is finished.
+     * Does nothing for now.
+     */
     @Override
     public void processingFinished() {
     }
