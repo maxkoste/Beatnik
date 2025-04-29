@@ -7,6 +7,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
+/**
+ * This class is responsible for the logic and the appearance of the Knob. 
+ */
 public class CircularSliderSkin extends SkinBase<CircularSlider> {
 
     private static final int size = 50;
@@ -16,7 +19,13 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
     int tickCount;
     boolean snapToTick;
 
-    protected CircularSliderSkin(CircularSlider control, int tickCount, boolean snapToTick) {
+    /**
+     * 
+     * @param control the object to be drawn, the interface. 
+     * @param tickCount The ticks in the knob, represents each value that can be selected. 
+     * @param snapToTick if the knob snaps to the values or is completely free like a bird
+     */
+    public CircularSliderSkin(CircularSlider control, int tickCount, boolean snapToTick) {
         super(control);
 
         this.tickCount = tickCount;
@@ -37,7 +46,13 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
 
         getChildren().add(container);
     }
-
+    /**
+     * takes the position of the mouse and converts it into a position (a degree) on a circle
+     * if snap to tick is true it only allows the values dictated by the ticks.
+     * Never allows access to the bottom of the circle or anything but continuos movement of the slider.
+     * Sets the calculated angle to the interface and redraws the knob.
+     * @param event the user moved my knob
+     */
     private void handleMouseDrag(MouseEvent event) {
         double centerX = size / 2.0;
         double centerY = size / 2.0;
@@ -77,7 +92,11 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
         control.setAngle(newAngle);
         drawKnob(newAngle);
     }
-
+    /**
+     * Redraws the knob (the interface control)
+     * offsets the knob by 125 degrees so that 0 is not to the right
+     * @param angle the current position of the knob. 
+     */
     public void drawKnob(double angle) {
         gc.clearRect(0, 0, size, size);
         gc.setFill(Color.LIGHTGRAY);
