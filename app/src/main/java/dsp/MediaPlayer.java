@@ -61,7 +61,7 @@ public class MediaPlayer {
             // Add audio player for final output
             AudioPlayer audioPlayer = new AudioPlayer(format);
             playbackDispatcher.addAudioProcessor(audioPlayer);
-            
+
             playAudio();
 
         } catch (Exception e) {
@@ -86,39 +86,46 @@ public class MediaPlayer {
 
     // plays the song from the MediaPlayer class
     public void playAudio() {
-        if (!isPlaying) {
-            //setUp();
-            //System.out.println("Playing..");
-            playbackDispatcher.skip(currentTime);
-            this.audioThread = new Thread(playbackDispatcher, "Playback thread");
-            audioThread.setPriority(Thread.MAX_PRIORITY); // Give audio thread high priority
-            audioThread.start();
-            isPlaying = true;
+        // setUp();
+        // System.out.println("Playing..");
+        System.out.println("playAudio()");
+        //playbackDispatcher.skip(currentTime);
+        this.audioThread = new Thread(playbackDispatcher, "Playback thread");
+        audioThread.setPriority(Thread.MAX_PRIORITY); // Give audio thread high priority
+
+        audioThread.start();
+        System.out.println("Thread start");
+        System.out.println(Thread.currentThread().getName());
+        isPlaying = true;
         // } else {
-        //     isPlaying = !isPlaying;
-        //     System.out.println("Stopping..");
-        //     currentTime = playbackDispatcher.secondsProcessed();
-        //     playbackDispatcher.stop();
-        }
+        // isPlaying = !isPlaying;
+        // System.out.println("Stopping..");
+        // currentTime = playbackDispatcher.secondsProcessed();
+        // playbackDispatcher.stop();
     }
 
     public void pauseAudio() {
         if (isPlaying) {
             currentTime = playbackDispatcher.secondsProcessed();
             isPlaying = false;
-            
-            playbackDispatcher.stop();
+
+            try {
+                playbackDispatcher.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
-    
-    public void resumePlayback(){
+
+    public void resumePlayback() {
+        System.out.println("Resume playing");
         if (isPlaying) {
-            //setUp();
+            // setUp();
             playbackDispatcher.skip(currentTime);
             isPlaying = true;
 
             audioThread.notify();
-        } 
+        }
     }
 
     public void setVolume(float volume) {
@@ -179,8 +186,8 @@ public class MediaPlayer {
         this.currentSongFilePath = filepath;
         this.fullPath = "src/main/resources/songs/" + filepath;
         this.currentTime = 0;
-        setUp();
         this.isPlaying = true;
+        setUp();
     }
 
     public void resetSong() {
