@@ -19,6 +19,7 @@ public class MediaPlayer {
     private Equalizer bassEqualizer;
     private Equalizer trebleEqualizer;
     private boolean isPlaying;
+    private boolean started;
     private float currentTime;
     private Delay delayEffect;
     private Flanger flangerEffect;
@@ -84,6 +85,24 @@ public class MediaPlayer {
         System.out.println("Audio Shutdown Complete");
     }
 
+    public void playPause() throws InterruptedException {
+        if (!started) {
+            this.audioThread = new Thread(playbackDispatcher, "Playback Thread");
+            audioThread.setPriority(Thread.MAX_PRIORITY);
+            audioThread.start();
+            started = true;
+            isPlaying = true;
+        } else if (isPlaying) {
+            audioThread.wait();
+            currentTime = playbackDispatcher.secondsProcessed();
+            isPlaying = false;
+        } else {
+            audioThread.notify();
+            isPlaying = true;
+        }
+    }
+
+    /*
     // plays the song from the MediaPlayer class
     public void playAudio() {
         // setUp();
@@ -127,6 +146,8 @@ public class MediaPlayer {
             audioThread.notify();
         }
     }
+
+     */
 
     public void setVolume(float volume) {
         if (volumeProcessor != null) {
