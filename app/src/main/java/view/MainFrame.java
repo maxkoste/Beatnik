@@ -2,6 +2,7 @@ package view;
 
 import controller.Controller;
 import controller.PlaylistManager;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -56,7 +57,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private Button switchChannelTwo;
     private double screenHeight;
     private double screenWidth;
-    private Map<String, Float> effectIntensityMap;
 
     private Circle[] auIndicatorCirclesOne = new Circle[10];
     private Circle[] auIndicatorCirclesTwo = new Circle[10];
@@ -703,46 +703,46 @@ public class MainFrame implements EventHandler<ActionEvent> {
     }
 
     public void updateWaveformTwo(float currentSecond) {
-        waveformTwo.update(currentSecond); // thing
+        waveformTwo.update(currentSecond);
     }
 
     public void updateAudioIndicatorOne(double rms) {
-
         int totalDots = auIndicatorCirclesOne.length;
-        int activeDots = (int) Math.round(Math.min(rms * totalDots * 5, totalDots));
+        int activeDots = Math.min((int) (rms * totalDots * 5), totalDots);
 
-        for (int i = 0; i < totalDots; i++) {
-            if (activeDots > i) {
-                if (5 > i) {
-                    auIndicatorCirclesOne[i].setFill(Color.LIGHTGREEN);
-                } else if (8 > i) {
-                    auIndicatorCirclesOne[i].setFill(Color.GOLD);
+        Platform.runLater(() -> {
+            for (int i = 0; i < totalDots; i++) {
+                Color targetColor;
+
+                if (i < activeDots) {
+                    targetColor = (i < 5) ? Color.LIGHTGREEN : (i < 8) ? Color.GOLD : Color.RED;
                 } else {
-                    auIndicatorCirclesOne[i].setFill(Color.RED);
+                    targetColor = Color.GRAY;
                 }
-            } else {
-                auIndicatorCirclesOne[i].setFill(Color.GRAY);
+                if (!auIndicatorCirclesOne[i].getFill().equals(targetColor)) {
+                    auIndicatorCirclesOne[i].setFill(targetColor);
+                }
             }
-        }
+        });
     }
 
     public void updateAudioIndicatorTwo(double rms) {
-
         int totalDots = auIndicatorCirclesTwo.length;
-        int activeDots = (int) Math.round(Math.min(rms * totalDots * 5, totalDots));
+        int activeDots = Math.min((int) (rms * totalDots * 5), totalDots);
 
-        for (int i = 0; i < totalDots; i++) {
-            if (activeDots > i) {
-                if (5 > i) {
-                    auIndicatorCirclesTwo[i].setFill(Color.LIGHTGREEN);
-                } else if (8 > i) {
-                    auIndicatorCirclesTwo[i].setFill(Color.GOLD);
+        Platform.runLater(() -> {
+            for (int i = 0; i < totalDots; i++) {
+                Color targetColor;
+
+                if (i < activeDots) {
+                    targetColor = (i < 5) ? Color.LIGHTGREEN : (i < 8) ? Color.GOLD : Color.RED;
                 } else {
-                    auIndicatorCirclesTwo[i].setFill(Color.RED);
+                    targetColor = Color.GRAY;
                 }
-            } else {
-                auIndicatorCirclesTwo[i].setFill(Color.GRAY);
+                if (!auIndicatorCirclesTwo[i].getFill().equals(targetColor)) {
+                    auIndicatorCirclesTwo[i].setFill(targetColor);
+                }
             }
-        }
+        });
     }
 }
