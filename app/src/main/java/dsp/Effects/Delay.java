@@ -4,7 +4,7 @@ import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 
 /**
- * This class represents the delay effect. Has to be made custom to support
+ * This class represents the delay effect. Had to be made custom to support
  * mixing
  * dry and wet signal.
  */
@@ -31,7 +31,9 @@ public class Delay implements AudioProcessor {
     }
 
     /**
-     * Acts as the mix but not sure if this is how i want to use it...
+     * Sets the decay values for the delay
+     * imprecise casting to float from double .
+     * Not relevant since it doesnt need to be super accurate.
      * 
      * @param newDecay
      */
@@ -39,10 +41,19 @@ public class Delay implements AudioProcessor {
         this.decay = (float) newDecay;
     }
 
+    /**
+     * Set the echo length permits null or blank values.
+     * 
+     * @param newEchoLength
+     */
     public void setEchoLength(double newEchoLength) {
         this.newEchoLength = newEchoLength;
     }
 
+    /**
+     * Can't be repeated unless new echo length is set.
+     * Updates the echo length from the last read position in the buffer 
+     */
     private void applyNewEchoLength() {
         if (newEchoLength != -1) {
 
@@ -76,6 +87,7 @@ public class Delay implements AudioProcessor {
 
     /**
      * Processes the audio and apply the delay-effect
+     * gets the overlap value from the currently playing songs buffer and syncs up with it.
      */
     @Override
     public boolean process(AudioEvent audioEvent) {
@@ -103,6 +115,10 @@ public class Delay implements AudioProcessor {
         return true;
     }
 
+    /**
+     * is called when the processing on the stream is finished.
+     * Does nothing for now.
+     */
     @Override
     public void processingFinished() {
     }

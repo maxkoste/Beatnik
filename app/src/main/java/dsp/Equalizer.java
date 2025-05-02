@@ -1,33 +1,36 @@
 package dsp;
 
-import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.filters.BandPass;
-import be.tarsos.dsp.GainProcessor;
 
 public class Equalizer implements AudioProcessor {
     private final float sampleRate;
     private BandPass bandPassFilter;
-    private GainProcessor gainProcessor;
     private float gain; // in dB
     private float centerFrequency;
     private float bandwidth;
 
+    /**
+     * 
+     * @param sampleRate sample rate of the song
+     * @param bandWidth  the width of the effected frequencies
+     * @param frequency  the center of the frequency that is effected
+     */
     public Equalizer(float sampleRate, float bandWidth, float frequency) {
         this.sampleRate = sampleRate;
         this.centerFrequency = frequency;
         this.bandwidth = bandWidth;
         this.gain = 0.0f; // 0 dB by default
-        // this.gainProcessor = new GainProcessor(1.0f); // Start with unity gain
-        updateFilter();
-    }
-
-    public void updateFilter() {
         bandPassFilter = new BandPass(centerFrequency, bandwidth, sampleRate);
     }
 
-    // Set the gain for the specified frequencies of the EQ
+    /**
+     * Set the gain of the effected frequencies
+     * converts them to a dB scale +/-12dB.
+     * 
+     * @param gainDb
+     */
     public void setGain(float gainDb) {
         float scaledDb = (gainDb - 50) * 0.24f; // This maps 0-100 to +/-12dB
 
@@ -36,6 +39,11 @@ public class Equalizer implements AudioProcessor {
         this.gain = (float) Math.pow(10.0, scaledDb / 20.0);
     }
 
+    /**
+     * Processes the audio and apply the equalizer effect
+     * gets the overlap value from the currently playing songs buffer and syncs up
+     * with it.
+     */
     @Override
     public boolean process(AudioEvent audioEvent) {
         /*
@@ -71,6 +79,9 @@ public class Equalizer implements AudioProcessor {
         return true;
     }
 
+    /**
+    *is called when the audio buffer is completely processed (song is over) 
+    */
     @Override
     public void processingFinished() {
         // Cleanup resources if needed

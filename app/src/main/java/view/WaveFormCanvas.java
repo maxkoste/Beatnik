@@ -5,9 +5,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class WaveFormCanvas extends Canvas {
     private final GraphicsContext gc;
     private double width;
@@ -18,18 +15,33 @@ public class WaveFormCanvas extends Canvas {
     private final float floatSecond = 43809.7051598F;
     private final int snippetLength = Math.round(tenFloatSeconds * 2);
 
+    /**
+     * For now width and height cant be changed. Might get implemented later
+     * Collects the graphics content from the super class. 
+     * @param width
+     * @param height
+     */
     public WaveFormCanvas(double width, double height) {
         super(width, height);
         this.width = width;
         this.height = height;
         gc = getGraphicsContext2D();
     }
-
+    /**
+     * Sets the songs audio data to a float array equal to the length of the entire song.
+     * Sets the length that is used in the update method. 
+     * @param originalAudioData
+     */
     public void setOriginalAudioData(float[] originalAudioData) {
         this.originalAudioData = originalAudioData;
         originalAudioDataSize = originalAudioData.length;
     }
 
+    /**
+     * Updates the waveform 10 sek before and after what is currently being played. 
+     * 10 sek before the songs starts and 10 seconds after it ended the array is filled with 0.0f 
+     * @param currentSecond the current values in the float array, represented by its float value
+     */
     public void update(float currentSecond) {
         if (currentSecond != 0) {
             float currentFloatSecond = currentSecond * floatSecond;
@@ -40,7 +52,7 @@ public class WaveFormCanvas extends Canvas {
             float[] audioSnippet = new float[snippetLength];
 
             int insertStart = Math.max(0, -startingPoint); // if startingPoint is negative, insert later
-            for (int i = audioDataStart; i < audioDataEnd; i ++) {
+            for (int i = audioDataStart; i < audioDataEnd; i++) {
                 audioSnippet[insertStart + i - audioDataStart] = originalAudioData[i];
             }
 
@@ -48,6 +60,11 @@ public class WaveFormCanvas extends Canvas {
         }
     }
 
+    /**
+     * Redraws the new waveform based on a array of float values
+     * Lines are closer to the middle the lower the float value
+     * @param audioData
+     */
     public void draw(float[] audioData) {
         Platform.runLater(() -> {
             gc.clearRect(0, 0, width, height);

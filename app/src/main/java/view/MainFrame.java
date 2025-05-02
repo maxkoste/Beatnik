@@ -2,6 +2,7 @@ package view;
 
 import controller.Controller;
 import controller.PlaylistManager;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -56,7 +57,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private Button switchChannelTwo;
     private double screenHeight;
     private double screenWidth;
-    private Map<String, Float> effectIntensityMap;
 
     private Circle[] auIndicatorCirclesOne = new Circle[10];
     private Circle[] auIndicatorCirclesTwo = new Circle[10];
@@ -336,8 +336,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         CircularSlider channelOneSpeed = new CircularSlider(9, false);
         channelOneSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double volume = newValue.doubleValue();
-            System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
+            double rawValue = newValue.doubleValue(); // 0.0 - 270.0
+            // Map 0.0 - 270.0 to 0.8 - 1.2
+            double mappedValue = 1.2 - (rawValue / 270.0) * (1.2 - 0.8);
+            // Round to 2 decimal places
+            mappedValue = Math.round(mappedValue * 100.0) / 100.0;
+
+            controller.setPlaybackSpeedCh1(mappedValue);
         });
         AnchorPane.setTopAnchor(channelOneSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelOneSpeed, (screenWidth / 3.275) - 25);
@@ -348,8 +353,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         CircularSlider channelTwoSpeed = new CircularSlider(9, false);
         channelTwoSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double volume = newValue.doubleValue();
-            System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
+            double rawValue = newValue.doubleValue(); // 0.0 - 270.0
+            //Map 0.0 - 270.0 to 0.8 -1.2
+            double mappedValue = 1.2 - (rawValue / 270.0) * (1.2 - 0.8);
+            // Round to 2 decimal places
+            mappedValue = Math.round(mappedValue * 100.0) / 100.0;
+
+            controller.ssetPlaybackSpeedCh2(mappedValue);
         });
         AnchorPane.setTopAnchor(channelTwoSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelTwoSpeed, ((screenWidth / 1.442) - 25));
@@ -395,7 +405,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     private void initializeZoneFour() {
         CircularSlider effectIntensity = new CircularSlider(9, false);
-        effectIntensity.updateAngle(0.0); //Starts of at 0 degrees  
+        effectIntensity.updateAngle(0.0); // Starts of at 0 degrees
         effectIntensity.valueProperty().addListener((observable, oldValue, newValue) -> {
             float volume = newValue.floatValue();
             float mixValue = volume / 270.0f;
@@ -414,7 +424,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
             int effectSelectorValue = newValue.intValue();
             controller.setEffect(effectSelectorValue);
-            //Gets the saved state of the selected effects mix settings and redraws the knob 
+            // Gets the saved state of the selected effects mix settings and redraws the
+            // knob
             float savedMix = controller.getCurrentEffectMix();
             float knobValue = savedMix * 270.0f;
             effectIntensity.updateAngle(knobValue);
@@ -542,13 +553,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
     public void handleSongSelection(MouseEvent mouseEvent) {
         if (mouseEvent.getClickCount() == 2) {
             if (channelOneActive) {
-                String currentSong = songSelector.getSelectedItem();
-                controller.setSong(1, currentSong);
-                channelOneContainer.setText("Song loaded: " + currentSong); // TODO: Replace with song/playlist
-                                                                            // info-label
+                controller.setSong(1, songSelector.getSelectedItem());
+                setInfoText(false, songSelector.getSelectedItem(), 1);
             } else {
                 controller.setSong(2, songSelector.getSelectedItem());
-                channelTwoContainer.setText("Song loaded: " + songSelector.getSelectedItem());
+                setInfoText(false, songSelector.getSelectedItem(), 2);
             }
         }
     }
@@ -624,14 +633,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         if (mouseEvent.getClickCount() == 2) {
             if (channelOneActive) {
                 controller.startPlaylist(1, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
-                channelOneContainer.setText("Song loaded: " + playlistSongSelector.getSelectedItem()); // TODO: Replace
-                                                                                                       // with spectral
-                                                                                                       // analyzer
+                setInfoText(true, playlistSongSelector.getSelectedItem(), 1);
             } else {
                 controller.startPlaylist(2, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
-                channelTwoContainer.setText("Song loaded: " + playlistSongSelector.getSelectedItem()); // TODO: Replace
-                                                                                                       // with spectral
-                                                                                                       // analyzer
+                setInfoText(true, playlistSongSelector.getSelectedItem(), 2);
             }
         }
     }
@@ -658,6 +663,22 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     public void handleChannelTwoSkip(ActionEvent actionEvent) {
         controller.nextSong(2);
+    }
+
+    public void setInfoText(boolean playlist, String song, int channel) {
+        if (channel == 1) {
+            if (playlist) {
+                channelOneContainer.setText("Playing " + song + " in " + playlistSelector.getSelectedItem());
+            } else {
+                channelOneContainer.setText("Playing " + song);
+            }
+        } else {
+            if (playlist) {
+                channelTwoContainer.setText("Playing " + song + " in " + playlistSelector.getSelectedItem());
+            } else {
+                channelTwoContainer.setText("Playing " + song);
+            }
+        }
     }
 
     public String promptUserInput(String title, String headerText) {
@@ -703,46 +724,46 @@ public class MainFrame implements EventHandler<ActionEvent> {
     }
 
     public void updateWaveformTwo(float currentSecond) {
-        waveformTwo.update(currentSecond); // thing
+        waveformTwo.update(currentSecond);
     }
 
     public void updateAudioIndicatorOne(double rms) {
-
         int totalDots = auIndicatorCirclesOne.length;
-        int activeDots = (int) Math.round(Math.min(rms * totalDots * 5, totalDots));
+        int activeDots = Math.min((int) (rms * totalDots * 5), totalDots);
 
-        for (int i = 0; i < totalDots; i++) {
-            if (activeDots > i) {
-                if (5 > i) {
-                    auIndicatorCirclesOne[i].setFill(Color.LIGHTGREEN);
-                } else if (8 > i) {
-                    auIndicatorCirclesOne[i].setFill(Color.GOLD);
+        Platform.runLater(() -> {
+            for (int i = 0; i < totalDots; i++) {
+                Color targetColor;
+
+                if (i < activeDots) {
+                    targetColor = (i < 5) ? Color.LIGHTGREEN : (i < 8) ? Color.GOLD : Color.RED;
                 } else {
-                    auIndicatorCirclesOne[i].setFill(Color.RED);
+                    targetColor = Color.GRAY;
                 }
-            } else {
-                auIndicatorCirclesOne[i].setFill(Color.GRAY);
+                if (!auIndicatorCirclesOne[i].getFill().equals(targetColor)) {
+                    auIndicatorCirclesOne[i].setFill(targetColor);
+                }
             }
-        }
+        });
     }
 
     public void updateAudioIndicatorTwo(double rms) {
-
         int totalDots = auIndicatorCirclesTwo.length;
-        int activeDots = (int) Math.round(Math.min(rms * totalDots * 5, totalDots));
+        int activeDots = Math.min((int) (rms * totalDots * 5), totalDots);
 
-        for (int i = 0; i < totalDots; i++) {
-            if (activeDots > i) {
-                if (5 > i) {
-                    auIndicatorCirclesTwo[i].setFill(Color.LIGHTGREEN);
-                } else if (8 > i) {
-                    auIndicatorCirclesTwo[i].setFill(Color.GOLD);
+        Platform.runLater(() -> {
+            for (int i = 0; i < totalDots; i++) {
+                Color targetColor;
+
+                if (i < activeDots) {
+                    targetColor = (i < 5) ? Color.LIGHTGREEN : (i < 8) ? Color.GOLD : Color.RED;
                 } else {
-                    auIndicatorCirclesTwo[i].setFill(Color.RED);
+                    targetColor = Color.GRAY;
                 }
-            } else {
-                auIndicatorCirclesTwo[i].setFill(Color.GRAY);
+                if (!auIndicatorCirclesTwo[i].getFill().equals(targetColor)) {
+                    auIndicatorCirclesTwo[i].setFill(targetColor);
+                }
             }
-        }
+        });
     }
 }

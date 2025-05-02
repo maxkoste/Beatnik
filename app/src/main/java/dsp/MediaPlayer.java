@@ -1,34 +1,38 @@
 package dsp;
 
-import java.io.File;
-
 import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.AudioEvent;
+import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.GainProcessor;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
+import be.tarsos.dsp.resample.RateTransposer;
 import dsp.Effects.Delay;
 import dsp.Effects.Flanger;
+import dsp.util.DispatcherFactory;
+
+import java.io.File;
+
+import javax.sound.sampled.*;
 
 //This class is responsible for playing the audio, and its volume
 public class MediaPlayer {
     private AudioDispatcher playbackDispatcher; // For effects processing
-    private GainProcessor gainProcessor;
-    private String currentSongFilePath;
     private GainProcessor volumeProcessor;
     private Equalizer bassEqualizer;
     private Equalizer trebleEqualizer;
     private boolean isPlaying;
-    private float currentTime;
+    private boolean started;
     private Delay delayEffect;
     private Flanger flangerEffect;
+    private String fullPath;
+    private Thread audioThread;
+    private final Object lock = new Object();
+    private RateTransposer rateTransposer;
 
     public MediaPlayer() {
-        // Initialize equalizers with wide bandwidths to simulate shelf behavior
-        bassEqualizer = new Equalizer(44100, 80, 80); // 80Hz center, 50Hz bandwidth
-        flangerEffect = new Flanger(0.0002, 0, 44100, 3);
-        trebleEqualizer = new Equalizer(44100, 5000, 7000); // 7khz center, 5kHz bandwidth
-        delayEffect = new Delay(0.5, 0.6, 44100);
+
     }
 
     public void setUp() {
@@ -39,16 +43,32 @@ public class MediaPlayer {
                 playbackDispatcher = null;
             }
 
-            System.out.println("Sampling this file in the: songs/" + currentSongFilePath);
-
-            String filePath = new File("src/main/resources/songs/" + currentSongFilePath).getAbsolutePath();
-            System.out.println("Loading audio file from: " + filePath);
-
-            // Use AudioDispatcherFactory with the actual file path
-            playbackDispatcher = AudioDispatcherFactory.fromPipe(filePath, 44100, 4096, 0);
+            /**
+             * TODO: Stereo playback
+             * 
+             * For some stupid reason AudioDispatchFactory.fromPipe() creates a mono audio
+             * stream
+             * which in turn results in all audio playback being in mono instead of stereo.
+             * 
+             * Alternative is to create a audio file, File audioFile = new File(fullPath);
+             * and pass it to the
+             * AudioDispatcherFactory with: AudioDispatcherFactory.fromFile(audioFile, 2048,
+             * 0);
+             * This will give us stereo audio, BUT for some reason the audio playback is
+             * laggy and
+             * suuuper weird when doing this.. this needs to be fixed!!
+             */
+            playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath, 48000, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
-            System.out.println("Audio format: " + format.toString());
+            System.out.println(format.toString());
+            // AudioFormat audioFormat = new AudioFormat(format.getSampleRate(), 16, 2,
+            // false, false);
 
+            bassEqualizer = new Equalizer(format.getSampleRate(), 80, 80); // 80Hz center, 50Hz bandwidth
+            flangerEffect = new Flanger(0.0002, 0, format.getSampleRate(), 3);
+            trebleEqualizer = new Equalizer(format.getSampleRate(), 5000, 7000); // 7khz center, 5kHz bandwidth
+            delayEffect = new Delay(0.5, 0.6, format.getSampleRate());
+            rateTransposer = new RateTransposer(1.0F);
             // Add volume controll first
             volumeProcessor = new GainProcessor(0.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
@@ -58,12 +78,32 @@ public class MediaPlayer {
             playbackDispatcher.addAudioProcessor(flangerEffect);
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
+            playbackDispatcher.addAudioProcessor(rateTransposer);
+
+            playbackDispatcher.addAudioProcessor(new AudioProcessor() {
+                @Override
+                public boolean process(AudioEvent audioEvent) {
+                    if (!isPlaying) {
+                        synchronized (lock) {
+                            try {
+                                lock.wait(); // wait until resume is called
+                            } catch (InterruptedException e) {
+                                return false; // stop processing if interrupted
+                            }
+                        }
+                    }
+                    return true; // continue processing
+                }
+
+                @Override
+                public void processingFinished() {
+
+                }
+            });
 
             // Add audio player for final output
             AudioPlayer audioPlayer = new AudioPlayer(format);
             playbackDispatcher.addAudioProcessor(audioPlayer);
-
-            System.out.println("Setup complete..");
 
         } catch (Exception e) {
             System.err.println("Error setting up audio: " + e.getMessage());
@@ -81,26 +121,30 @@ public class MediaPlayer {
             playbackDispatcher = null;
         }
         isPlaying = false;
-        currentTime = 0;
         System.out.println("Audio Shutdown Complete");
     }
 
-    // plays the song from the MediaPlayer class
-    public void playAudio() {
-        if (!isPlaying) {
-            setUp();
-            System.out.println("Playing..");
-            playbackDispatcher.skip(currentTime);
-            Thread audioThread = new Thread(playbackDispatcher, "Playback thread");
-            audioThread.setPriority(Thread.MAX_PRIORITY); // Give audio thread high priority
+    public void playPause() throws InterruptedException {
+        if (!started) {
+            this.audioThread = new Thread(playbackDispatcher, "Playback Thread");
+            audioThread.setPriority(Thread.MAX_PRIORITY);
             audioThread.start();
+            started = true;
             isPlaying = true;
+        } else if (isPlaying) {
+            synchronized (lock) {
+                isPlaying = false;
+            }
         } else {
-            isPlaying = !isPlaying;
-            System.out.println("Stopping..");
-            currentTime = playbackDispatcher.secondsProcessed();
-            playbackDispatcher.stop();
+            synchronized (lock) {
+                isPlaying = true;
+                lock.notifyAll();
+            }
         }
+    }
+
+    public void setPlaybackSpeed(double speedFactor) {
+        rateTransposer.setFactor(speedFactor);
     }
 
     public void setVolume(float volume) {
@@ -158,16 +202,15 @@ public class MediaPlayer {
      *                 dispatcher
      */
     public void setSong(String filepath) {
-        this.isPlaying = false;
-        this.currentSongFilePath = filepath;
-        this.currentTime = 0;
+        this.fullPath = "src/main/resources/songs/" + filepath;
+        this.started = false;
+        this.isPlaying = true;
+        setUp();
     }
 
     public void resetSong() {
-        System.out.println("Resetting");
-        currentTime = 0;
-        isPlaying = false;
-        playAudio();
-        playAudio();
+        started = false;
+        isPlaying = true;
+        setUp();
     }
 }
