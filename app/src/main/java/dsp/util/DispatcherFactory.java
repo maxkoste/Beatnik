@@ -9,6 +9,11 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class DispatcherFactory {
+    
+    /**
+     * Custom implementation that tries to send a custom script to ffmpeg to make it play in stereo. Messes up the audio !... 
+     * Not ideal 
+     */
 
     public static AudioDispatcher fromPipeStereo(String audioFilePath, int sampleRate, int bufferSize,
             int bufferOverlap)

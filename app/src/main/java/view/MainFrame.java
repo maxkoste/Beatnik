@@ -354,7 +354,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         CircularSlider channelTwoSpeed = new CircularSlider(9, false);
         channelTwoSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
             double rawValue = newValue.doubleValue(); // 0.0 - 270.0
-            //Map 0.0 - 270.0 to 0.8 -1.2
+            // Map 0.0 - 270.0 to 0.8 -1.2
             double mappedValue = 1.2 - (rawValue / 270.0) * (1.2 - 0.8);
             // Round to 2 decimal places
             mappedValue = Math.round(mappedValue * 100.0) / 100.0;
