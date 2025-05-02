@@ -542,13 +542,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
     public void handleSongSelection(MouseEvent mouseEvent) {
         if (mouseEvent.getClickCount() == 2) {
             if (channelOneActive) {
-                String currentSong = songSelector.getSelectedItem();
-                controller.setSong(1, currentSong);
-                channelOneContainer.setText("Song loaded: " + currentSong); // TODO: Replace with song/playlist
-                                                                            // info-label
+                controller.setSong(1, songSelector.getSelectedItem());
+                setInfoText(false, songSelector.getSelectedItem(), 1);
             } else {
                 controller.setSong(2, songSelector.getSelectedItem());
-                channelTwoContainer.setText("Song loaded: " + songSelector.getSelectedItem());
+                setInfoText(false, songSelector.getSelectedItem(), 2);
             }
         }
     }
@@ -624,14 +622,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         if (mouseEvent.getClickCount() == 2) {
             if (channelOneActive) {
                 controller.startPlaylist(1, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
-                channelOneContainer.setText("Song loaded: " + playlistSongSelector.getSelectedItem()); // TODO: Replace
-                                                                                                       // with spectral
-                                                                                                       // analyzer
+                setInfoText(true, playlistSongSelector.getSelectedItem(), 1);
             } else {
                 controller.startPlaylist(2, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
-                channelTwoContainer.setText("Song loaded: " + playlistSongSelector.getSelectedItem()); // TODO: Replace
-                                                                                                       // with spectral
-                                                                                                       // analyzer
+                setInfoText(true, playlistSongSelector.getSelectedItem(), 2);
             }
         }
     }
@@ -658,6 +652,22 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     public void handleChannelTwoSkip(ActionEvent actionEvent) {
         controller.nextSong(2);
+    }
+
+    public void setInfoText(boolean playlist, String song, int channel) {
+        if (channel == 1) {
+            if (playlist) {
+                channelOneContainer.setText("Playing " + song + " in " + playlistSelector.getSelectedItem());
+            } else {
+                channelOneContainer.setText("Playing " + song);
+            }
+        } else {
+            if (playlist) {
+                channelTwoContainer.setText("Playing " + song + " in " + playlistSelector.getSelectedItem());
+            } else {
+                channelTwoContainer.setText("Playing " + song);
+            }
+        }
     }
 
     public String promptUserInput(String title, String headerText) {

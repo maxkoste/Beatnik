@@ -111,12 +111,16 @@ public class Controller {
                 audioPlayer1.playPause();
                 setChannelOneVolume(latestVolume1);
                 dispatcherOne = audioPlayer1.getAudioDispatcher();
-                volumeIndicator(dispatcherOne, channel);
+                if (dispatcherOne != null) {
+                    volumeIndicator(dispatcherOne, channel);
+                }
             } else {
                 audioPlayer2.playPause();
                 setChannelTwoVolume(latestVolume2);
                 dispatcherTwo = audioPlayer2.getAudioDispatcher();
-                volumeIndicator(dispatcherTwo, channel);
+                if (dispatcherTwo != null) {
+                    volumeIndicator(dispatcherTwo, channel);
+                }
             }
         } catch (InterruptedException e) {
             playSong(channel);
@@ -171,12 +175,16 @@ public class Controller {
             if (!(currentPosInPlaylist >= playlistSongPaths.size() - 1)) {
                 currentPosInPlaylist++;
                 setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
+                frame.setInfoText(true, playlistSongPaths.get(currentPosInPlaylist), channel);
             } else {
                 frame.userMessage(Alert.AlertType.INFORMATION, "Playlist Finished, Skip now Random");
                 playlistSongPaths = null;
+                nextSong(channel);
             }
         } else {
-            setSong(channel, playlistManager.randomSong());
+            String song = playlistManager.randomSong();
+            setSong(channel, song);
+            frame.setInfoText(false, song, channel);
         }
     }
 
