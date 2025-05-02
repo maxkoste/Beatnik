@@ -2,6 +2,7 @@ package view;
 
 import controller.Controller;
 import controller.PlaylistManager;
+import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -56,7 +57,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private Button switchChannelTwo;
     private double screenHeight;
     private double screenWidth;
-    private Map<String, Float> effectIntensityMap;
 
     private Circle[] auIndicatorCirclesOne = new Circle[10];
     private Circle[] auIndicatorCirclesTwo = new Circle[10];
@@ -542,13 +542,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
     public void handleSongSelection(MouseEvent mouseEvent) {
         if (mouseEvent.getClickCount() == 2) {
             if (channelOneActive) {
-                String currentSong = songSelector.getSelectedItem();
-                controller.setSong(1, currentSong);
-                channelOneContainer.setText("Song loaded: " + currentSong); // TODO: Replace with song/playlist
-                                                                            // info-label
+                controller.setSong(1, songSelector.getSelectedItem());
+                setInfoText(false, songSelector.getSelectedItem(), 1);
             } else {
                 controller.setSong(2, songSelector.getSelectedItem());
-                channelTwoContainer.setText("Song loaded: " + songSelector.getSelectedItem());
+                setInfoText(false, songSelector.getSelectedItem(), 2);
             }
         }
     }
@@ -624,14 +622,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         if (mouseEvent.getClickCount() == 2) {
             if (channelOneActive) {
                 controller.startPlaylist(1, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
-                channelOneContainer.setText("Song loaded: " + playlistSongSelector.getSelectedItem()); // TODO: Replace
-                                                                                                       // with spectral
-                                                                                                       // analyzer
+                setInfoText(true, playlistSongSelector.getSelectedItem(), 1);
             } else {
                 controller.startPlaylist(2, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
-                channelTwoContainer.setText("Song loaded: " + playlistSongSelector.getSelectedItem()); // TODO: Replace
-                                                                                                       // with spectral
-                                                                                                       // analyzer
+                setInfoText(true, playlistSongSelector.getSelectedItem(), 2);
             }
         }
     }
@@ -658,6 +652,22 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     public void handleChannelTwoSkip(ActionEvent actionEvent) {
         controller.nextSong(2);
+    }
+
+    public void setInfoText(boolean playlist, String song, int channel) {
+        if (channel == 1) {
+            if (playlist) {
+                channelOneContainer.setText("Playing " + song + " in " + playlistSelector.getSelectedItem());
+            } else {
+                channelOneContainer.setText("Playing " + song);
+            }
+        } else {
+            if (playlist) {
+                channelTwoContainer.setText("Playing " + song + " in " + playlistSelector.getSelectedItem());
+            } else {
+                channelTwoContainer.setText("Playing " + song);
+            }
+        }
     }
 
     public String promptUserInput(String title, String headerText) {
@@ -703,46 +713,46 @@ public class MainFrame implements EventHandler<ActionEvent> {
     }
 
     public void updateWaveformTwo(float currentSecond) {
-        waveformTwo.update(currentSecond); // thing
+        waveformTwo.update(currentSecond);
     }
 
     public void updateAudioIndicatorOne(double rms) {
-
         int totalDots = auIndicatorCirclesOne.length;
-        int activeDots = (int) Math.round(Math.min(rms * totalDots * 5, totalDots));
+        int activeDots = Math.min((int) (rms * totalDots * 5), totalDots);
 
-        for (int i = 0; i < totalDots; i++) {
-            if (activeDots > i) {
-                if (5 > i) {
-                    auIndicatorCirclesOne[i].setFill(Color.LIGHTGREEN);
-                } else if (8 > i) {
-                    auIndicatorCirclesOne[i].setFill(Color.GOLD);
+        Platform.runLater(() -> {
+            for (int i = 0; i < totalDots; i++) {
+                Color targetColor;
+
+                if (i < activeDots) {
+                    targetColor = (i < 5) ? Color.LIGHTGREEN : (i < 8) ? Color.GOLD : Color.RED;
                 } else {
-                    auIndicatorCirclesOne[i].setFill(Color.RED);
+                    targetColor = Color.GRAY;
                 }
-            } else {
-                auIndicatorCirclesOne[i].setFill(Color.GRAY);
+                if (!auIndicatorCirclesOne[i].getFill().equals(targetColor)) {
+                    auIndicatorCirclesOne[i].setFill(targetColor);
+                }
             }
-        }
+        });
     }
 
     public void updateAudioIndicatorTwo(double rms) {
-
         int totalDots = auIndicatorCirclesTwo.length;
-        int activeDots = (int) Math.round(Math.min(rms * totalDots * 5, totalDots));
+        int activeDots = Math.min((int) (rms * totalDots * 5), totalDots);
 
-        for (int i = 0; i < totalDots; i++) {
-            if (activeDots > i) {
-                if (5 > i) {
-                    auIndicatorCirclesTwo[i].setFill(Color.LIGHTGREEN);
-                } else if (8 > i) {
-                    auIndicatorCirclesTwo[i].setFill(Color.GOLD);
+        Platform.runLater(() -> {
+            for (int i = 0; i < totalDots; i++) {
+                Color targetColor;
+
+                if (i < activeDots) {
+                    targetColor = (i < 5) ? Color.LIGHTGREEN : (i < 8) ? Color.GOLD : Color.RED;
                 } else {
-                    auIndicatorCirclesTwo[i].setFill(Color.RED);
+                    targetColor = Color.GRAY;
                 }
-            } else {
-                auIndicatorCirclesTwo[i].setFill(Color.GRAY);
+                if (!auIndicatorCirclesTwo[i].getFill().equals(targetColor)) {
+                    auIndicatorCirclesTwo[i].setFill(targetColor);
+                }
             }
-        }
+        });
     }
 }

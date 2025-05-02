@@ -7,6 +7,7 @@ import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
+import model.SongData;
 import view.MainFrame;
 
 import java.io.*;
@@ -29,7 +30,7 @@ public class Controller {
     private TimerThreadOne timerThreadOne;
     private TimerThreadTwo timerThreadTwo;
     private ObservableList<String> playlistSongPaths; // TODO: Find way of alerting Controller when a song has naturally
-                                              // finished playing
+    // finished playing
     private int currentPosInPlaylist;
     private float masterModifier = 0.5F;
     private float crossfaderModifier1 = 1.0F;
@@ -40,9 +41,11 @@ public class Controller {
     private AudioDispatcher dispatcherTwo;
     private String currentEffect;
     private Map<String, Float> effectIntensityMap;
+    private Map<String, float[]> songsData = new HashMap<>();
 
     public Controller(Stage primaryStage) {
-        //HashMap saves the state of the Effect-selector knob & the Effect-intensity knob from the GUI
+        // HashMap saves the state of the Effect-selector knob & the Effect-intensity
+        // knob from the GUI
         effectIntensityMap = new HashMap<String, Float>();
         effectIntensityMap.put("delay", 0.0F);
         effectIntensityMap.put("flanger", 0.0F);
@@ -62,8 +65,18 @@ public class Controller {
         frame.start(primaryStage);
         playlistManager.addSongsFromResources();
         playlistManager.loadPlaylistData();
+        preloadSongData();
         timerThreadOne.start();
         timerThreadTwo.start();
+    }
+
+    private void preloadSongData() { //TODO: Allow for imports
+        ObservableList<String> songFileNames = playlistManager.getSongsGUI();
+        for (int i = 0; i < songFileNames.size(); i++) {
+            String songName = songFileNames.get(i);
+            float[] songData = extract(songName);
+            songsData.put(songName, songData);
+        }
     }
 
     /**
@@ -83,7 +96,7 @@ public class Controller {
             audioPlayer2.setSong(songPath);
         }
         playSong(channel);
-        frame.setWaveformAudioData(extract(songPath), channel);
+        frame.setWaveformAudioData(songsData.get(songPath), channel);
     }
 
     public void startPlaylist(int channel, int selectedIndex, ObservableList<String> songPaths) {
@@ -93,32 +106,34 @@ public class Controller {
     }
 
     public void playSong(int channel) {
-        if (channel == 1) {
-            audioPlayer1.playAudio();
-            setChannelOneVolume(latestVolume1);
-            dispatcherOne = audioPlayer1.getAudioDispatcher();
-            if (dispatcherOne != null) {
-                volumeIndicator(dispatcherOne, channel);
+        try {
+            if (channel == 1) {
+                audioPlayer1.playPause();
+                setChannelOneVolume(latestVolume1);
+                dispatcherOne = audioPlayer1.getAudioDispatcher();
+                if (dispatcherOne != null) {
+                    volumeIndicator(dispatcherOne, channel);
+                }
+            } else {
+                audioPlayer2.playPause();
+                setChannelTwoVolume(latestVolume2);
+                dispatcherTwo = audioPlayer2.getAudioDispatcher();
+                if (dispatcherTwo != null) {
+                    volumeIndicator(dispatcherTwo, channel);
+                }
             }
-        } else if (channel == 2) {
-            audioPlayer2.playAudio();
-            setChannelTwoVolume(latestVolume2);
-            dispatcherTwo = audioPlayer2.getAudioDispatcher();
-            if (dispatcherTwo != null) {
-                volumeIndicator(dispatcherTwo, channel);
-            }
+        } catch (InterruptedException e) {
+            playSong(channel);
         }
     }
 
     public void resetSong(int channel) {
         if (channel == 1) {
             audioPlayer1.resetSong();
-            playSong(1);
         } else {
             audioPlayer2.resetSong();
-            playSong(2);
         }
-
+        playSong(channel);
     }
 
     public void setEffect(int effectSelectorValue) {
@@ -150,8 +165,8 @@ public class Controller {
                 System.out.println("Something went wrong...");
         }
     }
-    
-    public float getCurrentEffectMix(){
+
+    public float getCurrentEffectMix() {
         return this.effectIntensityMap.getOrDefault(currentEffect, 0.0F);
     }
 
@@ -160,12 +175,16 @@ public class Controller {
             if (!(currentPosInPlaylist >= playlistSongPaths.size() - 1)) {
                 currentPosInPlaylist++;
                 setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
+                frame.setInfoText(true, playlistSongPaths.get(currentPosInPlaylist), channel);
             } else {
                 frame.userMessage(Alert.AlertType.INFORMATION, "Playlist Finished, Skip now Random");
                 playlistSongPaths = null;
+                nextSong(channel);
             }
         } else {
-            setSong(channel, playlistManager.randomSong());
+            String song = playlistManager.randomSong();
+            setSong(channel, song);
+            frame.setInfoText(false, song, channel);
         }
     }
 
@@ -217,7 +236,7 @@ public class Controller {
      * 1 = 100% effect signal (only effect)
      * all the effects should be applied on both audio-signals
      * 
-     * @param mix        float value between 0-1f
+     * @param mix float value between 0-1f
      */
     public void setEffectMix(float mix) {
         // Save the state
@@ -288,16 +307,11 @@ public class Controller {
 
                 rms = Math.sqrt(rms / buffer.length);
                 final double completeRms = rms;
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (channel == 1) {
-                            frame.updateAudioIndicatorOne(completeRms);
-                        } else if (channel == 2) {
-                            frame.updateAudioIndicatorTwo(completeRms);
-                        }
-                    }
-                });
+                if (channel == 1) {
+                    frame.updateAudioIndicatorOne(completeRms);
+                } else if (channel == 2) {
+                    frame.updateAudioIndicatorTwo(completeRms);
+                }
                 return true;
             }
 
@@ -317,7 +331,7 @@ public class Controller {
                         frame.updateWaveformOne(dispatcherOne.secondsProcessed());
                     }
                 }
-            }, 0, 4);
+            }, 0, 5);
         }
     }
 
@@ -331,7 +345,7 @@ public class Controller {
                         frame.updateWaveformTwo(dispatcherTwo.secondsProcessed());
                     }
                 }
-            }, 0, 4);
+            }, 0, 5);
         }
     }
 }
