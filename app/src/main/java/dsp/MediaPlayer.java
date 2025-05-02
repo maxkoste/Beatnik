@@ -30,17 +30,15 @@ public class MediaPlayer {
     private Thread audioThread;
     private final Object lock = new Object();
     private RateTransposer rateTransposer;
-    /**
-     * TODO: Dont hardcode the Sample rates. 
-     * Creates the audio processing objects
-     * Hardcoded values for sample rates 
-     */
+
     public MediaPlayer() {
         // Initialize equalizers with wide bandwidths to simulate shelf behavior
-        bassEqualizer = new Equalizer(44100, 80, 80); // 80Hz center, 50Hz bandwidth
-        flangerEffect = new Flanger(0.0002, 0, 44100, 3);
-        trebleEqualizer = new Equalizer(44100, 5000, 7000); // 7khz center, 5kHz bandwidth
-        delayEffect = new Delay(0.5, 0.6, 44100);
+        // bassEqualizer = new Equalizer(44100, 80, 80); // 80Hz center, 50Hz bandwidth
+        // flangerEffect = new Flanger(0.0002, 0, 44100, 3);
+        // trebleEqualizer = new Equalizer(44100, 5000, 7000); // 7khz center, 5kHz
+        // bandwidth
+        // delayEffect = new Delay(0.5, 0.6, 44100);
+        // // rateTransposer = new RateTransposer(1.5F);
     }
 
     public void setUp() {
@@ -52,9 +50,13 @@ public class MediaPlayer {
             }
 
             // Use AudioDispatcherFactory with the actual file path
-            playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath, 44100, 4096, 0);
+            playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath, 48000, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
             // System.out.println("Audio format: " + format.toString());
+            bassEqualizer = new Equalizer(format.getSampleRate(), 80, 80); // 80Hz center, 50Hz bandwidth
+            flangerEffect = new Flanger(0.0002, 0, format.getSampleRate(), 3);
+            trebleEqualizer = new Equalizer(format.getSampleRate(), 5000, 7000); // 7khz center, 5kHz bandwidth
+            delayEffect = new Delay(0.5, 0.6, format.getSampleRate());
 
             // Add volume controll first
             volumeProcessor = new GainProcessor(0.0f);
@@ -65,6 +67,7 @@ public class MediaPlayer {
             playbackDispatcher.addAudioProcessor(flangerEffect);
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
+            // playbackDispatcher.addAudioProcessor(rateTransposer);
 
             playbackDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
