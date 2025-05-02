@@ -10,6 +10,7 @@ import be.tarsos.dsp.GainProcessor;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
+import be.tarsos.dsp.resample.RateTransposer;
 import dsp.Effects.Delay;
 import dsp.Effects.Flanger;
 
@@ -28,7 +29,7 @@ public class MediaPlayer {
     private String fullPath;
     private Thread audioThread;
     private final Object lock = new Object();
-
+    private RateTransposer rateTransposer;
     /**
      * TODO: Dont hardcode the Sample rates. 
      * Creates the audio processing objects
@@ -54,7 +55,6 @@ public class MediaPlayer {
             playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath, 44100, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
             // System.out.println("Audio format: " + format.toString());
-
 
             // Add volume controll first
             volumeProcessor = new GainProcessor(0.0f);
