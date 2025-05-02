@@ -336,8 +336,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         CircularSlider channelOneSpeed = new CircularSlider(9, false);
         channelOneSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double volume = newValue.doubleValue();
-            System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
+            double rawValue = newValue.doubleValue(); // 0.0 - 270.0
+            // Map 0.0 - 270.0 to 0.8 - 1.2
+            double mappedValue = 1.2 - (rawValue / 270.0) * (1.2 - 0.8);
+            // Round to 2 decimal places
+            mappedValue = Math.round(mappedValue * 100.0) / 100.0;
+
+            controller.setPlaybackSpeedCh1(mappedValue);
         });
         AnchorPane.setTopAnchor(channelOneSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelOneSpeed, (screenWidth / 3.275) - 25);
@@ -348,8 +353,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         CircularSlider channelTwoSpeed = new CircularSlider(9, false);
         channelTwoSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double volume = newValue.doubleValue();
-            System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
+            double rawValue = newValue.doubleValue(); // 0.0 - 270.0
+            //Map 0.0 - 270.0 to 0.8 -1.2
+            double mappedValue = 1.2 - (rawValue / 270.0) * (1.2 - 0.8);
+            // Round to 2 decimal places
+            mappedValue = Math.round(mappedValue * 100.0) / 100.0;
+
+            controller.ssetPlaybackSpeedCh2(mappedValue);
         });
         AnchorPane.setTopAnchor(channelTwoSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelTwoSpeed, ((screenWidth / 1.442) - 25));
@@ -395,7 +405,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     private void initializeZoneFour() {
         CircularSlider effectIntensity = new CircularSlider(9, false);
-        effectIntensity.updateAngle(0.0); //Starts of at 0 degrees  
+        effectIntensity.updateAngle(0.0); // Starts of at 0 degrees
         effectIntensity.valueProperty().addListener((observable, oldValue, newValue) -> {
             float volume = newValue.floatValue();
             float mixValue = volume / 270.0f;
@@ -414,7 +424,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
             int effectSelectorValue = newValue.intValue();
             controller.setEffect(effectSelectorValue);
-            //Gets the saved state of the selected effects mix settings and redraws the knob 
+            // Gets the saved state of the selected effects mix settings and redraws the
+            // knob
             float savedMix = controller.getCurrentEffectMix();
             float knobValue = savedMix * 270.0f;
             effectIntensity.updateAngle(knobValue);

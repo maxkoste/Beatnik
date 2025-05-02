@@ -32,7 +32,7 @@ public class MediaPlayer {
     private RateTransposer rateTransposer;
 
     public MediaPlayer() {
-        
+
     }
 
     public void setUp() {
@@ -48,7 +48,8 @@ public class MediaPlayer {
             playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath, 48000, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
             System.out.println(format.toString());
-            //AudioFormat audioFormat = new AudioFormat(format.getSampleRate(), 16, 2, false, false);
+            // AudioFormat audioFormat = new AudioFormat(format.getSampleRate(), 16, 2,
+            // false, false);
 
             bassEqualizer = new Equalizer(format.getSampleRate(), 80, 80); // 80Hz center, 50Hz bandwidth
             flangerEffect = new Flanger(0.0002, 0, format.getSampleRate(), 3);
@@ -127,6 +128,10 @@ public class MediaPlayer {
                 lock.notifyAll();
             }
         }
+    }
+
+    public void setPlaybackSpeed(double speedFactor) {
+        rateTransposer.setFactor(speedFactor);
     }
 
     public void setVolume(float volume) {

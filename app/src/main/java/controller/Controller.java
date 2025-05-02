@@ -70,7 +70,7 @@ public class Controller {
         timerThreadTwo.start();
     }
 
-    private void preloadSongData() { //TODO: Allow for imports
+    private void preloadSongData() { // TODO: Allow for imports
         ObservableList<String> songFileNames = playlistManager.getSongsGUI();
         for (int i = 0; i < songFileNames.size(); i++) {
             String songName = songFileNames.get(i);
@@ -228,6 +228,14 @@ public class Controller {
 
     public void setBass2(float bassGain) {
         audioPlayer2.setBass(bassGain);
+    }
+
+    public void setPlaybackSpeedCh1(double speedFactor) {
+        audioPlayer1.setPlaybackSpeed(speedFactor);
+    }
+
+    public void ssetPlaybackSpeedCh2(double speedFactor) {
+        audioPlayer2.setPlaybackSpeed(speedFactor);
     }
 
     /**
