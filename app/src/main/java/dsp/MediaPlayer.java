@@ -1,8 +1,5 @@
 package dsp;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-
 import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
@@ -10,8 +7,12 @@ import be.tarsos.dsp.GainProcessor;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
+import be.tarsos.dsp.resample.RateTransposer;
 import dsp.Effects.Delay;
 import dsp.Effects.Flanger;
+import dsp.util.DispatcherFactory;
+
+import java.io.File;
 
 import javax.sound.sampled.*;
 
@@ -28,13 +29,10 @@ public class MediaPlayer {
     private String fullPath;
     private Thread audioThread;
     private final Object lock = new Object();
+    private RateTransposer rateTransposer;
 
     public MediaPlayer() {
-        // Initialize equalizers with wide bandwidths to simulate shelf behavior
-        bassEqualizer = new Equalizer(44100, 80, 80); // 80Hz center, 50Hz bandwidth
-        flangerEffect = new Flanger(0.0002, 0, 44100, 3);
-        trebleEqualizer = new Equalizer(44100, 5000, 7000); // 7khz center, 5kHz bandwidth
-        delayEffect = new Delay(0.5, 0.6, 44100);
+
     }
 
     public void setUp() {
@@ -45,12 +43,32 @@ public class MediaPlayer {
                 playbackDispatcher = null;
             }
 
-            // Use AudioDispatcherFactory with the actual file path
-            playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath, 44100, 4096, 0);
+            /**
+             * TODO: Stereo playback
+             * 
+             * For some stupid reason AudioDispatchFactory.fromPipe() creates a mono audio
+             * stream
+             * which in turn results in all audio playback being in mono instead of stereo.
+             * 
+             * Alternative is to create a audio file, File audioFile = new File(fullPath);
+             * and pass it to the
+             * AudioDispatcherFactory with: AudioDispatcherFactory.fromFile(audioFile, 2048,
+             * 0);
+             * This will give us stereo audio, BUT for some reason the audio playback is
+             * laggy and
+             * suuuper weird when doing this.. this needs to be fixed!!
+             */
+            playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath, 48000, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
-            // System.out.println("Audio format: " + format.toString());
+            System.out.println(format.toString());
+            // AudioFormat audioFormat = new AudioFormat(format.getSampleRate(), 16, 2,
+            // false, false);
 
-
+            bassEqualizer = new Equalizer(format.getSampleRate(), 80, 80); // 80Hz center, 50Hz bandwidth
+            flangerEffect = new Flanger(0.0002, 0, format.getSampleRate(), 3);
+            trebleEqualizer = new Equalizer(format.getSampleRate(), 5000, 7000); // 7khz center, 5kHz bandwidth
+            delayEffect = new Delay(0.5, 0.6, format.getSampleRate());
+            rateTransposer = new RateTransposer(1.0F);
             // Add volume controll first
             volumeProcessor = new GainProcessor(0.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
@@ -60,6 +78,7 @@ public class MediaPlayer {
             playbackDispatcher.addAudioProcessor(flangerEffect);
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
+            playbackDispatcher.addAudioProcessor(rateTransposer);
 
             playbackDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
@@ -122,6 +141,10 @@ public class MediaPlayer {
                 lock.notifyAll();
             }
         }
+    }
+
+    public void setPlaybackSpeed(double speedFactor) {
+        rateTransposer.setFactor(speedFactor);
     }
 
     public void setVolume(float volume) {
