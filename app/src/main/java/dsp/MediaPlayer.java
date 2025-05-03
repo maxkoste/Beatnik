@@ -10,6 +10,8 @@ import be.tarsos.dsp.io.jvm.AudioPlayer;
 import be.tarsos.dsp.resample.RateTransposer;
 import dsp.Effects.Delay;
 import dsp.Effects.Flanger;
+//Custom Dispatcher factory might be part of a solution for stereo
+//audio
 import dsp.util.DispatcherFactory;
 
 import java.io.File;
