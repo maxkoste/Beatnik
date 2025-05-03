@@ -7,7 +7,6 @@ import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import model.SongData;
 import view.MainFrame;
 
 import java.io.*;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import javafx.application.Platform;
 
 import dsp.MediaPlayer;
 
@@ -29,7 +27,7 @@ public class Controller {
     private PlaylistManager playlistManager;
     private TimerThreadOne timerThreadOne;
     private TimerThreadTwo timerThreadTwo;
-    private ObservableList<String> playlistSongPaths; // TODO: Find way of alerting Controller when a song has naturally
+    private ObservableList<String> playlistSongPaths;
     // finished playing
     private int currentPosInPlaylist;
     private float masterModifier = 0.5F;
@@ -99,8 +97,9 @@ public class Controller {
         frame.setWaveformAudioData(songsData.get(songPath), channel);
     }
 
-    public void startPlaylist(int channel, int selectedIndex, ObservableList<String> songPaths) {
-        playlistSongPaths = songPaths; // TODO: Make into a queue or smth? Might not be needed.
+    public void startPlaylist(int channel, int selectedIndex,
+            ObservableList<String> songPaths) {
+        playlistSongPaths = songPaths; 
         currentPosInPlaylist = selectedIndex;
         setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
     }
@@ -167,7 +166,8 @@ public class Controller {
     }
 
     public float getCurrentEffectMix() {
-        return this.effectIntensityMap.getOrDefault(currentEffect, 0.0F);
+        return this.effectIntensityMap.getOrDefault(currentEffect,
+                0.0F);
     }
 
     public void nextSong(int channel) { // TODO: Update GUI with names etc
@@ -175,9 +175,11 @@ public class Controller {
             if (!(currentPosInPlaylist >= playlistSongPaths.size() - 1)) {
                 currentPosInPlaylist++;
                 setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
-                frame.setInfoText(true, playlistSongPaths.get(currentPosInPlaylist), channel);
+                frame.setInfoText(true, playlistSongPaths
+                        .get(currentPosInPlaylist), channel);
             } else {
-                frame.userMessage(Alert.AlertType.INFORMATION, "Playlist Finished, Skip now Random");
+                frame.userMessage(Alert.AlertType.INFORMATION,
+                        "Playlist Finished, Skip now Random");
                 playlistSongPaths = null;
                 nextSong(channel);
             }
@@ -193,12 +195,12 @@ public class Controller {
         latestVolume1 = volume;
     }
 
-    public void setChannelTwoVolume(float volume) { // Does not use a channel check for speed
+    public void setChannelTwoVolume(float volume) {
         audioPlayer2.setVolume((volume * masterModifier) * crossfaderModifier2);
         latestVolume2 = volume;
     }
 
-    public void setMasterVolume(float masterModifier) { // TODO: Kan vara långsamt
+    public void setMasterVolume(float masterModifier) { 
         this.masterModifier = masterModifier;
         setChannelOneVolume(latestVolume1);
         setChannelTwoVolume(latestVolume2);
@@ -274,11 +276,13 @@ public class Controller {
         System.out.println("File moved into the songsGUI folder");
     }
 
-    private float[] extract(String filePath) { // TODO: Collect all fileData att app launch
+    private float[] extract(String filePath) { 
         List<Float> audioSamples = new ArrayList<>();
         try {
-            String path = new File("src/main/resources/songs/" + filePath).getAbsolutePath();
-            AudioDispatcher audioDataGetter = AudioDispatcherFactory.fromPipe(path, 44100, 4096, 0);
+            String path = new File("src/main/resources/songs/" + filePath)
+                    .getAbsolutePath();
+            AudioDispatcher audioDataGetter = AudioDispatcherFactory.fromPipe(path,
+                    44100, 4096, 0);
             audioDataGetter.addAudioProcessor(new AudioProcessor() {
                 @Override
                 public boolean process(AudioEvent audioEvent) {
