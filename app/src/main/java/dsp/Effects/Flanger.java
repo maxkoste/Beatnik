@@ -12,6 +12,14 @@ public class Flanger implements AudioProcessor {
     private double lfoFrequency;
     private double sampleRate;
 
+    /**
+     * 
+     * @param maxFlangerLength the max length should be a really small number
+     * @param wet              The amount of the effect value between 1-0
+     * @param sampleRate       sample rate of the song
+     * @param lfoFrequency     the frequency of the lfo changes the sound of the
+     *                         effect
+     */
     public Flanger(double maxFlangerLength, double wet,
             double sampleRate, double lfoFrequency) {
         this.flangerBuffer = new float[(int) (sampleRate * maxFlangerLength)];
@@ -21,6 +29,11 @@ public class Flanger implements AudioProcessor {
         this.dry = (float) (1 - wet);
     }
 
+    /**
+     * Processes the audio and applies the flanger effect.
+     * Reads the buffer to sync up with it and creates a sine wave that 
+     * makes the audio get out of phase
+     */
     @Override
     public boolean process(AudioEvent audioEvent) {
         float[] audioFloatBuffer = audioEvent.getFloatBuffer();
@@ -54,6 +67,9 @@ public class Flanger implements AudioProcessor {
         return true;
     }
 
+    /**
+     * is called when the audiobuffer is completely processed
+     */
     @Override
     public void processingFinished() {
     }

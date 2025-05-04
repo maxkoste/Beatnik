@@ -12,32 +12,42 @@ import view.MainFrame;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import dsp.MediaPlayer;
 
 public class Controller {
-    MediaPlayer audioPlayer1;
-    MediaPlayer audioPlayer2;
-    MainFrame frame;
-    PlaylistManager playlistManager;
-    TimerThreadOne timerThreadOne;
-    TimerThreadTwo timerThreadTwo;
-    ObservableList<String> playlistSongPaths; // TODO: Find way of alerting Controller when a song has naturally
-                                              // finished playing
-    int currentPosInPlaylist;
-    float masterModifier = 0.5F;
-    float crossfaderModifier1 = 1.0F;
-    float crossfaderModifier2 = 1.0F;
-    float latestVolume1 = 50.0F;
-    float latestVolume2 = 50.0F;
-    AudioDispatcher dispatcherOne;
-    AudioDispatcher dispatcherTwo;
-    String currentEffect;
+    private MediaPlayer audioPlayer1;
+    private MediaPlayer audioPlayer2;
+    private MainFrame frame;
+    private PlaylistManager playlistManager;
+    private TimerThreadOne timerThreadOne;
+    private TimerThreadTwo timerThreadTwo;
+    private ObservableList<String> playlistSongPaths;
+    // finished playing
+    private int currentPosInPlaylist;
+    private float masterModifier = 0.5F;
+    private float crossfaderModifier1 = 1.0F;
+    private float crossfaderModifier2 = 1.0F;
+    private float latestVolume1 = 50.0F;
+    private float latestVolume2 = 50.0F;
+    private AudioDispatcher dispatcherOne;
+    private AudioDispatcher dispatcherTwo;
+    private String currentEffect;
+    private Map<String, Float> effectIntensityMap;
+    private Map<String, float[]> songsData = new HashMap<>();
 
     public Controller(Stage primaryStage) {
+        // HashMap saves the state of the Effect-selector knob & the Effect-intensity
+        // knob from the GUI
+        effectIntensityMap = new HashMap<String, Float>();
+        effectIntensityMap.put("delay", 0.0F);
+        effectIntensityMap.put("flanger", 0.0F);
+
         audioPlayer1 = new MediaPlayer();
         audioPlayer2 = new MediaPlayer();
         timerThreadOne = new TimerThreadOne();
@@ -45,7 +55,7 @@ public class Controller {
         frame = new MainFrame(this);
         playlistManager = new PlaylistManager(frame);
         frame.registerPlaylistManager(playlistManager);
-        this.currentEffect = "delay"; 
+        this.currentEffect = "delay";
         startUp(primaryStage);
     }
 
@@ -53,8 +63,28 @@ public class Controller {
         frame.start(primaryStage);
         playlistManager.addSongsFromResources();
         playlistManager.loadPlaylistData();
+        preloadSongData();
         timerThreadOne.start();
         timerThreadTwo.start();
+    }
+
+    private void preloadSongData() { // TODO: Allow for imports
+        ObservableList<String> songFileNames = playlistManager.getSongsGUI();
+        for (int i = 0; i < songFileNames.size(); i++) {
+            String songName = songFileNames.get(i);
+            float[] songData = extract(songName);
+            songsData.put(songName, songData);
+        }
+    }
+
+    /**
+     * Method for cleaning up resources and stopping the playback of any audio
+     */
+    public void shutDown() {
+        if (audioPlayer1 != null && audioPlayer2 != null) {
+            audioPlayer2.shutDown();
+            audioPlayer1.shutDown();
+        }
     }
 
     public void setSong(int channel, String songPath) {
@@ -64,26 +94,45 @@ public class Controller {
             audioPlayer2.setSong(songPath);
         }
         playSong(channel);
-        frame.setWaveformAudioData(extract(songPath), channel);
+        frame.setWaveformAudioData(songsData.get(songPath), channel);
     }
 
-    public void startPlaylist(int channel, int selectedIndex, ObservableList<String> songPaths) {
-        playlistSongPaths = songPaths; // TODO: Make into a queue or smth? Might not be needed.
+    public void startPlaylist(int channel, int selectedIndex,
+            ObservableList<String> songPaths) {
+        playlistSongPaths = songPaths; 
         currentPosInPlaylist = selectedIndex;
         setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
     }
 
-    // plays the song from the MediaPlayer class
     public void playSong(int channel) {
-        if (channel == 1) {
-            audioPlayer1.playAudio();
-            setChannelOneVolume(latestVolume1);
-            dispatcherOne = audioPlayer1.getAudioDispatcher();
-        } else {
-            audioPlayer2.playAudio();
-            setChannelTwoVolume(latestVolume2);
-            dispatcherTwo = audioPlayer2.getAudioDispatcher();
+        try {
+            if (channel == 1) {
+                audioPlayer1.playPause();
+                setChannelOneVolume(latestVolume1);
+                dispatcherOne = audioPlayer1.getAudioDispatcher();
+                if (dispatcherOne != null) {
+                    volumeIndicator(dispatcherOne, channel);
+                }
+            } else {
+                audioPlayer2.playPause();
+                setChannelTwoVolume(latestVolume2);
+                dispatcherTwo = audioPlayer2.getAudioDispatcher();
+                if (dispatcherTwo != null) {
+                    volumeIndicator(dispatcherTwo, channel);
+                }
+            }
+        } catch (InterruptedException e) {
+            playSong(channel);
         }
+    }
+
+    public void resetSong(int channel) {
+        if (channel == 1) {
+            audioPlayer1.resetSong();
+        } else {
+            audioPlayer2.resetSong();
+        }
+        playSong(channel);
     }
 
     public void setEffect(int effectSelectorValue) {
@@ -94,6 +143,7 @@ public class Controller {
          * 204 = 4
          * 270 = 5
          */
+
         switch (effectSelectorValue) {
             case 0:
                 this.currentEffect = "delay";
@@ -115,17 +165,28 @@ public class Controller {
         }
     }
 
+    public float getCurrentEffectMix() {
+        return this.effectIntensityMap.getOrDefault(currentEffect,
+                0.0F);
+    }
+
     public void nextSong(int channel) { // TODO: Update GUI with names etc
         if (playlistSongPaths != null) {
             if (!(currentPosInPlaylist >= playlistSongPaths.size() - 1)) {
                 currentPosInPlaylist++;
                 setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
+                frame.setInfoText(true, playlistSongPaths
+                        .get(currentPosInPlaylist), channel);
             } else {
-                frame.userMessage(Alert.AlertType.INFORMATION, "Playlist Finished, Skip now Random");
+                frame.userMessage(Alert.AlertType.INFORMATION,
+                        "Playlist Finished, Skip now Random");
                 playlistSongPaths = null;
+                nextSong(channel);
             }
         } else {
-            setSong(channel, playlistManager.randomSong());
+            String song = playlistManager.randomSong();
+            setSong(channel, song);
+            frame.setInfoText(false, song, channel);
         }
     }
 
@@ -134,12 +195,12 @@ public class Controller {
         latestVolume1 = volume;
     }
 
-    public void setChannelTwoVolume(float volume) { // Does not use a channel check for speed
+    public void setChannelTwoVolume(float volume) {
         audioPlayer2.setVolume((volume * masterModifier) * crossfaderModifier2);
         latestVolume2 = volume;
     }
 
-    public void setMasterVolume(float masterModifier) { // TODO: Kan vara långsamt
+    public void setMasterVolume(float masterModifier) { 
         this.masterModifier = masterModifier;
         setChannelOneVolume(latestVolume1);
         setChannelTwoVolume(latestVolume2);
@@ -171,16 +232,26 @@ public class Controller {
         audioPlayer2.setBass(bassGain);
     }
 
+    public void setPlaybackSpeedCh1(double speedFactor) {
+        audioPlayer1.setPlaybackSpeed(speedFactor);
+    }
+
+    public void ssetPlaybackSpeedCh2(double speedFactor) {
+        audioPlayer2.setPlaybackSpeed(speedFactor);
+    }
+
     /**
      * set the mix value of the effect
      * 0 = 100% dry signal (no effect)
      * 1 = 100% effect signal (only effect)
      * all the effects should be applied on both audio-signals
      * 
-     * @param mix        float value between 0-1f
-     * @param effectType indicating the effect being applied.
+     * @param mix float value between 0-1f
      */
     public void setEffectMix(float mix) {
+        // Save the state
+        effectIntensityMap.put(currentEffect, mix);
+
         switch (this.currentEffect) {
             case "delay":
                 audioPlayer1.setDelayEffectMix(mix);
@@ -205,11 +276,13 @@ public class Controller {
         System.out.println("File moved into the songsGUI folder");
     }
 
-    private float[] extract(String filePath) { // TODO: Collect all fileData att app launch
+    private float[] extract(String filePath) { 
         List<Float> audioSamples = new ArrayList<>();
         try {
-            String path = new File("src/main/resources/songs/" + filePath).getAbsolutePath();
-            AudioDispatcher audioDataGetter = AudioDispatcherFactory.fromPipe(path, 44100, 4096, 0);
+            String path = new File("src/main/resources/songs/" + filePath)
+                    .getAbsolutePath();
+            AudioDispatcher audioDataGetter = AudioDispatcherFactory.fromPipe(path,
+                    44100, 4096, 0);
             audioDataGetter.addAudioProcessor(new AudioProcessor() {
                 @Override
                 public boolean process(AudioEvent audioEvent) {
@@ -235,6 +308,31 @@ public class Controller {
         return audioSamplesFinal;
     }
 
+    private void volumeIndicator(AudioDispatcher dispatcher, int channel) {
+        dispatcher.addAudioProcessor(new AudioProcessor() {
+            public boolean process(AudioEvent audioEvent) {
+                float[] buffer = audioEvent.getFloatBuffer();
+                double rms = 0; // rms = root mean square
+                for (float sample : buffer) {
+                    rms += sample * sample;
+                }
+
+                rms = Math.sqrt(rms / buffer.length);
+                final double completeRms = rms;
+                if (channel == 1) {
+                    frame.updateAudioIndicatorOne(completeRms);
+                } else if (channel == 2) {
+                    frame.updateAudioIndicatorTwo(completeRms);
+                }
+                return true;
+            }
+
+            @Override
+            public void processingFinished() {
+            }
+        });
+    }
+
     public class TimerThreadOne extends Thread {
         public void run() {
             Timer timer = new Timer();
@@ -245,7 +343,7 @@ public class Controller {
                         frame.updateWaveformOne(dispatcherOne.secondsProcessed());
                     }
                 }
-            }, 0, 4);
+            }, 0, 5);
         }
     }
 
@@ -259,7 +357,7 @@ public class Controller {
                         frame.updateWaveformTwo(dispatcherTwo.secondsProcessed());
                     }
                 }
-            }, 0, 4);
+            }, 0, 5);
         }
     }
 }
