@@ -18,11 +18,17 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Mixer;
+
+import dsp.TestMediaPlayer;
 import dsp.MediaPlayer;
 
 public class Controller {
-    private MediaPlayer audioPlayer1;
-    private MediaPlayer audioPlayer2;
+    //  private MediaPlayer audioPlayer1;
+    // private MediaPlayer audioPlayer2;
+    TestMediaPlayer audioPlayer1;
+    TestMediaPlayer audioPlayer2;
     private MainFrame frame;
     private PlaylistManager playlistManager;
     private TimerThreadOne timerThreadOne;
@@ -40,7 +46,6 @@ public class Controller {
     private String currentEffect;
     private Map<String, Float> effectIntensityMap;
     private Map<String, float[]> songsData = new HashMap<>();
-    private final Object lock = new Object();
 
     public Controller(Stage primaryStage) {
         // HashMap saves the state of the Effect-selector knob & the Effect-intensity
@@ -48,9 +53,12 @@ public class Controller {
         effectIntensityMap = new HashMap<String, Float>();
         effectIntensityMap.put("delay", 0.0F);
         effectIntensityMap.put("flanger", 0.0F);
-
-        audioPlayer1 = new MediaPlayer();
-        audioPlayer2 = new MediaPlayer();
+        Mixer masterMixer = getMixerByName("Voicemeeter Input (VB-Audio Voicemeeter VAIO)");  //"Voicemeeter Input (VB-Audio Voicemeeter VAIO)"
+        Mixer cueMixer = getMixerByName("Realtek (R) audio"); // "Voicemeeter AUX Input (VB-Audio Voicemeeter AUX VAIO)"
+        //audioPlayer1 = new MediaPlayer();
+        //  audioPlayer2 = new MediaPlayer();
+        audioPlayer1 = new TestMediaPlayer(masterMixer, cueMixer);
+        audioPlayer2 = new TestMediaPlayer(masterMixer, cueMixer);
         timerThreadOne = new TimerThreadOne();
         timerThreadTwo = new TimerThreadTwo();
         frame = new MainFrame(this);
@@ -72,15 +80,19 @@ public class Controller {
     private void preloadSongData() { // TODO: Allow for imports
         ObservableList<String> songFileNames = playlistManager.getSongsGUI();
         for (int i = 0; i < songFileNames.size(); i++) {
-            int pos = i;
-            new Thread(() -> {
-                String songName = songFileNames.get(pos);
-                float[] songData = extract(songName);
-                synchronized (lock) {
-                    songsData.put(songName, songData);
-                }
-            }).start();
+            String songName = songFileNames.get(i);
+            float[] songData = extract(songName);
+            songsData.put(songName, songData);
         }
+    }
+
+    private Mixer getMixerByName(String namePart) {
+        for (Mixer.Info info : AudioSystem.getMixerInfo()) {
+            if (info.getName().toLowerCase().contains(namePart.toLowerCase())) {
+                return AudioSystem.getMixer(info);
+            }
+        }
+        return null;
     }
 
     /**
@@ -104,8 +116,8 @@ public class Controller {
     }
 
     public void startPlaylist(int channel, int selectedIndex,
-            ObservableList<String> songPaths) {
-        playlistSongPaths = songPaths; 
+                              ObservableList<String> songPaths) {
+        playlistSongPaths = songPaths;
         currentPosInPlaylist = selectedIndex;
         setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
     }
@@ -206,10 +218,25 @@ public class Controller {
         latestVolume2 = volume;
     }
 
-    public void setMasterVolume(float masterModifier) { 
+    public void setMasterVolume(float masterModifier) {
         this.masterModifier = masterModifier;
         setChannelOneVolume(latestVolume1);
         setChannelTwoVolume(latestVolume2);
+    }
+
+    public void toggleCue(int playerNumber) {
+        if (playerNumber == 1) {
+            audioPlayer1.setCueEnabled(!audioPlayer1.isCueEnabled());
+        } else if (playerNumber == 2) {
+            audioPlayer2.setCueEnabled(!audioPlayer2.isCueEnabled());
+        }
+    }
+    public void setCueVolume(int playerNumber, float volume) {
+        if (playerNumber == 1) {
+            audioPlayer1.setCueVolume(volume);
+        } else if (playerNumber == 2) {
+            audioPlayer2.setCueVolume(volume);
+        }
     }
 
     public void setCrossfaderModifier(float crossfaderValue) {
@@ -251,7 +278,7 @@ public class Controller {
      * 0 = 100% dry signal (no effect)
      * 1 = 100% effect signal (only effect)
      * all the effects should be applied on both audio-signals
-     * 
+     *
      * @param mix float value between 0-1f
      */
     public void setEffectMix(float mix) {
@@ -278,9 +305,7 @@ public class Controller {
         System.out.println(sourceFile.toPath());
         System.out.println(desinationFile.toPath());
         Files.copy(sourceFile.toPath(), desinationFile.toPath());
-        String fileName = desinationFile.getName();
-        playlistManager.getSongsGUI().add(fileName);
-        songsData.put(fileName, extract(fileName));
+        playlistManager.getSongsGUI().add(desinationFile.getName());
         System.out.println("File moved into the songsGUI folder");
     }
 

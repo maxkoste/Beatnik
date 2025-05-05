@@ -249,6 +249,17 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelTwoCue, (screenHeight / 1.15));
         AnchorPane.setLeftAnchor(channelTwoCue, ((screenWidth / 1.442) - (channelTwoCue.getPrefWidth() / 2)));
 
+        channelOneCue.setOnAction(event -> {
+            boolean cueEnabled = channelOneCue.isSelected();
+            controller.toggleCue(1);
+            System.out.println("Pressed cue");
+        });
+
+        channelTwoCue.setOnAction(event -> {
+            boolean cueEnabled = channelTwoCue.isSelected();
+            controller.toggleCue(2);
+        });
+
         Slider channelOneVolume = new Slider();
         channelOneVolume.setPrefSize(5, (screenHeight / 4.5));
         channelOneVolume.setOrientation(Orientation.VERTICAL);
