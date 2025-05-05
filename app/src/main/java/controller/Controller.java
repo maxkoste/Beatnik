@@ -40,6 +40,7 @@ public class Controller {
     private String currentEffect;
     private Map<String, Float> effectIntensityMap;
     private Map<String, float[]> songsData = new HashMap<>();
+    private final Object lock = new Object();
 
     public Controller(Stage primaryStage) {
         // HashMap saves the state of the Effect-selector knob & the Effect-intensity
@@ -71,9 +72,14 @@ public class Controller {
     private void preloadSongData() { // TODO: Allow for imports
         ObservableList<String> songFileNames = playlistManager.getSongsGUI();
         for (int i = 0; i < songFileNames.size(); i++) {
-            String songName = songFileNames.get(i);
-            float[] songData = extract(songName);
-            songsData.put(songName, songData);
+            int pos = i;
+            new Thread(() -> {
+                String songName = songFileNames.get(pos);
+                float[] songData = extract(songName);
+                synchronized (lock) {
+                    songsData.put(songName, songData);
+                }
+            }).start();
         }
     }
 
@@ -272,11 +278,13 @@ public class Controller {
         System.out.println(sourceFile.toPath());
         System.out.println(desinationFile.toPath());
         Files.copy(sourceFile.toPath(), desinationFile.toPath());
-        playlistManager.getSongsGUI().add(desinationFile.getName());
+        String fileName = desinationFile.getName();
+        playlistManager.getSongsGUI().add(fileName);
+        songsData.put(fileName, extract(fileName));
         System.out.println("File moved into the songsGUI folder");
     }
 
-    private float[] extract(String filePath) { 
+    private float[] extract(String filePath) {
         List<Float> audioSamples = new ArrayList<>();
         try {
             String path = new File("src/main/resources/songs/" + filePath)
