@@ -139,8 +139,15 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         CircularSlider cueVolume = new CircularSlider(9, false);
         cueVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double volume = newValue.doubleValue();
-            System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
+            float volume = newValue.floatValue();
+            float scaled = (float) Math.ceil(volume / 2.7f);
+
+            if (channelOneActive) {
+                controller.setCueVolume(1, volume);
+            }
+            else {
+                controller.setCueVolume(2, volume);
+            }
         });
         AnchorPane.setTopAnchor(cueVolume, screenHeight / 1.25);
         AnchorPane.setLeftAnchor(cueVolume, screenWidth / 10);

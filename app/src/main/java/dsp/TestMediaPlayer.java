@@ -81,9 +81,6 @@ public class TestMediaPlayer {
                     5000, 7000); // 7khz center, 5kHz bandwidth
             delayEffect = new Delay(0.5, 0.6, format.getSampleRate());
             rateTransposer = new RateTransposer(1.0F);
-            // Add volume controll first
-            volumeProcessor = new GainProcessor(0.0f);
-            playbackDispatcher.addAudioProcessor(volumeProcessor);
 
             // Add effects-processing
             playbackDispatcher.addAudioProcessor(delayEffect);
@@ -93,6 +90,7 @@ public class TestMediaPlayer {
             playbackDispatcher.addAudioProcessor(rateTransposer);
 
             // Add seperate GainProcessor
+            volumeProcessor    = new GainProcessor(1.0f);
             cueVolumeProcessor = new GainProcessor(0.5f);
 
             // Create the outputs
@@ -112,14 +110,16 @@ public class TestMediaPlayer {
                             }
                         }
                     }
-
+                    AudioEvent cueEvent = null;
+                    if (cueEnabled) {
+                        cueEvent = makeCueEvent(audioEvent);
+                    }
                     // Master signal
                     volumeProcessor.process(audioEvent);
                     masterPlayer.write(audioEvent.getByteBuffer());
 
                     // Cue signal
-                    if (cueEnabled) {
-                        AudioEvent cueEvent = makeCueEvent(audioEvent);
+                    if (cueEnabled && cueEvent != null) {
                         cueVolumeProcessor.process(cueEvent);
                         cuePlayer.write(cueEvent.getByteBuffer());
                     }
