@@ -92,14 +92,14 @@ public class TestMediaPlayer {
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
             playbackDispatcher.addAudioProcessor(rateTransposer);
 
-
-            // === HUVUDUTGÅNG: MASTER ===
-            masterPlayer = new CustomAudioPlayer(masterMixer, format);
-
+            // Add seperate GainProcessor
             cueVolumeProcessor = new GainProcessor(0.5f);
 
-            // === CUE-UTGÅNG: HÖRLURAR ===
-            cuePlayer = new CustomAudioPlayer(cueMixer, format);
+            // Create the outputs
+            masterPlayer = new CustomAudioPlayer(masterMixer, format);
+            cuePlayer    = new CustomAudioPlayer(cueMixer,    format);
+
+            // Splitter
             playbackDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
                 public boolean process(AudioEvent audioEvent) {
@@ -112,18 +112,16 @@ public class TestMediaPlayer {
                             }
                         }
                     }
-                    byte[] originalBuffer = audioEvent.getByteBuffer();
 
+                    // Master signal
+                    volumeProcessor.process(audioEvent);
+                    masterPlayer.write(audioEvent.getByteBuffer());
 
-
-                    masterPlayer.write(originalBuffer);
-
-
+                    // Cue signal
                     if (cueEnabled) {
-                        byte[] copiedBuffer = new byte[originalBuffer.length];
-                        System.arraycopy(originalBuffer, 0, copiedBuffer, 0, originalBuffer.length);
-
-                        cuePlayer.write(copiedBuffer);
+                        AudioEvent cueEvent = makeCueEvent(audioEvent);
+                        cueVolumeProcessor.process(cueEvent);
+                        cuePlayer.write(cueEvent.getByteBuffer());
                     }
 
                     return true;
@@ -260,5 +258,21 @@ public class TestMediaPlayer {
             System.out.println("Setting cue gain to: " + gain);
             cueVolumeProcessor.setGain(gain);
         }
+    }
+
+    private AudioEvent makeCueEvent(AudioEvent src) {
+
+    float[] srcFloat = src.getFloatBuffer();
+    float[] cueFloat = new float[srcFloat.length];
+    System.arraycopy(srcFloat, 0, cueFloat, 0, srcFloat.length);
+
+    TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
+    AudioEvent cue = new AudioEvent(format);
+    cue.setFloatBuffer(cueFloat);
+
+    cue.setOverlap(src.getOverlap());
+    cue.setBytesProcessing(src.getByteBuffer().length);
+
+    return cue;
     }
 }
