@@ -224,11 +224,13 @@ public class Controller {
         setChannelTwoVolume(latestVolume2);
     }
 
-    public void toggleCue(int playerNumber) {
+    public void toggleCue(int playerNumber, boolean enabled) {
         if (playerNumber == 1) {
-            audioPlayer1.setCueEnabled(!audioPlayer1.isCueEnabled());
+            audioPlayer1.setCueEnabled(enabled);
+            audioPlayer2.setCueEnabled(false);
         } else if (playerNumber == 2) {
-            audioPlayer2.setCueEnabled(!audioPlayer2.isCueEnabled());
+            audioPlayer1.setCueEnabled(false);
+            audioPlayer2.setCueEnabled(enabled);
         }
     }
     public void setCueVolume(int playerNumber, float volume) {

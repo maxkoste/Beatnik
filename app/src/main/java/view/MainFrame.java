@@ -244,6 +244,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(crossFaderLabel, (screenHeight / 1.1));
         AnchorPane.setLeftAnchor(crossFaderLabel, ((screenWidth / 2) - (crossFaderLabel.getPrefWidth() / 2)));
 
+
         ToggleButton channelOneCue = new ToggleButton(); // Button that can be tied to boolean value
         channelOneCue.setPrefSize(50, 30);
         channelOneCue.setText("CUE");
@@ -256,15 +257,19 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelTwoCue, (screenHeight / 1.15));
         AnchorPane.setLeftAnchor(channelTwoCue, ((screenWidth / 1.442) - (channelTwoCue.getPrefWidth() / 2)));
 
+        ToggleGroup cueGroup = new ToggleGroup();
+        channelOneCue.setToggleGroup(cueGroup);
+        channelTwoCue.setToggleGroup(cueGroup);
+
         channelOneCue.setOnAction(event -> {
             boolean cueEnabled = channelOneCue.isSelected();
-            controller.toggleCue(1);
+            controller.toggleCue(1, cueEnabled);
             System.out.println("Pressed cue");
         });
 
         channelTwoCue.setOnAction(event -> {
             boolean cueEnabled = channelTwoCue.isSelected();
-            controller.toggleCue(2);
+            controller.toggleCue(2, cueEnabled);
         });
 
         Slider channelOneVolume = new Slider();
