@@ -89,13 +89,13 @@ public class TestMediaPlayer {
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
             playbackDispatcher.addAudioProcessor(rateTransposer);
 
-            // Add seperate GainProcessor
+            // Add seperate GainProcessors
             volumeProcessor    = new GainProcessor(1.0f);
             cueVolumeProcessor = new GainProcessor(0.5f);
 
             // Create the outputs
             masterPlayer = new CustomAudioPlayer(masterMixer, format);
-            cuePlayer    = new CustomAudioPlayer(cueMixer,    format);
+            cuePlayer = new CustomAudioPlayer(cueMixer, format);
 
             // Splitter
             playbackDispatcher.addAudioProcessor(new AudioProcessor() {
