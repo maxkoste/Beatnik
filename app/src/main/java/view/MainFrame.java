@@ -395,12 +395,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
         }
 
         primaryPane.getChildren().addAll(crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
-
                 channelTwoVolume, channelOneBass, bassLabelOne, channelTwoBass, bassLabelTwo, channelOneTreble,
-                trebleLabelOne,
-                channelTwoTreble, trebleLabelTwo, channelOneSpeed, speedLabelOne, channelTwoSpeed, speedLabelTwo,
-                audioIndicatorOne, audioIndicatorTwo);
-
+                trebleLabelOne, channelTwoTreble, trebleLabelTwo, channelOneSpeed, speedLabelOne, channelTwoSpeed,
+                speedLabelTwo, audioIndicatorOne, audioIndicatorTwo);
     }
 
     private void initializeZoneFour() {
