@@ -69,7 +69,7 @@ public class Controller {
         timerThreadTwo.start();
     }
 
-    private void preloadSongData() { // TODO: Allow for imports
+    private void preloadSongData() {
         ObservableList<String> songFileNames = playlistManager.getSongsGUI();
         for (int i = 0; i < songFileNames.size(); i++) {
             int pos = i;
