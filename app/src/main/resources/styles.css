@@ -3,4 +3,6 @@
     -fx-font-family: "Arial";
     -fx-font-weight: bold;
     -fx-font-size: 14px;
+    -fx-text-fill: #f0e6d2;  /* Eggshell white text color */
+    -fx-background-color: #222531; /* Background color */
 }

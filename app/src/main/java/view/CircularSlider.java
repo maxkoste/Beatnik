@@ -5,6 +5,8 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.DoublePropertyBase;
 import javafx.scene.AccessibleAttribute;
 import javafx.scene.control.Control;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class CircularSlider extends Control {
 
@@ -13,17 +15,25 @@ public class CircularSlider extends Control {
     private DoubleProperty min;
     private DoubleProperty value;
     private CircularSliderSkin skin;
+    private ImageView knobImage;
 
-    public CircularSlider(int tickCount, boolean snapToTick) {
+    public CircularSlider(int tickCount, boolean snapToTick, String imageUrl) {
+        knobImage = new ImageView(new Image(imageUrl));
+        knobImage.setFitHeight(70);
+        knobImage.setFitWidth(70);
+
         setAngle(0.0); // Set twice because of bad design, give me a break
         setMin(0.0);
         setMax(270.0);
         setAngle(135.0); // Could be made into a parameter to allow custom start position
         this.skin = new CircularSliderSkin(this, tickCount, snapToTick);
         setSkin(this.skin);
+
+        getChildren().add(knobImage);
     }
-    
-    public void updateAngle(double angle){
+
+    public void updateAngle(double angle) {
+        knobImage.setRotate(angle-135);
         this.skin.drawKnob(angle);
     }
 
@@ -37,6 +47,10 @@ public class CircularSlider extends Control {
         }
     }
 
+    public ImageView getKnobImage(){
+        return this.knobImage;
+    }
+    
     double getAngle() {
         return angle;
     }
@@ -44,6 +58,8 @@ public class CircularSlider extends Control {
     void setAngle(double angle) {
         this.angle = angle;
         setValue(angle);
+
+        knobImage.setRotate(angle - 135); // Subtract 135 so 135° visually maps to 0°
     }
 
     public final DoubleProperty valueProperty() {
