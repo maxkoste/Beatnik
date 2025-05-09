@@ -61,8 +61,9 @@ public class MediaPlayer {
              * suuuper weird when doing this.. this needs to be fixed!!
              */
 
-            // File audioFile = new File(fullPath);
-            // playbackDispatcher = AudioDispatcherFactory.fromFile(audioFile, 4096, 0);
+            //File audioFile = new File(fullPath);
+            //playbackDispatcher = AudioDispatcherFactory.fromFile(audioFile, 4096, 512);
+            //playbackDispatcher = DispatcherFactory.fromPipeStereo(fullPath, 48000, 4096, 0);
 
             playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath,
                     48000, 4096, 0);
@@ -87,7 +88,6 @@ public class MediaPlayer {
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
             playbackDispatcher.addAudioProcessor(rateTransposer);
-
             playbackDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
                 public boolean process(AudioEvent audioEvent) {
