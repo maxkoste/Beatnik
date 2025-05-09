@@ -1,8 +1,66 @@
-
 .root {
     -fx-font-family: "Arial";
     -fx-font-weight: bold;
     -fx-font-size: 14px;
-    -fx-text-fill: #f0e6d2;  /* Eggshell white text color */
-    -fx-background-color: #222531; /* Background color */
+    -fx-text-fill: #f0e6d2;
+    /* Eggshell white text color */
+    -fx-background-color: #222531;
+    /* Background color */
+}
+
+.label {
+    -fx-text-fill: #f0e6d2;
+    /* Eggshell white */
+}
+
+.button {
+    -fx-text-fill: #f0e6d2;
+    /* Eggshell white text */
+    -fx-background-color: #444857;
+    /* Optional: darker background */
+    -fx-font-weight: bold;
+    /* Optional: bold text */
+    -fx-border-color: transparent;
+    
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 6, 0.4, 0, 2)
+     
+}
+
+.button:hover {
+    -fx-background-color: #40475d;
+    -fx-cursor: hand;
+}
+
+.button:pressed {
+    -fx-background-color: #2a2e3d;
+    -fx-translate-y: 2px; /* subtle "press" movement */
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.4), 6, 0.4, 0, 2);
+}
+
+.slider {
+    -fx-padding: 10;
+}
+
+.slider .track {
+    -fx-background-color: #888; /* Track background */
+    -fx-background-insets: 0;
+    -fx-background-radius: 2;
+    -fx-pref-height: 4;
+}
+
+.slider .thumb {
+    -fx-background-color: #f0e6d2; /* Eggshell white thumb */
+    -fx-background-insets: 0;
+    -fx-background-radius: 50%;
+    -fx-pref-width: 14;
+    -fx-pref-height: 14;
+}
+
+.slider .tick-mark {
+    -fx-stroke: #aaa;
+}
+
+.slider .tick-label {
+    -fx-text-fill: #f0e6d2; /* Eggshell white tick labels */
+    -fx-font-size: 12px;
 }
