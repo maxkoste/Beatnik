@@ -4,9 +4,12 @@ import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.GainProcessor;
+import be.tarsos.dsp.filters.BandPass;
+import be.tarsos.dsp.io.TarsosDSPAudioFloatConverter;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
+import be.tarsos.dsp.io.jvm.JVMAudioInputStream;
 import be.tarsos.dsp.resample.RateTransposer;
 import dsp.Effects.Delay;
 import dsp.Effects.Flanger;
@@ -57,36 +60,32 @@ public class MediaPlayer {
              * AudioDispatcherFactory with: AudioDispatcherFactory.fromFile(audioFile, 2048,
              * 0);
              * This will give us stereo audio, BUT for some reason the audio playback is
-             * laggy and
-             * suuuper weird when doing this.. this needs to be fixed!!
+             * laggy and its obvious that data is missing 
              */
 
-            // File audioFile = new File(fullPath);
-            // playbackDispatcher = AudioDispatcherFactory.fromFile(audioFile, 4096, 0);
-
-            playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath,
-                    48000, 4096, 0);
+            File audioFile = new File(fullPath);
+            playbackDispatcher = AudioDispatcherFactory.fromFile(audioFile, 2048, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
             System.out.println(format.toString());
 
-            bassEqualizer = new Equalizer(format.getSampleRate(),
-                    80, 80); // 80Hz center, 50Hz bandwidth
-            flangerEffect = new Flanger(0.0002,
-                    0, format.getSampleRate(), 3);
-            trebleEqualizer = new Equalizer(format.getSampleRate(),
-                    5000, 7000); // 7khz center, 5kHz bandwidth
-            delayEffect = new Delay(0.5, 0.6, format.getSampleRate());
-            rateTransposer = new RateTransposer(1.0F);
-            // Add volume controll first
+            // bassEqualizer = new Equalizer(format.getSampleRate(),
+            // 80, 80); // 80Hz center, 50Hz bandwidth
+            // flangerEffect = new Flanger(0.0002,
+            // 0, format.getSampleRate(), 3);
+            // trebleEqualizer = new Equalizer(format.getSampleRate(),
+            // 5000, 7000); // 7khz center, 5kHz bandwidth
+            // delayEffect = new Delay(0.5, 0.6, format.getSampleRate());
+            // rateTransposer = new RateTransposer(1.0F);
+            // // Add volume controll first
             volumeProcessor = new GainProcessor(0.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
 
             // Add effects-processing
-            playbackDispatcher.addAudioProcessor(delayEffect);
-            playbackDispatcher.addAudioProcessor(flangerEffect);
-            playbackDispatcher.addAudioProcessor(bassEqualizer);
-            playbackDispatcher.addAudioProcessor(trebleEqualizer);
-            playbackDispatcher.addAudioProcessor(rateTransposer);
+            // playbackDispatcher.addAudioProcessor(delayEffect);
+            // playbackDispatcher.addAudioProcessor(flangerEffect);
+            // playbackDispatcher.addAudioProcessor(bassEqualizer);
+            // playbackDispatcher.addAudioProcessor(trebleEqualizer);
+            // playbackDispatcher.addAudioProcessor(rateTransposer);
 
             playbackDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
@@ -109,9 +108,75 @@ public class MediaPlayer {
                 }
             });
 
-            // Add audio player for final output
-            AudioPlayer audioPlayer = new AudioPlayer(format);
-            playbackDispatcher.addAudioProcessor(audioPlayer);
+            // Custom stereo output using SourceDataLine
+            playbackDispatcher.addAudioProcessor(new AudioProcessor() {
+
+                private SourceDataLine line;
+                private TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
+                private TarsosDSPAudioFloatConverter converter;
+                private byte[] buffer;
+
+                @Override
+                public boolean process(AudioEvent audioEvent) {
+                    try {
+                        if (line == null) {
+                            float sampleRate = format.getSampleRate();
+                            int sampleSizeInBits = format.getSampleSizeInBits();
+                            int channels = format.getChannels();
+
+                            AudioFormat javaFormat = new AudioFormat(
+                                    sampleRate,
+                                    sampleSizeInBits,
+                                    channels,
+                                    true,
+                                    false);
+
+                            DataLine.Info info = new DataLine.Info(SourceDataLine.class, javaFormat);
+                            line = (SourceDataLine) AudioSystem.getLine(info);
+                            line.open(javaFormat);
+                            line.start();
+                            
+                            converter = TarsosDSPAudioFloatConverter.getConverter(format);
+                            int numSamples = audioEvent.getBufferSize();
+                            int bytesPerSample = sampleSizeInBits / 8;
+                            buffer = new byte[numSamples *  bytesPerSample]; // Allocate buffer
+                        }
+
+                        // Check if the float buffer is correctly sized
+                        float[] floatBuffer = audioEvent.getFloatBuffer();
+                        if (floatBuffer.length != buffer.length / 2) {
+                            System.out.println("Warning: Buffer length mismatch. Audio event buffer length: "
+                                    + floatBuffer.length + " vs. buffer size: " + buffer.length / 2);
+                        }
+
+                        converter.toByteArray(floatBuffer, buffer);
+
+                        // Debugging: Print the first few bytes to see if they are correctly populated
+                        if (buffer.length > 10) {
+                            System.out.println("First few bytes: " + buffer[0] + ", " + buffer[1] + ", " + buffer[2]
+                                    + ", " + buffer[3]);
+                        }
+
+                        // Write the converted byte buffer to the line
+                        line.write(buffer, 0, buffer.length);
+
+                    } catch (LineUnavailableException e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                    return true;
+                }
+
+                @Override
+                public void processingFinished() {
+                    if (line != null) {
+                        line.drain();
+                        line.stop();
+                        line.close();
+                    }
+                }
+
+            });
 
         } catch (Exception e) {
             System.err.println("Error setting up audio: " + e.getMessage());
