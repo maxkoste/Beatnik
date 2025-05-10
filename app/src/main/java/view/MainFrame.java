@@ -96,9 +96,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         Scene primaryScene = new Scene(primaryPane, screenWidth, screenHeight); // Add pane to scene
 
-        songsScene = new Scene(songsPane, 400, 400);
-        playlistsScene = new Scene(playlistsPane, 400, 400);
+        songsScene = new Scene(songsPane, 600, 600);
+        playlistsScene = new Scene(playlistsPane, 600, 600);
 
+        playlistsScene.getStylesheets().add("styles.css");
+        songsScene.getStylesheets().add("styles.css");
         Image logo = new Image("beatnik-logo.png"); // Add icon
         primaryStage.getIcons().add(logo);
         primaryStage.setScene(primaryScene); // Finalize window to be shown
@@ -583,8 +585,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
         songsPane.setCenter(songList);
 
         Label infoLabel = new Label();
-        infoLabel.setText("Double Click To Pick Song — Hold CTRL for Multiple Selections");
-        infoLabel.setPrefSize(400, 40);
+        infoLabel.setText(" Double Click To Pick Song — Hold CTRL for Multiple Selections");
+        infoLabel.setPrefSize(500, 40);
         infoLabel.setAlignment(Pos.CENTER);
         songsPane.setBottom(infoLabel);
 
