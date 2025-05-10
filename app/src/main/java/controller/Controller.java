@@ -41,6 +41,8 @@ public class Controller {
     private Map<String, Float> effectIntensityMap;
     private Map<String, float[]> songsData = new HashMap<>();
     private final Object lock = new Object();
+    private Timer timerOne;
+    private Timer timerTwo;
 
     public Controller(Stage primaryStage) {
         // HashMap saves the state of the Effect-selector knob & the Effect-intensity
@@ -91,6 +93,16 @@ public class Controller {
             audioPlayer2.shutDown();
             audioPlayer1.shutDown();
         }
+        if (timerOne != null) {
+            timerOne.cancel();
+        }
+        if (timerTwo != null) {
+            timerTwo.cancel();
+        }
+        if (dispatcherOne != null)
+            dispatcherOne.stop();
+        if (dispatcherTwo != null)
+            dispatcherTwo.stop();
     }
 
     public void setSong(int channel, String songPath) {
@@ -105,7 +117,7 @@ public class Controller {
 
     public void startPlaylist(int channel, int selectedIndex,
             ObservableList<String> songPaths) {
-        playlistSongPaths = songPaths; 
+        playlistSongPaths = songPaths;
         currentPosInPlaylist = selectedIndex;
         setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
     }
@@ -206,7 +218,7 @@ public class Controller {
         latestVolume2 = volume;
     }
 
-    public void setMasterVolume(float masterModifier) { 
+    public void setMasterVolume(float masterModifier) {
         this.masterModifier = masterModifier;
         setChannelOneVolume(latestVolume1);
         setChannelTwoVolume(latestVolume2);
@@ -343,8 +355,8 @@ public class Controller {
 
     public class TimerThreadOne extends Thread {
         public void run() {
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
+            timerOne = new Timer();
+            timerOne.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     if (dispatcherOne != null) {
@@ -357,8 +369,8 @@ public class Controller {
 
     public class TimerThreadTwo extends Thread {
         public void run() {
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
+            timerTwo = new Timer();
+            timerTwo.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     if (dispatcherTwo != null) {
