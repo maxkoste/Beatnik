@@ -17,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -57,12 +58,16 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private Button switchChannelTwo;
     private double screenHeight;
     private double screenWidth;
+    private final Image KNOB_BG;
+    private final Image EFFECT_SELECTOR_KNOB;
 
     private Circle[] auIndicatorCirclesOne = new Circle[10];
     private Circle[] auIndicatorCirclesTwo = new Circle[10];
 
     public MainFrame(Controller controller) {
         this.controller = controller;
+        this.KNOB_BG = new Image("/Knobs/knob-bg.png");
+        this.EFFECT_SELECTOR_KNOB = new Image("/Knobs/effect-selector-bg.png");
     }
 
     public void start(Stage primaryStage) {
@@ -91,9 +96,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         Scene primaryScene = new Scene(primaryPane, screenWidth, screenHeight); // Add pane to scene
 
-        songsScene = new Scene(songsPane, 400, 400);
-        playlistsScene = new Scene(playlistsPane, 400, 400);
+        songsScene = new Scene(songsPane, 600, 600);
+        playlistsScene = new Scene(playlistsPane, 600, 600);
 
+        playlistsScene.getStylesheets().add("styles.css");
+        songsScene.getStylesheets().add("styles.css");
         Image logo = new Image("beatnik-logo.png"); // Add icon
         primaryStage.getIcons().add(logo);
         primaryStage.setScene(primaryScene); // Finalize window to be shown
@@ -125,19 +132,29 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(songsButton, screenHeight / 10);
         AnchorPane.setLeftAnchor(songsButton, screenWidth / 10);
 
-        CircularSlider quantize = new CircularSlider(9, false);
+        CircularSlider quantize = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
         quantize.valueProperty().addListener((observable, oldValue, newValue) -> {
             double volume = newValue.doubleValue();
             System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
         });
+
         AnchorPane.setTopAnchor(quantize, (screenHeight / 2));
         AnchorPane.setLeftAnchor(quantize, (screenWidth / 10));
+
+        // image for the knob
+        ImageView quantizeImg = new ImageView(KNOB_BG);
+
+        quantizeImg.setFitWidth(70);
+        quantizeImg.setFitHeight(70);
+
+        AnchorPane.setTopAnchor(quantizeImg, (screenHeight / 2)); // Same position as knob
+        AnchorPane.setLeftAnchor(quantizeImg, (screenWidth / 10)); // Same position as knob
 
         Label quantizeLabel = new Label("Quantizer");
         AnchorPane.setTopAnchor(quantizeLabel, screenHeight / 1.76);
         AnchorPane.setLeftAnchor(quantizeLabel, screenWidth / 10.1);
 
-        CircularSlider cueVolume = new CircularSlider(9, false);
+        CircularSlider cueVolume = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
         cueVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
             double volume = newValue.doubleValue();
             System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
@@ -145,11 +162,20 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(cueVolume, screenHeight / 1.25);
         AnchorPane.setLeftAnchor(cueVolume, screenWidth / 10);
 
+        // Image for the next knob
+        ImageView cueImg = new ImageView(KNOB_BG);
+        cueImg.setFitHeight(70);
+        cueImg.setFitWidth(70);
+
+        AnchorPane.setTopAnchor(cueImg, screenHeight / 1.25);
+        AnchorPane.setLeftAnchor(cueImg, screenWidth / 10);
+
         Label cueVolumeLabel = new Label("Cue Volume");
         AnchorPane.setTopAnchor(cueVolumeLabel, screenHeight / 1.15);
         AnchorPane.setLeftAnchor(cueVolumeLabel, screenWidth / 10.7);
 
-        primaryPane.getChildren().addAll(songsButton, quantize, quantizeLabel, cueVolume, cueVolumeLabel);
+        primaryPane.getChildren().addAll(songsButton, quantize, quantizeLabel, cueVolume, cueVolumeLabel, quantizeImg,
+                cueImg);
     }
 
     private void initializeZoneTwo() {
@@ -243,11 +269,41 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelOneCue, (screenHeight / 1.15));
         AnchorPane.setLeftAnchor(channelOneCue, ((screenWidth / 3.275)) - (channelOneCue.getPrefWidth() / 2));
 
+        // Image overlay for channel one
+        ImageView channelOneCueImage = new ImageView(
+                new Image(getClass().getResourceAsStream("/Buttons/cue-passive.png")));
+        channelOneCueImage.setFitWidth(80);
+        channelOneCueImage.setFitHeight(80);
+        channelOneCueImage.setMouseTransparent(true); // Allow mouse events to pass through
+        AnchorPane.setTopAnchor(channelOneCueImage, (screenHeight / 1.15)-20);
+        AnchorPane.setLeftAnchor(channelOneCueImage, ((screenWidth / 3.275)) - (channelOneCue.getPrefWidth() / 2) - 13);
+
+        // Toggle image on button state change
+        channelOneCue.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+            String imagePath = isNowSelected ? "/Buttons/cue-engaged.png" : "/Buttons/cue-passive.png";
+            channelOneCueImage.setImage(new Image(getClass().getResourceAsStream(imagePath)));
+        });
+
         ToggleButton channelTwoCue = new ToggleButton(); // Button that can be tied to boolean value
         channelTwoCue.setPrefSize(50, 30);
         channelTwoCue.setText("CUE");
         AnchorPane.setTopAnchor(channelTwoCue, (screenHeight / 1.15));
         AnchorPane.setLeftAnchor(channelTwoCue, ((screenWidth / 1.442) - (channelTwoCue.getPrefWidth() / 2)));
+
+        // Image overlay for channel two
+        ImageView channelTwoCueImage = new ImageView(
+                new Image(getClass().getResourceAsStream("/Buttons/cue-passive.png")));
+        channelTwoCueImage.setFitWidth(80);
+        channelTwoCueImage.setFitHeight(80);
+        channelTwoCueImage.setMouseTransparent(true); // Allow mouse events to pass through
+        AnchorPane.setTopAnchor(channelTwoCueImage, (screenHeight / 1.15)- 20);
+        AnchorPane.setLeftAnchor(channelTwoCueImage, ((screenWidth / 1.442) - (channelTwoCue.getPrefWidth() / 2))- 13);
+
+        // Toggle image on button state change
+        channelTwoCue.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+            String imagePath = isNowSelected ? "/Buttons/cue-engaged.png" : "/Buttons/cue-passive.png";
+            channelTwoCueImage.setImage(new Image(getClass().getResourceAsStream(imagePath)));
+        });
 
         Slider channelOneVolume = new Slider();
         channelOneVolume.setPrefSize(5, (screenHeight / 4.5));
@@ -276,7 +332,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelTwoVolume, (screenHeight / 1.635));
         AnchorPane.setLeftAnchor(channelTwoVolume, ((screenWidth / 1.453) - (channelOneVolume.getPrefWidth() / 2)));
 
-        CircularSlider channelOneBass = new CircularSlider(9, false);
+        CircularSlider channelOneBass = new CircularSlider(9, false, "/Knobs/knob-blue-fg.png");
         channelOneBass.valueProperty().addListener((observable, oldValue, newValue) -> {
             float bassGain = newValue.floatValue();
             // Scale value from 0–270 to 0–100dB
@@ -286,11 +342,18 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelOneBass, (screenHeight / 1.87));
         AnchorPane.setLeftAnchor(channelOneBass, (screenWidth / 3.275) - 25);
 
+        ImageView chOneBassImg = new ImageView(KNOB_BG);
+        chOneBassImg.setFitHeight(70);
+        chOneBassImg.setFitWidth(70);
+
+        AnchorPane.setTopAnchor(chOneBassImg, screenHeight / 1.87);
+        AnchorPane.setLeftAnchor(chOneBassImg, (screenWidth / 3.275) - 25);
+
         Label bassLabelOne = new Label("B");
         AnchorPane.setTopAnchor(bassLabelOne, (screenHeight / 1.8));
         AnchorPane.setLeftAnchor(bassLabelOne, (screenWidth / 3.3));
 
-        CircularSlider channelTwoBass = new CircularSlider(9, false);
+        CircularSlider channelTwoBass = new CircularSlider(9, false, "/Knobs/knob-blue-fg.png");
         channelTwoBass.valueProperty().addListener((observable, oldValue, newValue) -> {
             float bassGain = newValue.floatValue();
             // Scale value from 0–270 to 0–100dB
@@ -300,11 +363,18 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelTwoBass, (screenHeight / 1.87));
         AnchorPane.setLeftAnchor(channelTwoBass, (screenWidth / 1.442) - 25);
 
+        ImageView chTwoBassImg = new ImageView(KNOB_BG);
+        chTwoBassImg.setFitHeight(70);
+        chTwoBassImg.setFitWidth(70);
+
+        AnchorPane.setTopAnchor(chTwoBassImg, (screenHeight / 1.87));
+        AnchorPane.setLeftAnchor(chTwoBassImg, (screenWidth / 1.442) - 25);
+
         Label bassLabelTwo = new Label("B");
         AnchorPane.setTopAnchor(bassLabelTwo, (screenHeight / 1.8));
         AnchorPane.setLeftAnchor(bassLabelTwo, (screenWidth / 1.446));
 
-        CircularSlider channelOneTreble = new CircularSlider(9, false);
+        CircularSlider channelOneTreble = new CircularSlider(9, false, "/Knobs/knob-green-fg.png");
         channelOneTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
             // Scale the value from 0-270 to 0-100dB
             float trebleGain = newValue.floatValue();
@@ -315,11 +385,18 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelOneTreble, (screenHeight / 1.87) - 75);
         AnchorPane.setLeftAnchor(channelOneTreble, (screenWidth / 3.275) - 25);
 
+        ImageView chOneTreImg = new ImageView(KNOB_BG);
+        chOneTreImg.setFitHeight(70);
+        chOneTreImg.setFitWidth(70);
+
+        AnchorPane.setTopAnchor(chOneTreImg, (screenHeight / 1.87) - 75);
+        AnchorPane.setLeftAnchor(chOneTreImg, (screenWidth / 3.275) - 25);
+
         Label trebleLabelOne = new Label("T");
         AnchorPane.setTopAnchor(trebleLabelOne, (screenHeight / 1.8) - 75);
         AnchorPane.setLeftAnchor(trebleLabelOne, (screenWidth / 3.3));
 
-        CircularSlider channelTwoTreble = new CircularSlider(9, false);
+        CircularSlider channelTwoTreble = new CircularSlider(9, false, "/Knobs/knob-green-fg.png");
         channelTwoTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
             float trebleGain = newValue.floatValue();
             // Scale the value from 0-270 to 0-100dB
@@ -330,11 +407,18 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelTwoTreble, (screenHeight / 1.87) - 75);
         AnchorPane.setLeftAnchor(channelTwoTreble, (screenWidth / 1.442) - 25);
 
+        ImageView chTwoTreImg = new ImageView(KNOB_BG);
+        chTwoTreImg.setFitHeight(70);
+        chTwoTreImg.setFitWidth(70);
+
+        AnchorPane.setTopAnchor(chTwoTreImg, (screenHeight / 1.87) - 75);
+        AnchorPane.setLeftAnchor(chTwoTreImg, (screenWidth / 1.442) - 25);
+
         Label trebleLabelTwo = new Label("T");
         AnchorPane.setTopAnchor(trebleLabelTwo, (screenHeight / 1.8) - 75);
         AnchorPane.setLeftAnchor(trebleLabelTwo, (screenWidth / 1.446));
 
-        CircularSlider channelOneSpeed = new CircularSlider(9, false);
+        CircularSlider channelOneSpeed = new CircularSlider(9, false, "/Knobs/knob-red-fg.png");
         channelOneSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
             double rawValue = newValue.doubleValue(); // 0.0 - 270.0
             // Map 0.0 - 270.0 to 0.8 - 1.2
@@ -347,14 +431,21 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(channelOneSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelOneSpeed, (screenWidth / 3.275) - 25);
 
+        ImageView chOneSpeedImg = new ImageView(KNOB_BG);
+        chOneSpeedImg.setFitHeight(70);
+        chOneSpeedImg.setFitWidth(70);
+
+        AnchorPane.setTopAnchor(chOneSpeedImg, ((screenHeight / 1.87) - 150));
+        AnchorPane.setLeftAnchor(chOneSpeedImg, (screenWidth / 3.275) - 25);
+
         Label speedLabelOne = new Label("S");
         AnchorPane.setTopAnchor(speedLabelOne, (screenHeight / 1.8) - 150);
         AnchorPane.setLeftAnchor(speedLabelOne, (screenWidth / 3.3));
 
-        CircularSlider channelTwoSpeed = new CircularSlider(9, false);
+        CircularSlider channelTwoSpeed = new CircularSlider(9, false, "/Knobs/knob-red-fg.png");
         channelTwoSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
             double rawValue = newValue.doubleValue(); // 0.0 - 270.0
-            //Map 0.0 - 270.0 to 0.8 -1.2
+            // Map 0.0 - 270.0 to 0.8 -1.2
             double mappedValue = 1.2 - (rawValue / 270.0) * (1.2 - 0.8);
             // Round to 2 decimal places
             mappedValue = Math.round(mappedValue * 100.0) / 100.0;
@@ -363,6 +454,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
         });
         AnchorPane.setTopAnchor(channelTwoSpeed, ((screenHeight / 1.87) - 150));
         AnchorPane.setLeftAnchor(channelTwoSpeed, ((screenWidth / 1.442) - 25));
+
+        ImageView chTwoSpeedImg = new ImageView(KNOB_BG);
+        chTwoSpeedImg.setFitHeight(70);
+        chTwoSpeedImg.setFitWidth(70);
+
+        AnchorPane.setTopAnchor(chTwoSpeedImg, ((screenHeight / 1.87) - 150));
+        AnchorPane.setLeftAnchor(chTwoSpeedImg, ((screenWidth / 1.442) - 25));
 
         VBox audioIndicatorOne = new VBox(8);
         audioIndicatorOne.setPrefHeight(100);
@@ -395,16 +493,14 @@ public class MainFrame implements EventHandler<ActionEvent> {
         }
 
         primaryPane.getChildren().addAll(crossFader, crossFaderLabel, channelOneCue, channelTwoCue, channelOneVolume,
-
                 channelTwoVolume, channelOneBass, bassLabelOne, channelTwoBass, bassLabelTwo, channelOneTreble,
-                trebleLabelOne,
-                channelTwoTreble, trebleLabelTwo, channelOneSpeed, speedLabelOne, channelTwoSpeed, speedLabelTwo,
-                audioIndicatorOne, audioIndicatorTwo);
-
+                trebleLabelOne, channelTwoTreble, trebleLabelTwo, channelOneSpeed, speedLabelOne, channelTwoSpeed,
+                speedLabelTwo, audioIndicatorOne, audioIndicatorTwo, chOneBassImg, chTwoBassImg, chOneSpeedImg,
+                chOneTreImg, chTwoSpeedImg, chTwoTreImg, channelOneCueImage, channelTwoCueImage);
     }
 
     private void initializeZoneFour() {
-        CircularSlider effectIntensity = new CircularSlider(9, false);
+        CircularSlider effectIntensity = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
         effectIntensity.updateAngle(0.0); // Starts of at 0 degrees
         effectIntensity.valueProperty().addListener((observable, oldValue, newValue) -> {
             float volume = newValue.floatValue();
@@ -415,11 +511,18 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setTopAnchor(effectIntensity, screenHeight / 10);
         AnchorPane.setLeftAnchor(effectIntensity, screenWidth / 1.15);
 
+        ImageView effectIntensityImg = new ImageView(KNOB_BG);
+        effectIntensityImg.setFitHeight(70);
+        effectIntensityImg.setFitWidth(70);
+
+        AnchorPane.setTopAnchor(effectIntensityImg, screenHeight / 10);
+        AnchorPane.setLeftAnchor(effectIntensityImg, screenWidth / 1.15);
+
         Label effectIntensityLabel = new Label("Effect Intensity");
         AnchorPane.setTopAnchor(effectIntensityLabel, screenHeight / 6);
         AnchorPane.setLeftAnchor(effectIntensityLabel, screenWidth / 1.163);
 
-        CircularSlider effectSelector = new CircularSlider(5, true);
+        CircularSlider effectSelector = new CircularSlider(5, true, "/Knobs/knob-black-fg.png");
         effectSelector.valueProperty().addListener((observable, oldValue, newValue) -> {
 
             int effectSelectorValue = newValue.intValue();
@@ -432,6 +535,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
         });
         AnchorPane.setTopAnchor(effectSelector, (screenHeight / 2));
         AnchorPane.setLeftAnchor(effectSelector, (screenWidth / 1.15));
+
+        ImageView effectSelectorImg = new ImageView(EFFECT_SELECTOR_KNOB);
+        effectSelectorImg.setFitHeight(70);
+        effectSelectorImg.setFitWidth(70);
+
+        AnchorPane.setTopAnchor(effectSelectorImg, (screenHeight / 2));
+        AnchorPane.setLeftAnchor(effectSelectorImg, (screenWidth / 1.15));
 
         Label flanger = new Label("Echo");
         AnchorPane.setTopAnchor(flanger, (screenHeight / 1.90));
@@ -464,7 +574,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         primaryPane.getChildren().addAll(effectIntensity, effectIntensityLabel, effectSelector, delay, flanger,
                 masterVolume,
-                masterVolumeLabel);
+                masterVolumeLabel, effectIntensityImg, effectSelectorImg);
     }
 
     public void initializeSongsPane() {
@@ -475,8 +585,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
         songsPane.setCenter(songList);
 
         Label infoLabel = new Label();
-        infoLabel.setText("Double Click To Pick Song — Hold CTRL for Multiple Selections");
-        infoLabel.setPrefSize(400, 40);
+        infoLabel.setText(" Double Click To Pick Song — Hold CTRL for Multiple Selections");
+        infoLabel.setPrefSize(500, 40);
         infoLabel.setAlignment(Pos.CENTER);
         songsPane.setBottom(infoLabel);
 

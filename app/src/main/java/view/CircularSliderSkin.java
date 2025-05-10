@@ -3,12 +3,13 @@ package view;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.SkinBase;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
 /**
- * This class is responsible for the logic and the appearance of the Knob. 
+ * This class is responsible for the logic and the appearance of the Knob.
  */
 public class CircularSliderSkin extends SkinBase<CircularSlider> {
 
@@ -18,15 +19,21 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
     private double lastAngle; // Track last valid angle
     int tickCount;
     boolean snapToTick;
+    CircularSlider controll;
+
 
     /**
      * 
-     * @param control the object to be drawn, the interface. 
-     * @param tickCount The ticks in the knob, represents each value that can be selected. 
-     * @param snapToTick if the knob snaps to the values or is completely free like a bird
+     * @param control    the object to be drawn, the interface.
+     * @param tickCount  The ticks in the knob, represents each value that can be
+     *                   selected.
+     * @param snapToTick if the knob snaps to the values or is completely free like
+     *                   a bird
      */
     public CircularSliderSkin(CircularSlider control, int tickCount, boolean snapToTick) {
         super(control);
+        
+        this.controll = control;
 
         this.tickCount = tickCount;
         this.snapToTick = snapToTick;
@@ -44,13 +51,21 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
 
         container.getChildren().addAll(canvas);
 
-        getChildren().add(container);
+        ImageView knobImage = control.getKnobImage();
+        knobImage.setMouseTransparent(true);  // Make the image ignore mouse events
+        container.getChildren().add(knobImage); // The image will be underneath the canvas
+
+        getChildren().add(container);;
     }
+
     /**
-     * takes the position of the mouse and converts it into a position (a degree) on a circle
+     * takes the position of the mouse and converts it into a position (a degree) on
+     * a circle
      * if snap to tick is true it only allows the values dictated by the ticks.
-     * Never allows access to the bottom of the circle or anything but continuos movement of the slider.
+     * Never allows access to the bottom of the circle or anything but continuos
+     * movement of the slider.
      * Sets the calculated angle to the interface and redraws the knob.
+     * 
      * @param event the user moved my knob
      */
     private void handleMouseDrag(MouseEvent event) {
@@ -71,7 +86,8 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
                 newAngle = 135;
             } else if (newAngle > 165 && newAngle <= 237) {
                 newAngle = 204;
-            } else newAngle = 270;
+            } else
+                newAngle = 270;
             if (Math.abs(newAngle - lastAngle) > 70) {
                 return; // Prevent jumps
             }
@@ -92,13 +108,16 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
         control.setAngle(newAngle);
         drawKnob(newAngle);
     }
+
     /**
      * Redraws the knob (the interface control)
      * offsets the knob by 125 degrees so that 0 is not to the right
-     * @param angle the current position of the knob. 
+     * 
+     * @param angle the current position of the knob.
      */
     public void drawKnob(double angle) {
         gc.clearRect(0, 0, size, size);
+
         gc.setFill(Color.LIGHTGRAY);
         gc.fillOval(0, 0, size, size);
         gc.setFill(Color.DARKGRAY);
@@ -110,15 +129,19 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
         double tickLength = 5;
 
         for (int i = 0; i < tickCount; i++) {
-            double tickAngle = 270.0 * (i / (double)(tickCount - 1)) - 225;
-            double innerX = centerX + (knobRadius - tickLength) * Math.cos(Math.toRadians(tickAngle));
-            double innerY = centerY + (knobRadius - tickLength) * Math.sin(Math.toRadians(tickAngle));
-            double outerX = centerX + (knobRadius + 2) * Math.cos(Math.toRadians(tickAngle));
-            double outerY = centerY + (knobRadius + 2) * Math.sin(Math.toRadians(tickAngle));
+        double tickAngle = 270.0 * (i / (double) (tickCount - 1)) - 225;
+        double innerX = centerX + (knobRadius - tickLength) *
+        Math.cos(Math.toRadians(tickAngle));
+        double innerY = centerY + (knobRadius - tickLength) *
+        Math.sin(Math.toRadians(tickAngle));
+        double outerX = centerX + (knobRadius + 2) *
+        Math.cos(Math.toRadians(tickAngle));
+        double outerY = centerY + (knobRadius + 2) *
+        Math.sin(Math.toRadians(tickAngle));
 
-            gc.setStroke(Color.DARKGRAY);
-            gc.setLineWidth(2);
-            gc.strokeLine(innerX, innerY, outerX, outerY);
+        gc.setStroke(Color.DARKGRAY);
+        gc.setLineWidth(2);
+        gc.strokeLine(innerX, innerY, outerX, outerY);
         }
 
         double knobX = centerX + knobRadius * Math.cos(Math.toRadians(angle + 135));
@@ -126,5 +149,9 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
 
         gc.setFill(Color.DARKGRAY);
         gc.fillOval(knobX - 5, knobY - 5, 10, 10);
+
+        // Rotate the knob image from the control
+        ImageView knobImage = controll.getKnobImage();
+        knobImage.setRotate(angle - 135); // Normalize rotation
     }
 }

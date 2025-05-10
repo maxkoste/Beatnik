@@ -10,6 +10,8 @@ import be.tarsos.dsp.io.jvm.AudioPlayer;
 import be.tarsos.dsp.resample.RateTransposer;
 import dsp.Effects.Delay;
 import dsp.Effects.Flanger;
+//Custom Dispatcher factory might be part of a solution for stereo
+//audio
 import dsp.util.DispatcherFactory;
 
 import java.io.File;
@@ -58,15 +60,22 @@ public class MediaPlayer {
              * laggy and
              * suuuper weird when doing this.. this needs to be fixed!!
              */
-            playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath, 48000, 4096, 0);
+
+            //File audioFile = new File(fullPath);
+            //playbackDispatcher = AudioDispatcherFactory.fromFile(audioFile, 4096, 512);
+            //playbackDispatcher = DispatcherFactory.fromPipeStereo(fullPath, 48000, 4096, 0);
+
+            playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath,
+                    48000, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
             System.out.println(format.toString());
-            // AudioFormat audioFormat = new AudioFormat(format.getSampleRate(), 16, 2,
-            // false, false);
 
-            bassEqualizer = new Equalizer(format.getSampleRate(), 80, 80); // 80Hz center, 50Hz bandwidth
-            flangerEffect = new Flanger(0.0002, 0, format.getSampleRate(), 3);
-            trebleEqualizer = new Equalizer(format.getSampleRate(), 5000, 7000); // 7khz center, 5kHz bandwidth
+            bassEqualizer = new Equalizer(format.getSampleRate(),
+                    80, 80); // 80Hz center, 50Hz bandwidth
+            flangerEffect = new Flanger(0.0002,
+                    0, format.getSampleRate(), 3);
+            trebleEqualizer = new Equalizer(format.getSampleRate(),
+                    5000, 7000); // 7khz center, 5kHz bandwidth
             delayEffect = new Delay(0.5, 0.6, format.getSampleRate());
             rateTransposer = new RateTransposer(1.0F);
             // Add volume controll first
@@ -79,7 +88,6 @@ public class MediaPlayer {
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
             playbackDispatcher.addAudioProcessor(rateTransposer);
-
             playbackDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
                 public boolean process(AudioEvent audioEvent) {

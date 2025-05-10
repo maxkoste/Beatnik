@@ -17,7 +17,8 @@ public class WaveFormCanvas extends Canvas {
 
     /**
      * For now width and height cant be changed. Might get implemented later
-     * Collects the graphics content from the super class. 
+     * Collects the graphics content from the super class.
+     * 
      * @param width
      * @param height
      */
@@ -26,10 +27,17 @@ public class WaveFormCanvas extends Canvas {
         this.width = width;
         this.height = height;
         gc = getGraphicsContext2D();
+
+        // to make sure its colored before playing audio
+        gc.setFill(Color.web("#191c2b")); // Dark gray
+        gc.fillRect(0, 0, width, height);
     }
+
     /**
-     * Sets the songs audio data to a float array equal to the length of the entire song.
-     * Sets the length that is used in the update method. 
+     * Sets the songs audio data to a float array equal to the length of the entire
+     * song.
+     * Sets the length that is used in the update method.
+     * 
      * @param originalAudioData
      */
     public void setOriginalAudioData(float[] originalAudioData) {
@@ -38,9 +46,12 @@ public class WaveFormCanvas extends Canvas {
     }
 
     /**
-     * Updates the waveform 10 sek before and after what is currently being played. 
-     * 10 sek before the songs starts and 10 seconds after it ended the array is filled with 0.0f 
-     * @param currentSecond the current values in the float array, represented by its float value
+     * Updates the waveform 10 sek before and after what is currently being played.
+     * 10 sek before the songs starts and 10 seconds after it ended the array is
+     * filled with 0.0f
+     * 
+     * @param currentSecond the current values in the float array, represented by
+     *                      its float value
      */
     public void update(float currentSecond) {
         if (currentSecond != 0) {
@@ -63,11 +74,14 @@ public class WaveFormCanvas extends Canvas {
     /**
      * Redraws the new waveform based on a array of float values
      * Lines are closer to the middle the lower the float value
+     * 
      * @param audioData
      */
     public void draw(float[] audioData) {
         Platform.runLater(() -> {
-            gc.clearRect(0, 0, width, height);
+            gc.setFill(Color.web("#191c2b"));
+            gc.fillRect(0, 0, width, height);
+            // gc.clearRect(0, 0, width, height);
             gc.setStroke(Color.RED);
             double midY = height / 2;
             int widthX = (int) width;
@@ -76,6 +90,15 @@ public class WaveFormCanvas extends Canvas {
                 int index = (int) ((x / (double) widthX) * totalSamples);
                 float sampleValue = audioData[index];
                 double y = sampleValue * midY;
+
+                //Rainbow effect
+                //double hue = (x * 360.0 / widthX) % 360; // Gradual color shift from left to right
+                //gc.setStroke(Color.hsb(hue, 1.0, 1.0));
+
+                // Color based on the amplitude of the sample value
+                float normalizedSample = Math.abs(sampleValue); // Range from 0 to 1
+                gc.setStroke(Color.hsb(normalizedSample * 240, 1.0, 1.0)); // Blue to red based on value
+
                 gc.strokeLine(x, midY - y, x, midY + y);
             }
         });
