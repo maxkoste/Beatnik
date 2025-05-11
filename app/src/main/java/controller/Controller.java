@@ -209,6 +209,7 @@ public class Controller {
     }
 
     public void setChannelOneVolume(float volume) {
+
         audioPlayer1.setVolume((volume * masterModifier) * crossfaderModifier1);
         latestVolume1 = volume;
     }
