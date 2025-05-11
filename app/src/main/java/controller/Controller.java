@@ -57,7 +57,7 @@ public class Controller {
         timerThreadTwo = new TimerThreadTwo();
         frame = new MainFrame(this);
         playlistManager = new PlaylistManager(frame);
-        frame.registerPlaylistManager(playlistManager);
+        frame.setPlaylistManager(playlistManager);
         this.currentEffect = "delay";
         startUp(primaryStage);
     }
@@ -262,7 +262,7 @@ public class Controller {
         audioPlayer1.setPlaybackSpeed(speedFactor);
     }
 
-    public void ssetPlaybackSpeedCh2(double speedFactor) {
+    public void setPlaybackSpeedCh2(double speedFactor) {
         audioPlayer2.setPlaybackSpeed(speedFactor);
     }
 
@@ -348,9 +348,9 @@ public class Controller {
                 rms = Math.sqrt(rms / buffer.length);
                 final double completeRms = rms;
                 if (channel == 1) {
-                    //frame.updateAudioIndicatorOne(completeRms);
+                    frame.updateAudioIndicatorOne(completeRms);
                 } else if (channel == 2) {
-                    //frame.updateAudioIndicatorTwo(completeRms);
+                    frame.updateAudioIndicatorTwo(completeRms);
                 }
                 return true;
             }

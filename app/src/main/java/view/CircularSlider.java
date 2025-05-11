@@ -33,7 +33,6 @@ public class CircularSlider extends Control {
     }
 
     public void updateAngle(double angle) {
-        knobImage.setRotate(angle-135);
         this.skin.drawKnob(angle);
     }
 

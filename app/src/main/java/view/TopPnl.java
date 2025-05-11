@@ -1,5 +1,7 @@
 package view;
 
+import controller.Controller;
+import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -9,6 +11,7 @@ import javafx.scene.layout.StackPane;
 
 public class TopPnl {
   private MainFrame mainFrame;
+  private Controller controller;
   private GridPane primaryPane;
   private int maxCols;
   private Label waveformOneText;
@@ -16,8 +19,9 @@ public class TopPnl {
   private WaveFormCanvas waveFormOne;
   private WaveFormCanvas waveFormTwo;
 
-  public TopPnl(MainFrame mainFrame, GridPane primaryPane, int maxCols) {
+  public TopPnl(MainFrame mainFrame, Controller controller, GridPane primaryPane, int maxCols) {
     this.mainFrame = mainFrame;
+    this.controller = controller;
     this.primaryPane = primaryPane;
     this.maxCols = maxCols -1;
     initializeButtons();
@@ -26,38 +30,38 @@ public class TopPnl {
 
   private void initializeButtons() {
     Button channelOnePlayPause = new Button("⏯");
-    channelOnePlayPause.setOnAction(mainFrame::handleChannelOnePlayPause);
+    channelOnePlayPause.setOnAction(this::handleChannelOnePlayPause);
     channelOnePlayPause.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     channelOnePlayPause.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
     primaryPane.add(channelOnePlayPause, 0, 0);
 
     Button channelTwoPlayPause = new Button("⏯");
-    channelTwoPlayPause.setOnAction(mainFrame::handleChannelTwoPlayPause);
+    channelTwoPlayPause.setOnAction(this::handleChannelTwoPlayPause);
     channelTwoPlayPause.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     channelTwoPlayPause.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
     primaryPane.add(channelTwoPlayPause, 0, 2);
 
     Button channelOneTrackCue = new Button("C");
-    channelOneTrackCue.setOnAction(mainFrame::handleChannelOneTrackCue);
+    channelOneTrackCue.setOnAction(this::handleChannelOneTrackCue);
     channelOneTrackCue.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     channelOneTrackCue.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
     primaryPane.add(channelOneTrackCue, 0 ,1);
 
     Button channelTwoTrackCue = new Button("C");
-    channelTwoTrackCue.setOnAction(mainFrame::handleChannelTwoTrackCue);
+    channelTwoTrackCue.setOnAction(this::handleChannelTwoTrackCue);
     channelTwoTrackCue.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     channelTwoTrackCue.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
     primaryPane.add(channelTwoTrackCue, 0, 3);
 
     Button channelOneSkip = new Button("⏭");
-    channelOneSkip.setOnAction(mainFrame::handleChannelOneSkip);
+    channelOneSkip.setOnAction(this::handleChannelOneSkip);
     channelOneSkip.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     channelOneSkip.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
     GridPane.setRowSpan(channelOneSkip, 2);
     primaryPane.add(channelOneSkip, maxCols, 0);
 
     Button channelTwoSkip = new Button("⏭");
-    channelTwoSkip.setOnAction(mainFrame::handleChannelTwoSkip);
+    channelTwoSkip.setOnAction(this::handleChannelTwoSkip);
     channelTwoSkip.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     channelTwoSkip.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
     GridPane.setRowSpan(channelTwoSkip, 2);
@@ -103,17 +107,42 @@ public class TopPnl {
   public void setInfoText(boolean playlist, String song, int channel) {
     if (channel == 1) {
       if (playlist) {
-        waveformOneText.setText("Playing " + song + " in " + mainFrame.getSelectedPlaylist());
+        waveformOneText.setText(" Playing " + song + " in " + mainFrame.getSelectedPlaylist());
       } else {
-        waveformOneText.setText("Playing " + song);
+        waveformOneText.setText(" Playing " + song);
       }
     } else {
       if (playlist) {
-        waveformTwoText.setText("Playing " + song + " in " + mainFrame.getSelectedPlaylist());
+        waveformTwoText.setText(" Playing " + song + " in " + mainFrame.getSelectedPlaylist());
       } else {
-        waveformTwoText.setText("Playing " + song);
+        waveformTwoText.setText(" Playing " + song);
       }
     }
+  }
+
+
+  public void handleChannelOnePlayPause(ActionEvent actionEvent) {
+    controller.playSong(1);
+  }
+
+  public void handleChannelTwoPlayPause(ActionEvent actionEvent) {
+    controller.playSong(2);
+  }
+
+  public void handleChannelOneTrackCue(ActionEvent actionEvent) {
+    controller.resetSong(1);
+  }
+
+  public void handleChannelTwoTrackCue(ActionEvent actionEvent) {
+    controller.resetSong(2);
+  }
+
+  public void handleChannelOneSkip(ActionEvent actionEvent) {
+    controller.nextSong(1);
+  }
+
+  public void handleChannelTwoSkip(ActionEvent actionEvent) {
+    controller.nextSong(2);
   }
 
   public void setWaveformAudioData(float[] originalAudioData, int channel) {

@@ -16,7 +16,7 @@ import javafx.scene.paint.Color;
  */
 public class CircularSliderSkin extends SkinBase<CircularSlider> {
 
-    private double lastAngle = 135; // Track last valid angle
+    private double lastAngle; // Track last valid angle
     int tickCount;
     boolean snapToTick;
     CircularSlider control;
