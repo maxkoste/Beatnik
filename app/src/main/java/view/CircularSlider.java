@@ -155,4 +155,8 @@ public class CircularSlider extends Control {
         return this.max;
     }
 
+    @Override
+    public boolean isResizable() {
+        return true;
+    }
 }

@@ -3,25 +3,16 @@ package view;
 import controller.Controller;
 import controller.PlaylistManager;
 import javafx.application.Platform;
-import javafx.beans.Observable;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.NodeOrientation;
-import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.geometry.VerticalDirection;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
@@ -32,12 +23,10 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class MainFrame implements EventHandler<ActionEvent> {
-    private AnchorPane primaryPane;
+    private GridPane primaryPane;
     private BorderPane songsPane;
     private BorderPane playlistsPane;
     private Stage playlistStage;
@@ -50,16 +39,14 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private Boolean channelOneActive = true;
     private Controller controller;
     private PlaylistManager playlistManager;
-    private TextArea channelOneContainer;
-    private WaveFormCanvas waveformOne;
-    private TextArea channelTwoContainer;
-    private WaveFormCanvas waveformTwo;
     private Button switchChannelOne;
     private Button switchChannelTwo;
     private double screenHeight;
     private double screenWidth;
     private final Image KNOB_BG;
     private final Image EFFECT_SELECTOR_KNOB;
+    private TopPnl topPnl;
+    private LeftPnl leftPnl;
 
     private Circle[] auIndicatorCirclesOne = new Circle[10];
     private Circle[] auIndicatorCirclesTwo = new Circle[10];
@@ -76,25 +63,42 @@ public class MainFrame implements EventHandler<ActionEvent> {
         screenWidth = screenResolution.getWidth();
 
         primaryStage.setTitle("Beatnik");
-        primaryStage.setResizable(false);
-        primaryStage.setMaximized(true);
+        primaryStage.setResizable(true);
 
         playlistStage = new Stage();
         playlistStage.setTitle("All Songs");
-        playlistStage.setResizable(false);
+        playlistStage.setResizable(true);
 
-        primaryPane = new AnchorPane(); // Pane which contains all content
+        primaryPane = new GridPane(); // Pane which contains all content
         songsPane = new BorderPane(); // Pane which contains songs popup content
         playlistsPane = new BorderPane(); // Pane which contains currentPlaylist popup content
 
-        initializeZoneOne();
+        //initializeZoneOne();
+        //initializeZoneThree();
+        //initializeZoneFour();
+
+        primaryPane.setGridLinesVisible(true); //TODO: TEMPORARY
+        final int numCols = 13;
+        final int numRows = 13;
+        for (int i = 0; i < numCols; i++) {
+            ColumnConstraints colConst = new ColumnConstraints();
+            colConst.setPercentWidth(100.0 / numCols);
+            colConst.setFillWidth(true);
+            primaryPane.getColumnConstraints().add(colConst);
+        }
+        for (int i = 0; i < numRows; i++) {
+            RowConstraints rowConst = new RowConstraints();
+            rowConst.setPercentHeight(100.0 / numRows);
+            rowConst.setFillHeight(true);
+            primaryPane.getRowConstraints().add(rowConst);
+        }
+
         initializeSongsPane();
         initializePlaylistPane();
-        initializeZoneTwo();
-        initializeZoneThree();
-        initializeZoneFour();
+        topPnl = new TopPnl(this, primaryPane, numRows);
+        leftPnl = new LeftPnl(this, primaryPane);
 
-        Scene primaryScene = new Scene(primaryPane, screenWidth, screenHeight); // Add pane to scene
+        Scene primaryScene = new Scene(primaryPane, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
 
         songsScene = new Scene(songsPane, 600, 600);
         playlistsScene = new Scene(playlistsPane, 600, 600);
@@ -123,7 +127,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
             controller.shutDown();
         });
     }
-
+/*
     private void initializeZoneOne() {
         Button songsButton = new Button();
         songsButton.setPrefSize(50, 50);
@@ -176,72 +180,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         primaryPane.getChildren().addAll(songsButton, quantize, quantizeLabel, cueVolume, cueVolumeLabel, quantizeImg,
                 cueImg);
-    }
-
-    private void initializeZoneTwo() {
-        channelOneContainer = new TextArea(); // Temporary implementation maybe try splitPane?
-        channelOneContainer.setPrefSize(screenWidth / 2, 75.0);
-        AnchorPane.setTopAnchor(channelOneContainer, 75.0);
-        AnchorPane.setLeftAnchor(channelOneContainer, (((screenWidth / 2)) - ((screenWidth / 2) / 2)));
-
-        waveformOne = new WaveFormCanvas(screenWidth / 2, 75);
-        AnchorPane.setTopAnchor(waveformOne, 75.0);
-        AnchorPane.setLeftAnchor(waveformOne, (screenWidth - waveformOne.getWidth()) / 2);
-
-        channelTwoContainer = new TextArea(); // Temporary implementation
-        channelTwoContainer.setPrefSize(screenWidth / 2, 75.0);
-        AnchorPane.setTopAnchor(channelTwoContainer, (75.0 * 2));
-        AnchorPane.setLeftAnchor(channelTwoContainer, (((screenWidth / 2)) - ((screenWidth / 2) / 2)));
-
-        waveformTwo = new WaveFormCanvas(screenWidth / 2, 75);
-        AnchorPane.setTopAnchor(waveformTwo, 75.0 * 2);
-        AnchorPane.setLeftAnchor(waveformTwo, (screenWidth - waveformTwo.getWidth()) / 2);
-
-        Button channelOnePlayPause = new Button();
-        channelOnePlayPause.setPrefSize(30.0, 37.5);
-        channelOnePlayPause.setText("⏯");
-        channelOnePlayPause.setOnAction(this::handleChannelOnePlayPause);
-        AnchorPane.setTopAnchor(channelOnePlayPause, 75.0);
-        AnchorPane.setLeftAnchor(channelOnePlayPause, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
-
-        Button channelTwoPlayPause = new Button();
-        channelTwoPlayPause.setPrefSize(30.0, 37.5);
-        channelTwoPlayPause.setText("⏯");
-        channelTwoPlayPause.setOnAction(this::handleChannelTwoPlayPause);
-        AnchorPane.setTopAnchor(channelTwoPlayPause, 150.0);
-        AnchorPane.setLeftAnchor(channelTwoPlayPause, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
-
-        Button channelOneTrackCue = new Button();
-        channelOneTrackCue.setPrefSize(30, 37.5);
-        channelOneTrackCue.setText("C");
-        channelOneTrackCue.setOnAction(this::handleChannelOneTrackCue);
-        AnchorPane.setTopAnchor(channelOneTrackCue, 112.5);
-        AnchorPane.setLeftAnchor(channelOneTrackCue, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
-
-        Button channelTwoTrackCue = new Button();
-        channelTwoTrackCue.setPrefSize(30, 37.5);
-        channelTwoTrackCue.setText("C");
-        channelTwoTrackCue.setOnAction(this::handleChannelTwoTrackCue);
-        AnchorPane.setTopAnchor(channelTwoTrackCue, 187.5);
-        AnchorPane.setLeftAnchor(channelTwoTrackCue, ((((screenWidth / 2)) - ((screenWidth / 2) / 2)) - 30));
-
-        Button channelOneSkip = new Button();
-        channelOneSkip.setPrefSize(30.0, 75.0);
-        channelOneSkip.setText("⏭");
-        channelOneSkip.setOnAction(this::handleChannelOneSkip);
-        AnchorPane.setTopAnchor(channelOneSkip, 75.0);
-        AnchorPane.setLeftAnchor(channelOneSkip, ((((screenWidth / 2)) + ((screenWidth / 2) / 2))));
-
-        Button channelTwoSkip = new Button();
-        channelTwoSkip.setPrefSize(30.0, 75.0);
-        channelTwoSkip.setText("⏭");
-        channelTwoSkip.setOnAction(this::handleChannelTwoSkip);
-        AnchorPane.setTopAnchor(channelTwoSkip, 150.0);
-        AnchorPane.setLeftAnchor(channelTwoSkip, ((((screenWidth / 2)) + ((screenWidth / 2) / 2))));
-
-        primaryPane.getChildren().addAll(channelOneContainer, channelTwoContainer, waveformOne, waveformTwo,
-                channelOnePlayPause, channelTwoPlayPause, channelOneTrackCue, channelTwoTrackCue, channelOneSkip,
-                channelTwoSkip);
     }
 
     private void initializeZoneThree() {
@@ -576,7 +514,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
                 masterVolume,
                 masterVolumeLabel, effectIntensityImg, effectSelectorImg);
     }
-
+*/
     public void initializeSongsPane() {
         ListView<String> songList = new ListView<>(playlistManager.getSongsGUI());
         songSelector = songList.getSelectionModel();
@@ -653,6 +591,26 @@ public class MainFrame implements EventHandler<ActionEvent> {
         ToolBar playlistMenu = new ToolBar(viewSongs, editName, removeSongsFromPlaylist, deletePlaylist,
                 switchChannelTwo);
         playlistsPane.setTop(playlistMenu);
+    }
+
+    public void setWaveformAudioData(float[] originalAudioData, int channel) {
+        topPnl.setWaveformAudioData(originalAudioData, channel);
+    }
+
+    public void updateWaveformOne(float currentSecond) {
+        topPnl.updateWaveformOne(currentSecond);
+    }
+
+    public void updateWaveformTwo(float currentSecond) {
+        topPnl.updateWaveformTwo(currentSecond);
+    }
+
+    public void setInfoText(boolean playlist, String song, int channel) {
+        topPnl.setInfoText(playlist, song, channel);
+    }
+
+    public String getSelectedPlaylist() {
+        return playlistSelector.getSelectedItem();
     }
 
     @Override
@@ -751,19 +709,19 @@ public class MainFrame implements EventHandler<ActionEvent> {
         }
     }
 
-    private void handleChannelOnePlayPause(ActionEvent actionEvent) {
+    public void handleChannelOnePlayPause(ActionEvent actionEvent) {
         controller.playSong(1);
     }
 
-    private void handleChannelTwoPlayPause(ActionEvent actionEvent) {
+    public void handleChannelTwoPlayPause(ActionEvent actionEvent) {
         controller.playSong(2);
     }
 
-    private void handleChannelOneTrackCue(ActionEvent actionEvent) {
+    public void handleChannelOneTrackCue(ActionEvent actionEvent) {
         controller.resetSong(1);
     }
 
-    private void handleChannelTwoTrackCue(ActionEvent actionEvent) {
+    public void handleChannelTwoTrackCue(ActionEvent actionEvent) {
         controller.resetSong(2);
     }
 
@@ -773,22 +731,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     public void handleChannelTwoSkip(ActionEvent actionEvent) {
         controller.nextSong(2);
-    }
-
-    public void setInfoText(boolean playlist, String song, int channel) {
-        if (channel == 1) {
-            if (playlist) {
-                channelOneContainer.setText("Playing " + song + " in " + playlistSelector.getSelectedItem());
-            } else {
-                channelOneContainer.setText("Playing " + song);
-            }
-        } else {
-            if (playlist) {
-                channelTwoContainer.setText("Playing " + song + " in " + playlistSelector.getSelectedItem());
-            } else {
-                channelTwoContainer.setText("Playing " + song);
-            }
-        }
     }
 
     public String promptUserInput(String title, String headerText) {
@@ -820,21 +762,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     public void registerPlaylistManager(PlaylistManager playlistManager) {
         this.playlistManager = playlistManager;
-    }
-
-    public void setWaveformAudioData(float[] originalAudioData, int channel) {
-        if (channel == 1) {
-            waveformOne.setOriginalAudioData(originalAudioData);
-        } else
-            waveformTwo.setOriginalAudioData(originalAudioData);
-    }
-
-    public void updateWaveformOne(float currentSecond) {
-        waveformOne.update(currentSecond);
-    }
-
-    public void updateWaveformTwo(float currentSecond) {
-        waveformTwo.update(currentSecond);
     }
 
     public void updateAudioIndicatorOne(double rms) {

@@ -74,14 +74,22 @@ public class Controller {
     private void preloadSongData() {
         ObservableList<String> songFileNames = playlistManager.getSongsGUI();
         for (int i = 0; i < songFileNames.size(); i++) {
-            int pos = i;
-            new Thread(() -> {
-                String songName = songFileNames.get(pos);
+            if (i == songFileNames.size() -1) {
+                String songName = songFileNames.get(i);
                 float[] songData = extract(songName);
                 synchronized (lock) {
                     songsData.put(songName, songData);
                 }
-            }).start();
+            } else {
+                int pos = i;
+                new Thread(() -> {
+                    String songName = songFileNames.get(pos);
+                    float[] songData = extract(songName);
+                    synchronized (lock) {
+                        songsData.put(songName, songData);
+                    }
+                }).start();
+            }
         }
     }
 
@@ -188,7 +196,7 @@ public class Controller {
                 0.0F);
     }
 
-    public void nextSong(int channel) { // TODO: Update GUI with names etc
+    public void nextSong(int channel) {
         if (playlistSongPaths != null) {
             if (!(currentPosInPlaylist >= playlistSongPaths.size() - 1)) {
                 currentPosInPlaylist++;
@@ -340,9 +348,9 @@ public class Controller {
                 rms = Math.sqrt(rms / buffer.length);
                 final double completeRms = rms;
                 if (channel == 1) {
-                    frame.updateAudioIndicatorOne(completeRms);
+                    //frame.updateAudioIndicatorOne(completeRms);
                 } else if (channel == 2) {
-                    frame.updateAudioIndicatorTwo(completeRms);
+                    //frame.updateAudioIndicatorTwo(completeRms);
                 }
                 return true;
             }

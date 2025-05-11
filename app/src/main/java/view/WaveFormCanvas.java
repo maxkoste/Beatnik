@@ -7,30 +7,43 @@ import javafx.scene.paint.Color;
 
 public class WaveFormCanvas extends Canvas {
     private final GraphicsContext gc;
-    private double width;
-    private double height;
     private float[] originalAudioData;
     private int originalAudioDataSize;
-    private final float tenFloatSeconds = 438097.051598F;
+    private final float sevenFloatSeconds = 306667.936119F;
     private final float floatSecond = 43809.7051598F;
-    private final int snippetLength = Math.round(tenFloatSeconds * 2);
+    private final int snippetLength = Math.round(sevenFloatSeconds * 2);
 
     /**
      * For now width and height cant be changed. Might get implemented later
      * Collects the graphics content from the super class.
      * 
-     * @param width
-     * @param height
+     * @param //width
+     * @param //height
      */
-    public WaveFormCanvas(double width, double height) {
-        super(width, height);
-        this.width = width;
-        this.height = height;
+    public WaveFormCanvas() {
         gc = getGraphicsContext2D();
 
         // to make sure its colored before playing audio
         gc.setFill(Color.web("#191c2b")); // Dark gray
-        gc.fillRect(0, 0, width, height);
+        gc.fillRect(0, 0, getWidth(), getHeight());
+
+        widthProperty().addListener((obs, oldVal, newVal) -> redraw());
+        heightProperty().addListener((obs, oldVal, newVal) -> redraw());
+    }
+
+    @Override
+    public boolean isResizable() {
+        return true;
+    }
+
+    @Override
+    public double prefWidth(double height) {
+        return getWidth();
+    }
+
+    @Override
+    public double prefHeight(double width) {
+        return getHeight();
     }
 
     /**
@@ -56,13 +69,13 @@ public class WaveFormCanvas extends Canvas {
     public void update(float currentSecond) {
         if (currentSecond != 0) {
             float currentFloatSecond = currentSecond * floatSecond;
-            int startingPoint = Math.round(currentFloatSecond - tenFloatSeconds);
+            int startingPoint = Math.round(currentFloatSecond - sevenFloatSeconds);
             int audioDataStart = Math.max(startingPoint, 0);
             int audioDataEnd = Math.min(startingPoint + snippetLength, originalAudioDataSize);
 
             float[] audioSnippet = new float[snippetLength];
-
             int insertStart = Math.max(0, -startingPoint); // if startingPoint is negative, insert later
+
             for (int i = audioDataStart; i < audioDataEnd; i++) {
                 audioSnippet[insertStart + i - audioDataStart] = originalAudioData[i];
             }
@@ -79,10 +92,13 @@ public class WaveFormCanvas extends Canvas {
      */
     public void draw(float[] audioData) {
         Platform.runLater(() -> {
+            double width = getWidth();
+            double height = getHeight();
             gc.setFill(Color.web("#191c2b"));
             gc.fillRect(0, 0, width, height);
             // gc.clearRect(0, 0, width, height);
             gc.setStroke(Color.RED);
+
             double midY = height / 2;
             int widthX = (int) width;
             int totalSamples = audioData.length;
@@ -102,5 +118,10 @@ public class WaveFormCanvas extends Canvas {
                 gc.strokeLine(x, midY - y, x, midY + y);
             }
         });
+    }
+
+    private void redraw() {
+        gc.setFill(Color.web("#191c2b"));
+        gc.fillRect(0, 0, getWidth(), getHeight());
     }
 }
