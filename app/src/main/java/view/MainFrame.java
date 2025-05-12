@@ -3,9 +3,11 @@ package view;
 import controller.Controller;
 import controller.PlaylistManager;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -52,20 +54,33 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     public void start(Stage primaryStage) {
         Dimension screenResolution = Toolkit.getDefaultToolkit().getScreenSize();
-      double screenHeight = screenResolution.getHeight();
+        double screenHeight = screenResolution.getHeight();
 
         primaryStage.setTitle("Beatnik");
         primaryStage.setResizable(true);
+        primaryStage.getIcons().add(new Image("/Logo/beatnik-logo.png"));
 
         playlistStage = new Stage();
         playlistStage.setTitle("All Songs");
         playlistStage.setResizable(true);
 
+        StackPane root = new StackPane(); // Root layout with padding background
         primaryPane = new GridPane(); // Pane which contains all content
         songsPane = new BorderPane(); // Pane which contains songs popup content
         playlistsPane = new BorderPane(); // Pane which contains currentPlaylist popup content
 
-        primaryPane.setGridLinesVisible(true); //TODO: TEMPORARY
+        primaryPane.maxWidthProperty().bind(Bindings.createDoubleBinding(() ->
+                Math.min(root.getWidth(), root.getHeight()), root.widthProperty(), root.heightProperty()));
+
+        primaryPane.maxHeightProperty().bind(primaryPane.maxWidthProperty());
+        primaryPane.minWidthProperty().bind(primaryPane.maxWidthProperty());
+        primaryPane.minHeightProperty().bind(primaryPane.maxHeightProperty());
+
+        primaryPane.setAlignment(Pos.CENTER);
+        primaryPane.setGridLinesVisible(true); //TODO: TEMPORARY?
+
+        root.getChildren().add(primaryPane);
+
         final int numCols = 13;
         final int numRows = 13;
         for (int i = 0; i < numCols; i++) {
@@ -88,15 +103,14 @@ public class MainFrame implements EventHandler<ActionEvent> {
         rightPnl = new RightPnl(this, primaryPane, numCols);
         centerPnl = new CenterPnl(controller, primaryPane, numCols);
 
-        Scene primaryScene = new Scene(primaryPane, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
+        Scene primaryScene = new Scene(root, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
 
         songsScene = new Scene(songsPane, (screenHeight * 0.7), (screenHeight * 0.7));
         playlistsScene = new Scene(playlistsPane, (screenHeight * 0.7), (screenHeight * 0.7));
 
         playlistsScene.getStylesheets().add("styles.css");
         songsScene.getStylesheets().add("styles.css");
-        Image logo = new Image("/Logo/beatnik-logo.png"); // Add icon
-        primaryStage.getIcons().add(logo);
+        primaryStage.getIcons().add(new Image("/Logo/beatnik-logo.png"));
         primaryStage.setScene(primaryScene); // Finalize window to be shown
         primaryScene.getStylesheets().add("styles.css");
         primaryStage.show();
@@ -187,8 +201,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         switchChannelTwo = new Button("1");
         switchChannelTwo.setOnAction(this::handleChannelSwitch);
 
-        ToolBar playlistMenu = new ToolBar(viewSongs, editName, removeSongsFromPlaylist, deletePlaylist,
-                switchChannelTwo);
+        ToolBar playlistMenu = new ToolBar(viewSongs, editName, removeSongsFromPlaylist, deletePlaylist, switchChannelTwo);
         playlistsPane.setTop(playlistMenu);
     }
 

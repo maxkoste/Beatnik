@@ -1,5 +1,6 @@
 package view;
 
+import javafx.application.Platform;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
@@ -8,8 +9,10 @@ import javafx.scene.control.SkinBase;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 /**
  * This class is responsible for the logic and the appearance of the Knob.
@@ -31,30 +34,44 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
      * @param snapToTick if the knob snaps to the values or is completely free like
      *                   a bird
      */
-    public CircularSliderSkin(CircularSlider control, int tickCount, boolean snapToTick) {
+    public CircularSliderSkin(CircularSlider control, int tickCount, boolean snapToTick, String imagePath) {
         super(control);
 
         this.tickCount = tickCount;
         this.snapToTick = snapToTick;
         this.control = control;
-        knobImage = control.getKnobImage();
+        knobImage = new ImageView(new Image(imagePath));
 
-        // Resizable container
+        knobImage.setPreserveRatio(true);
+
+        // Set preferred knob size
+        knobImage.setFitWidth(60);
+        knobImage.setFitHeight(60);
+        knobImage.setMouseTransparent(true);
+
         container = new StackPane(knobImage);
+        container.setPrefSize(60, 60);
+        container.setMinSize(Double.MIN_VALUE, Double. MIN_VALUE);
+        container.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        // Bind image to container size
         knobImage.fitWidthProperty().bind(container.widthProperty());
         knobImage.fitHeightProperty().bind(container.heightProperty());
         knobImage.setMouseTransparent(true);
         knobImage.setPickOnBounds(true);
 
-        // Input handlers
+        //MYSTICAL MAGICAL NODE that prevents closely placed CircularSliders from eating mouse events (took me 5ish hours)
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(container.widthProperty());
+        clip.heightProperty().bind(container.heightProperty());
+        container.setClip(clip);
+
         container.setOnMousePressed(this::handleMouseDrag);
         container.setOnMouseDragged(this::handleMouseDrag);
 
         getChildren().add(container);
 
         // Initial position
+        lastAngle = control.getAngle();
         drawKnob(control.getAngle());
     }
 
@@ -119,6 +136,12 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
      */
     public void drawKnob(double angle) {
         // Rotate the knob image from the control
-        knobImage.setRotate(angle - 135); // Normalize rotation
+        Platform.runLater(() -> {
+            knobImage.setRotate(angle - 135); // Normalize rotation
+        });
+    }
+
+    public void setLastAngle(double angle) {
+        lastAngle = angle;
     }
 }

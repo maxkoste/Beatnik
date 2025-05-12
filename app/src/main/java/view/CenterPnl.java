@@ -136,10 +136,8 @@ public class CenterPnl {
 
     CircularSlider channelOneSpeed = new CircularSlider(9, false, "/Knobs/knob-red-fg.png");
     channelOneSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
-      double rawValue = newValue.doubleValue(); // 0.0 - 270.0
-      // Map 0.0 - 270.0 to 0.8 - 1.2
-      double mappedValue = 1.2 - (rawValue / 270.0) * (1.2 - 0.8);
-      // Round to 2 decimal places
+      double rawValue = newValue.doubleValue(); // 0.0 - 270.0// Map 0.0 - 270.0 to 0.8 - 1.2
+      double mappedValue = 1.2 - (rawValue / 270.0) * (1.2 - 0.8);// Round to 2 decimal places
       mappedValue = Math.round(mappedValue * 100.0) / 100.0;
       controller.setPlaybackSpeedCh1(mappedValue);
     });
@@ -201,7 +199,6 @@ public class CenterPnl {
       String imagePath = isNowSelected ? "/Buttons/cue-engaged.png" : "/Buttons/cue-passive.png";
       channelTwoCueImage.setImage(new Image(getClass().getResourceAsStream(imagePath)));
     });
-
 
     Slider channelTwoVolume = new Slider();
     channelTwoVolume.setOrientation(Orientation.VERTICAL);
@@ -287,12 +284,18 @@ public class CenterPnl {
     audioIndicatorTwo.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     audioIndicatorTwo.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
     audioIndicatorTwo.setAlignment(Pos.BOTTOM_CENTER);
+    audioIndicatorTwo.setMouseTransparent(true);
+    audioIndicatorTwo.setPickOnBounds(false);
 
     for (int i = auIndicatorCirclesTwo.length - 1; i >= 0; i--) {
       Circle dot = new Circle();
       dot.setFill(Color.DARKGRAY);
+      dot.setMouseTransparent(true);
+      dot.setPickOnBounds(false);
 
       StackPane circleWrapper = new StackPane(dot);
+      circleWrapper.setMouseTransparent(true);
+      circleWrapper.setPickOnBounds(false);
       circleWrapper.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
       circleWrapper.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
       VBox.setVgrow(circleWrapper, Priority.ALWAYS);

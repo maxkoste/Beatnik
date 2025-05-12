@@ -22,7 +22,7 @@ public class RightPnl {
 
   private void initialize() {
     CircularSlider effectIntensity = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
-    effectIntensity.updateAngle(0.0); // Starts of at 0 degrees
+    effectIntensity.setAngle(0.0); // Starts of at 0 degrees
     effectIntensity.valueProperty().addListener((observable, oldValue, newValue) -> {
       float volume = newValue.floatValue();
       float mixValue = volume / 270.0f;
@@ -54,7 +54,7 @@ public class RightPnl {
       // knob
       float savedMix = mainFrame.getCurrentEffectMix();
       float knobValue = savedMix * 270.0f;
-      effectIntensity.updateAngle(knobValue);
+      effectIntensity.setAngle(knobValue);
     });
     effectSelector.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     effectSelector.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
@@ -65,7 +65,6 @@ public class RightPnl {
     effectSelectorImg.fitHeightProperty().bind(effectSelector.heightProperty());
     effectSelectorImg.setMouseTransparent(true);
     primaryPane.add(effectSelectorImg, maxCols -1, 8);
-
 
     Label echo = new Label("Echo");
     echo.setAlignment(Pos.BOTTOM_RIGHT);
