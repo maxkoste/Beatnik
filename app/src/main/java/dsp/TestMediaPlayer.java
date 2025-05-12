@@ -244,7 +244,20 @@ public class TestMediaPlayer {
         setUp();
     }
 
-    public void setCueEnabled(boolean enabled) {
+    public synchronized void setCueEnabled(boolean enabled) {
+        if (enabled == cueEnabled) {
+            return;
+        }
+        if (enabled) {
+            if (cuePlayer != null) {
+                cuePlayer.startIfNeeded();
+            }
+        }
+        else {
+            if (cuePlayer != null) {
+                cuePlayer.stopAndFlush();
+            }
+        }
         this.cueEnabled = enabled;
     }
 

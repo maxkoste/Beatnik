@@ -58,6 +58,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private double screenHeight;
     private double screenWidth;
 
+    private ToggleGroup cueGroup = new ToggleGroup();
+    private ToggleButton channelOneCue;
+    private ToggleButton channelTwoCue;
+
     private Circle[] auIndicatorCirclesOne = new Circle[10];
     private Circle[] auIndicatorCirclesTwo = new Circle[10];
 
@@ -140,12 +144,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
         CircularSlider cueVolume = new CircularSlider(9, false);
         cueVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
             float volume = newValue.floatValue();
-            float scaled = (float) Math.ceil(volume / 2.7f);
 
-            if (channelOneActive) {
+            if (channelOneCue.isSelected()) {
                 controller.setCueVolume(1, volume);
             }
-            else {
+            else if (channelTwoCue.isSelected()) {
                 controller.setCueVolume(2, volume);
             }
         });
@@ -245,19 +248,20 @@ public class MainFrame implements EventHandler<ActionEvent> {
         AnchorPane.setLeftAnchor(crossFaderLabel, ((screenWidth / 2) - (crossFaderLabel.getPrefWidth() / 2)));
 
 
-        ToggleButton channelOneCue = new ToggleButton(); // Button that can be tied to boolean value
+        channelOneCue = new ToggleButton("CUE");
+        channelOneCue.setToggleGroup(cueGroup);
         channelOneCue.setPrefSize(50, 30);
         channelOneCue.setText("CUE");
         AnchorPane.setTopAnchor(channelOneCue, (screenHeight / 1.15));
         AnchorPane.setLeftAnchor(channelOneCue, ((screenWidth / 3.275)) - (channelOneCue.getPrefWidth() / 2));
 
-        ToggleButton channelTwoCue = new ToggleButton(); // Button that can be tied to boolean value
+        channelTwoCue = new ToggleButton("CUE");
+        channelTwoCue.setToggleGroup(cueGroup);
         channelTwoCue.setPrefSize(50, 30);
         channelTwoCue.setText("CUE");
         AnchorPane.setTopAnchor(channelTwoCue, (screenHeight / 1.15));
         AnchorPane.setLeftAnchor(channelTwoCue, ((screenWidth / 1.442) - (channelTwoCue.getPrefWidth() / 2)));
 
-        ToggleGroup cueGroup = new ToggleGroup();
         channelOneCue.setToggleGroup(cueGroup);
         channelTwoCue.setToggleGroup(cueGroup);
 

@@ -51,4 +51,15 @@ public class CustomAudioPlayer implements AudioProcessor {
         sourceLine.stop();
         sourceLine.close();
     }
+
+    public void stopAndFlush() {
+        sourceLine.stop();
+        sourceLine.flush();
+    }
+    public void startIfNeeded() {
+        if (!sourceLine.isRunning()) {
+            sourceLine.start();
+        }
+    }
+
 }
