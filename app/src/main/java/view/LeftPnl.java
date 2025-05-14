@@ -34,6 +34,8 @@ public class LeftPnl {
         });
         quantize.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         quantize.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+        quantize.setScaleX(0.8);
+        quantize.setScaleY(0.8);
         primaryPane.add(quantize, 1, 8);
 
         // image for the knob
@@ -41,6 +43,8 @@ public class LeftPnl {
         quantizeImg.fitWidthProperty().bind(quantize.widthProperty());
         quantizeImg.fitHeightProperty().bind(quantize.heightProperty());
         quantizeImg.setMouseTransparent(true);
+        quantizeImg.setScaleX(0.8);
+        quantizeImg.setScaleY(0.8);
         primaryPane.add(quantizeImg, 1, 8);
 
         Label quantizeLabel = new Label("Quantizer");
@@ -57,12 +61,16 @@ public class LeftPnl {
         });
         cueVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         cueVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+        cueVolume.setScaleX(0.8);
+        cueVolume.setScaleY(0.8);
         primaryPane.add(cueVolume, 1, maxCols - 1);
 
         ImageView cueImg = new ImageView("/Knobs/knob-bg.png");
         cueImg.fitWidthProperty().bind(cueVolume.widthProperty());
         cueImg.fitHeightProperty().bind(cueVolume.heightProperty());
         cueImg.setMouseTransparent(true);
+        cueImg.setScaleX(0.8);
+        cueImg.setScaleY(0.8);
         primaryPane.add(cueImg, 1, maxCols - 1);
 
         Label cueVolumeLabel = new Label("Cue Volume");
