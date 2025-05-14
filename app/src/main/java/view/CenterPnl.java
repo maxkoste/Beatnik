@@ -204,8 +204,10 @@ public class CenterPnl {
         channelTwoCue.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelTwoCue.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
         channelTwoCue.setBackground(Background.EMPTY);
+
         channelTwoCue.setScaleY(0.8);
         channelTwoCue.setScaleX(0.8);
+
         primaryPane.add(channelTwoCue, maxCols - 3, maxCols - 1);
 
         // Image overlay for channel one
