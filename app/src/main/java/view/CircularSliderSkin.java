@@ -1,26 +1,30 @@
 package view;
 
+import javafx.application.Platform;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.SkinBase;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 /**
  * This class is responsible for the logic and the appearance of the Knob.
  */
 public class CircularSliderSkin extends SkinBase<CircularSlider> {
 
-    private static final int size = 50;
-    private final Canvas canvas;
-    private final GraphicsContext gc;
     private double lastAngle; // Track last valid angle
     int tickCount;
     boolean snapToTick;
-    CircularSlider controll;
-
+    CircularSlider control;
+    private final StackPane container;
+    private final ImageView knobImage;
 
     /**
      * 
@@ -30,32 +34,45 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
      * @param snapToTick if the knob snaps to the values or is completely free like
      *                   a bird
      */
-    public CircularSliderSkin(CircularSlider control, int tickCount, boolean snapToTick) {
+    public CircularSliderSkin(CircularSlider control, int tickCount, boolean snapToTick, String imagePath) {
         super(control);
-        
-        this.controll = control;
 
         this.tickCount = tickCount;
         this.snapToTick = snapToTick;
-        canvas = new Canvas(size, size);
-        gc = canvas.getGraphicsContext2D();
+        this.control = control;
+        knobImage = new ImageView(new Image(imagePath));
 
+        knobImage.setPreserveRatio(true);
+
+        // Set preferred knob size
+        knobImage.setFitWidth(60);
+        knobImage.setFitHeight(60);
+        knobImage.setMouseTransparent(true);
+
+        container = new StackPane(knobImage);
+        container.setPrefSize(60, 60);
+        container.setMinSize(Double.MIN_VALUE, Double. MIN_VALUE);
+        container.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+        knobImage.fitWidthProperty().bind(container.widthProperty());
+        knobImage.fitHeightProperty().bind(container.heightProperty());
+        knobImage.setMouseTransparent(true);
+        knobImage.setPickOnBounds(true);
+
+        //MYSTICAL MAGICAL NODE that prevents closely placed CircularSliders from eating mouse events (took me 5ish hours)
+        Rectangle clip = new Rectangle();
+        clip.widthProperty().bind(container.widthProperty());
+        clip.heightProperty().bind(container.heightProperty());
+        container.setClip(clip);
+
+        container.setOnMousePressed(this::handleMouseDrag);
+        container.setOnMouseDragged(this::handleMouseDrag);
+
+        getChildren().add(container);
+
+        // Initial position
         lastAngle = control.getAngle();
         drawKnob(control.getAngle());
-
-        canvas.setOnMouseDragged(this::handleMouseDrag);
-        canvas.setOnMousePressed(this::handleMouseDrag);
-
-        StackPane container = new StackPane();
-        container.setPrefSize(size, size);
-
-        container.getChildren().addAll(canvas);
-
-        ImageView knobImage = control.getKnobImage();
-        knobImage.setMouseTransparent(true);  // Make the image ignore mouse events
-        container.getChildren().add(knobImage); // The image will be underneath the canvas
-
-        getChildren().add(container);;
     }
 
     /**
@@ -69,8 +86,11 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
      * @param event the user moved my knob
      */
     private void handleMouseDrag(MouseEvent event) {
-        double centerX = size / 2.0;
-        double centerY = size / 2.0;
+        Bounds bounds = container.getLayoutBounds();
+        double centerX = bounds.getWidth() / 2.0;
+        double centerY = bounds.getHeight() / 2.0;
+
+        // Get mouse position relative to the container
         double dx = event.getX() - centerX;
         double dy = event.getY() - centerY;
 
@@ -104,7 +124,6 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
 
         lastAngle = newAngle;
 
-        CircularSlider control = getSkinnable();
         control.setAngle(newAngle);
         drawKnob(newAngle);
     }
@@ -116,42 +135,13 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
      * @param angle the current position of the knob.
      */
     public void drawKnob(double angle) {
-        gc.clearRect(0, 0, size, size);
-
-        gc.setFill(Color.LIGHTGRAY);
-        gc.fillOval(0, 0, size, size);
-        gc.setFill(Color.DARKGRAY);
-        gc.fillOval(10, 10, size - 20, size - 20);
-
-        double centerX = size / 2.0;
-        double centerY = size / 2.0;
-        double knobRadius = (size / 2.0) - 5;
-        double tickLength = 5;
-
-        for (int i = 0; i < tickCount; i++) {
-        double tickAngle = 270.0 * (i / (double) (tickCount - 1)) - 225;
-        double innerX = centerX + (knobRadius - tickLength) *
-        Math.cos(Math.toRadians(tickAngle));
-        double innerY = centerY + (knobRadius - tickLength) *
-        Math.sin(Math.toRadians(tickAngle));
-        double outerX = centerX + (knobRadius + 2) *
-        Math.cos(Math.toRadians(tickAngle));
-        double outerY = centerY + (knobRadius + 2) *
-        Math.sin(Math.toRadians(tickAngle));
-
-        gc.setStroke(Color.DARKGRAY);
-        gc.setLineWidth(2);
-        gc.strokeLine(innerX, innerY, outerX, outerY);
-        }
-
-        double knobX = centerX + knobRadius * Math.cos(Math.toRadians(angle + 135));
-        double knobY = centerY + knobRadius * Math.sin(Math.toRadians(angle + 135));
-
-        gc.setFill(Color.DARKGRAY);
-        gc.fillOval(knobX - 5, knobY - 5, 10, 10);
-
         // Rotate the knob image from the control
-        ImageView knobImage = controll.getKnobImage();
-        knobImage.setRotate(angle - 135); // Normalize rotation
+        Platform.runLater(() -> {
+            knobImage.setRotate(angle - 135); // Normalize rotation
+        });
+    }
+
+    public void setLastAngle(double angle) {
+        lastAngle = angle;
     }
 }
