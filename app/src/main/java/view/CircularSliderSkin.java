@@ -51,7 +51,7 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
 
         container = new StackPane(knobImage);
         container.setPrefSize(60, 60);
-        container.setMinSize(Double.MIN_VALUE, Double. MIN_VALUE);
+        container.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
         container.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
         knobImage.fitWidthProperty().bind(container.widthProperty());
@@ -59,7 +59,8 @@ public class CircularSliderSkin extends SkinBase<CircularSlider> {
         knobImage.setMouseTransparent(true);
         knobImage.setPickOnBounds(true);
 
-        //MYSTICAL MAGICAL NODE that prevents closely placed CircularSliders from eating mouse events (took me 5ish hours)
+        // MYSTICAL MAGICAL NODE that prevents closely placed CircularSliders from
+        // eating mouse events (took me 5ish hours)
         Rectangle clip = new Rectangle();
         clip.widthProperty().bind(container.widthProperty());
         clip.heightProperty().bind(container.heightProperty());
