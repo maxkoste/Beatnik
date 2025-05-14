@@ -84,6 +84,7 @@ public class Controller {
                 float[] songData = extract(songName);
                 synchronized (lock) {
                     songsData.put(songName, songData);
+                    frame.updateLoading(songFileNames.size());
                 }
             });
             extractor.setDaemon(true);

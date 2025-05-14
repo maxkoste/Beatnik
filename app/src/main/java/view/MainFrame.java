@@ -13,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -31,9 +32,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private GridPane primaryPane;
     private BorderPane songsPane;
     private BorderPane playlistsPane;
+    private StackPane startUpPane;
+    private Stage primaryStage;
     private Stage playlistStage;
+    private Scene primaryScene;
     private Scene songsScene;
     private Scene playlistsScene;
+    private ProgressBar progressBar;
     private MultipleSelectionModel<String> songSelector;
     private SelectionModel<String> playlistSelector;
     private ListView<String> currentPlaylist;
@@ -47,6 +52,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private LeftPnl leftPnl;
     private RightPnl rightPnl;
     private CenterPnl centerPnl;
+    private int progressCounter;
 
     public MainFrame(Controller controller) {
         this.controller = controller;
@@ -65,7 +71,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         playlistStage.setResizable(true);
 
         StackPane root = new StackPane(); // Root layout with padding background
-        BorderPane startUpPane = new BorderPane(); // Pane which contains startup content
+        startUpPane = new StackPane(); // Pane which contains startup content
         primaryPane = new GridPane(); // Pane which contains all content
         songsPane = new BorderPane(); // Pane which contains songs popup content
         playlistsPane = new BorderPane(); // Pane which contains currentPlaylist popup content
@@ -97,30 +103,43 @@ public class MainFrame implements EventHandler<ActionEvent> {
             primaryPane.getRowConstraints().add(rowConst);
         }
 
+        initializeStartUpPane(screenHeight);
         initializeSongsPane();
         initializePlaylistPane();
-        //topPnl = new TopPnl(this, controller, primaryPane, numCols);
-        //leftPnl = new LeftPnl(this, primaryPane, numCols);
-        //rightPnl = new RightPnl(this, primaryPane, numCols);
-        //centerPnl = new CenterPnl(controller, primaryPane, numCols);
+        topPnl = new TopPnl(this, controller, primaryPane, numCols);
+        leftPnl = new LeftPnl(this, primaryPane, numCols);
+        rightPnl = new RightPnl(this, primaryPane, numCols);
+        centerPnl = new CenterPnl(controller, primaryPane, numCols);
 
-        Scene primaryScene = new Scene(root, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
+        primaryScene = new Scene(root, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
         Scene startUpScene = new Scene(startUpPane, (screenHeight * 0.9), (screenHeight * 0.9));
 
         songsScene = new Scene(songsPane, (screenHeight * 0.7), (screenHeight * 0.7));
         playlistsScene = new Scene(playlistsPane, (screenHeight * 0.7), (screenHeight * 0.7));
 
+        startUpScene.getStylesheets().add("styles.css");
+        primaryScene.getStylesheets().add("styles.css");
         playlistsScene.getStylesheets().add("styles.css");
         songsScene.getStylesheets().add("styles.css");
         primaryStage.getIcons().add(new Image("/Logo/beatnik-logo.png"));
-        primaryStage.setScene(primaryScene); // Finalize window to be shown
-        primaryScene.getStylesheets().add("styles.css");
+        primaryStage.setScene(startUpScene); // Finalize window to be shown
         primaryStage.show();
 
         playlistStage.setScene(songsScene);
         playlistStage.initModality(Modality.APPLICATION_MODAL);
 
         onClose(primaryStage);
+        this.primaryStage = primaryStage;
+    }
+
+    public void updateLoading(double nbrOfSongsToLoad) {
+        Platform.runLater(() -> {
+            progressCounter++;
+            progressBar.setProgress(progressCounter/nbrOfSongsToLoad);
+            if (progressCounter >= nbrOfSongsToLoad) {
+                primaryStage.setScene(primaryScene);
+            }
+        });
     }
 
     /**
@@ -132,6 +151,21 @@ public class MainFrame implements EventHandler<ActionEvent> {
         primaryStage.setOnCloseRequest(event -> {
             controller.shutDown();
         });
+    }
+
+    public void initializeStartUpPane(double screenHeight) {
+        ImageView logo = new ImageView(new Image("/Logo/beatnik-logo.png"));
+        logo.setFitHeight(screenHeight * 0.35);
+        logo.setFitWidth(screenHeight * 0.35);
+
+        progressBar = new ProgressBar();
+        HBox progressBarContainer = new HBox(progressBar);
+        progressBarContainer.setAlignment(Pos.CENTER);
+
+        VBox container = new VBox(20, logo, progressBarContainer);
+        container.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        startUpPane.setAlignment(Pos.CENTER);
+        startUpPane.getChildren().add(container);
     }
 
     public void initializeSongsPane() {
