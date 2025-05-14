@@ -62,7 +62,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         playlistStage = new Stage();
         playlistStage.setTitle("All Songs");
-        playlistStage.setResizable(true);
+        playlistStage.setResizable(false);
 
         StackPane root = new StackPane(); // Root layout with padding background
         primaryPane = new GridPane(); // Pane which contains all content
