@@ -85,13 +85,15 @@ public class Controller {
                 }
             } else {
                 int pos = i;
-                new Thread(() -> {
+                Thread extractor = new Thread(() -> {
                     String songName = songFileNames.get(pos);
                     float[] songData = extract(songName);
                     synchronized (lock) {
                         songsData.put(songName, songData);
                     }
-                }).start();
+                });
+                extractor.setDaemon(true);
+                extractor.start();
             }
         }
     }

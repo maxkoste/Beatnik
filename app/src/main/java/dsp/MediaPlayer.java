@@ -137,6 +137,7 @@ public class MediaPlayer {
         if (!started) {
             this.audioThread = new Thread(playbackDispatcher, "Playback Thread");
             audioThread.setPriority(Thread.MAX_PRIORITY);
+            audioThread.setDaemon(true);
             audioThread.start();
             started = true;
             isPlaying = true;
