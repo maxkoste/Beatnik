@@ -161,6 +161,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         progressBar = new ProgressBar();
         HBox progressBarContainer = new HBox(progressBar);
         progressBarContainer.setAlignment(Pos.CENTER);
+        progressBarContainer.setScaleX(4.0);
 
         VBox container = new VBox(20, logo, progressBarContainer);
         container.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
