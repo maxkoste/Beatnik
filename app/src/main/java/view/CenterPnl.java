@@ -178,8 +178,8 @@ public class CenterPnl {
             auIndicatorCirclesOne[i] = dot;
         }
 
-        GridPane.setRowSpan(audioIndicatorOne, 3);
-        primaryPane.add(audioIndicatorOne, 4, maxCols - 4);
+        GridPane.setRowSpan(audioIndicatorOne, 5);
+        primaryPane.add(audioIndicatorOne, 4, maxCols - 6);
     }
 
     private void initializeChannelTwo() {
@@ -312,8 +312,8 @@ public class CenterPnl {
             auIndicatorCirclesTwo[i] = dot;
         }
 
-        GridPane.setRowSpan(audioIndicatorTwo, 3);
-        primaryPane.add(audioIndicatorTwo, maxCols - 4, maxCols - 4);
+        GridPane.setRowSpan(audioIndicatorTwo, 5);
+        primaryPane.add(audioIndicatorTwo, maxCols - 4, maxCols - 6);
     }
 
     public void updateAudioIndicatorOne(double rms) {
