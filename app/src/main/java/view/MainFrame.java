@@ -69,15 +69,15 @@ public class MainFrame implements EventHandler<ActionEvent> {
         songsPane = new BorderPane(); // Pane which contains songs popup content
         playlistsPane = new BorderPane(); // Pane which contains currentPlaylist popup content
 
-        primaryPane.maxWidthProperty().bind(Bindings.createDoubleBinding(() ->
-                Math.min(root.getWidth(), root.getHeight()), root.widthProperty(), root.heightProperty()));
+        primaryPane.maxWidthProperty().bind(Bindings.createDoubleBinding(
+                () -> Math.min(root.getWidth(), root.getHeight()), root.widthProperty(), root.heightProperty()));
 
         primaryPane.maxHeightProperty().bind(primaryPane.maxWidthProperty());
         primaryPane.minWidthProperty().bind(primaryPane.maxWidthProperty());
         primaryPane.minHeightProperty().bind(primaryPane.maxHeightProperty());
 
         primaryPane.setAlignment(Pos.CENTER);
-        primaryPane.setGridLinesVisible(true); //TODO: TEMPORARY?
+        primaryPane.setGridLinesVisible(true); // TODO: TEMPORARY?
 
         root.getChildren().add(primaryPane);
 
@@ -201,7 +201,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
         switchChannelTwo = new Button("1");
         switchChannelTwo.setOnAction(this::handleChannelSwitch);
 
-        ToolBar playlistMenu = new ToolBar(viewSongs, editName, removeSongsFromPlaylist, deletePlaylist, switchChannelTwo);
+        ToolBar playlistMenu = new ToolBar(viewSongs, editName, removeSongsFromPlaylist, deletePlaylist,
+                switchChannelTwo);
         playlistsPane.setTop(playlistMenu);
     }
 
