@@ -42,6 +42,7 @@ public class CenterPnl {
         });
         crossFader.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         crossFader.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+        crossFader.setStyle("-fx-padding: 0;");
 
         BorderPane crossFaderContainer = new BorderPane();
         GridPane.setColumnSpan(crossFaderContainer, 3);
@@ -89,6 +90,7 @@ public class CenterPnl {
         });
         channelOneVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelOneVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+        channelOneVolume.setStyle("-fx-padding: 0;");
         GridPane.setRowSpan(channelOneVolume, 3);
         primaryPane.add(channelOneVolume, 3, maxCols - 4);
 
@@ -170,14 +172,14 @@ public class CenterPnl {
             VBox.setVgrow(circleWrapper, Priority.ALWAYS);
 
             // Bind the radius to a fraction of the container height
-            dot.radiusProperty().bind(audioIndicatorOne.heightProperty().multiply(0.025));
+            dot.radiusProperty().bind(audioIndicatorOne.heightProperty().multiply(0.020));
             audioIndicatorOne.getChildren().add(circleWrapper);
 
             auIndicatorCirclesOne[i] = dot;
         }
 
-        GridPane.setRowSpan(audioIndicatorOne, 5);
-        primaryPane.add(audioIndicatorOne, 4, maxCols - 6);
+        GridPane.setRowSpan(audioIndicatorOne, 3);
+        primaryPane.add(audioIndicatorOne, 4, maxCols - 4);
     }
 
     private void initializeChannelTwo() {
@@ -212,6 +214,9 @@ public class CenterPnl {
         });
         channelTwoVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelTwoVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+
+        channelTwoVolume.setStyle("-fx-padding: 0;");
+
         GridPane.setRowSpan(channelTwoVolume, 3);
         primaryPane.add(channelTwoVolume, maxCols - 3, maxCols - 4);
 
@@ -301,14 +306,14 @@ public class CenterPnl {
             VBox.setVgrow(circleWrapper, Priority.ALWAYS);
 
             // Bind the radius to a fraction of the container height
-            dot.radiusProperty().bind(audioIndicatorTwo.heightProperty().multiply(0.025));
+            dot.radiusProperty().bind(audioIndicatorTwo.heightProperty().multiply(0.020));
             audioIndicatorTwo.getChildren().add(circleWrapper);
 
             auIndicatorCirclesTwo[i] = dot;
         }
 
-        GridPane.setRowSpan(audioIndicatorTwo, 5);
-        primaryPane.add(audioIndicatorTwo, maxCols - 4, maxCols - 6);
+        GridPane.setRowSpan(audioIndicatorTwo, 3);
+        primaryPane.add(audioIndicatorTwo, maxCols - 4, maxCols - 4);
     }
 
     public void updateAudioIndicatorOne(double rms) {
