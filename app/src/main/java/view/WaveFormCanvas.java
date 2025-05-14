@@ -107,9 +107,10 @@ public class WaveFormCanvas extends Canvas {
                 float sampleValue = audioData[index];
                 double y = sampleValue * midY;
 
-                //Rainbow effect
-                //double hue = (x * 360.0 / widthX) % 360; // Gradual color shift from left to right
-                //gc.setStroke(Color.hsb(hue, 1.0, 1.0));
+                // Rainbow effect
+                // double hue = (x * 360.0 / widthX) % 360; // Gradual color shift from left to
+                // right
+                // gc.setStroke(Color.hsb(hue, 1.0, 1.0));
 
                 // Color based on the amplitude of the sample value
                 float normalizedSample = Math.abs(sampleValue); // Range from 0 to 1
