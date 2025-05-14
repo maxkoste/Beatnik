@@ -90,7 +90,7 @@ public class CenterPnl {
         });
         channelOneVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelOneVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        channelOneVolume.setStyle("-fx-padding: 0;");
+        // channelOneVolume.setStyle("-fx-padding: 0;");
         GridPane.setRowSpan(channelOneVolume, 3);
         primaryPane.add(channelOneVolume, 3, maxCols - 4);
 
@@ -215,7 +215,7 @@ public class CenterPnl {
         channelTwoVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelTwoVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 
-        channelTwoVolume.setStyle("-fx-padding: 0;");
+        // channelTwoVolume.setStyle("-fx-padding: 0;");
 
         GridPane.setRowSpan(channelTwoVolume, 3);
         primaryPane.add(channelTwoVolume, maxCols - 3, maxCols - 4);
