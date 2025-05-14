@@ -50,7 +50,7 @@ public class Controller {
         effectIntensityMap = new HashMap<String, Float>();
         effectIntensityMap.put("delay", 0.0F);
         effectIntensityMap.put("flanger", 0.0F);
-        effectIntensityMap.put("placebo", 0.0F);
+        effectIntensityMap.put("filter", 0.0F); 
         effectIntensityMap.put("PLACEHOLDER", 0.0F);
         effectIntensityMap.put("PLACEHOLDER2", 0.0F);
 
@@ -61,7 +61,8 @@ public class Controller {
         frame = new MainFrame(this);
         playlistManager = new PlaylistManager(frame);
         frame.setPlaylistManager(playlistManager);
-        this.currentEffect = "delay";
+        this.currentEffect = "filter"; //the knob for the effect selector starts at 12 o clock 
+                                       // which is the filter effect 
         startUp(primaryStage);
     }
 
@@ -187,7 +188,7 @@ public class Controller {
                 this.currentEffect = "flanger";
                 break;
             case 135:
-                this.currentEffect = "placebo";
+                this.currentEffect = "filter";
                 break;
             case 204:
                 this.currentEffect = "PLACEHOLDER";
@@ -297,6 +298,9 @@ public class Controller {
                 audioPlayer1.setFlangerEffectMix(mix);
                 audioPlayer2.setFlangerEffectMix(mix);
                 break;
+            case "filter":
+                audioPlayer1.setFilterFrequency(mix);
+                audioPlayer2.setFilterFrequency(mix);
             default:
                 break;
         }

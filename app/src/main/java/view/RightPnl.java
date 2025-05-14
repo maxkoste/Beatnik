@@ -55,6 +55,7 @@ public class RightPnl {
             float savedMix = mainFrame.getCurrentEffectMix();
             float knobValue = savedMix * 270.0f;
             effectIntensity.setAngle(knobValue);
+            mainFrame.setEffectMix(savedMix);
         });
         effectSelector.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         effectSelector.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
@@ -78,7 +79,7 @@ public class RightPnl {
         flanger.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
         primaryPane.add(flanger, maxCols - 2, 8);
 
-        Label placebo = new Label("Placebo");
+        Label placebo = new Label("Filter");
         placebo.setAlignment(Pos.BOTTOM_CENTER);
         placebo.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         placebo.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
