@@ -156,14 +156,15 @@ public class MainFrame implements EventHandler<ActionEvent> {
     public void initializeStartUpPane(double screenHeight) {
         ImageView logo = new ImageView(new Image("/Logo/beatnik-logo.png"));
         logo.setFitHeight(screenHeight * 0.35);
-        logo.setFitWidth(screenHeight * 0.35);
+        logo.setPreserveRatio(true);
 
         progressBar = new ProgressBar();
+        progressBar.setPrefWidth(screenHeight * 0.35);
         HBox progressBarContainer = new HBox(progressBar);
         progressBarContainer.setAlignment(Pos.CENTER);
-        progressBarContainer.setScaleX(4.0);
+        progressBarContainer.setScaleX(0.91);
 
-        VBox container = new VBox(20, logo, progressBarContainer);
+        VBox container = new VBox(logo, progressBarContainer);
         container.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         startUpPane.setAlignment(Pos.CENTER);
         startUpPane.getChildren().add(container);
