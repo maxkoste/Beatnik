@@ -32,6 +32,9 @@ public class MediaPlayer {
     private Thread audioThread;
     private final Object lock = new Object();
     private RateTransposer rateTransposer;
+    private LowPassEqualizer lowPassFilter;
+    private float smoothedFrequency = -1; // -1 indicates not initialized
+    private final float smoothingFactor = 0.1f; // Smaller = smoother
 
     public MediaPlayer() {
 
@@ -79,6 +82,8 @@ public class MediaPlayer {
                     5000, 7000); // 7khz center, 5kHz bandwidth
             delayEffect = new Delay(0.5, 0.6, format.getSampleRate());
             rateTransposer = new RateTransposer(1.0F);
+            lowPassFilter = new LowPassEqualizer(20000f, format.getSampleRate());
+
             // Add volume controll first
             volumeProcessor = new GainProcessor(0.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
@@ -89,6 +94,7 @@ public class MediaPlayer {
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
             playbackDispatcher.addAudioProcessor(rateTransposer);
+            playbackDispatcher.addAudioProcessor(lowPassFilter);
             playbackDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
                 public boolean process(AudioEvent audioEvent) {
@@ -153,6 +159,28 @@ public class MediaPlayer {
         }
     }
 
+    /**
+     * Helper method to map the value 0.0 - 1.0 to 20 000 hz-70hz
+     * 
+     * @param normalizedValue
+     * @return
+     */
+    public float mapNormalizedToFrequency(float normalizedValue) {
+        normalizedValue = Math.max(0.0f, Math.min(1.0f, normalizedValue));
+
+        float minFreq = 70.0f;
+        float maxFreq = 20000.0f;
+
+        double minLog = Math.log10(minFreq);
+        double maxLog = Math.log10(maxFreq);
+
+        // Shape the input to make upper values less sensitive
+        float shaped = normalizedValue * normalizedValue;
+
+        double logFreq = maxLog - shaped * (maxLog - minLog);
+        return (float) Math.pow(10, logFreq);
+    }
+
     public void setPlaybackSpeed(double speedFactor) {
         if (rateTransposer != null) {
             rateTransposer.setFactor(speedFactor);
@@ -164,6 +192,32 @@ public class MediaPlayer {
             // Convert volume percentage (0-100) to gain multiplier (0.0-1.0)
             float gain = volume / 100.0f;
             volumeProcessor.setGain(gain);
+        }
+    }
+
+    /**
+     * Takes the mix value between 0.0 and 1.0 from the effect-selector
+     * passes it to a helper function which maps it to a frequency and
+     * applies it to the filter
+     * Smoothes out the jumps in frequency if the user is turning the knob 
+     * aggressivly or making big jumps. This is to avoid harsh noises 
+     * or clicks that are an effect of big jumps near the lower end of the 
+     * frequency spectrum.
+     * 
+     * @param frequency
+     */
+    public void setFilterFrequency(float frequency) {
+        if (lowPassFilter != null) {
+            float targetFreq = mapNormalizedToFrequency(frequency);
+
+            if (smoothedFrequency < 0) {
+                smoothedFrequency = targetFreq; // initialize on first call
+            } else {
+                // Apply exponential smoothing
+                smoothedFrequency += smoothingFactor * (targetFreq - smoothedFrequency);
+            }
+
+            lowPassFilter.setFrequency(smoothedFrequency);
         }
     }
 
