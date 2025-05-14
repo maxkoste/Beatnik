@@ -50,6 +50,9 @@ public class Controller {
         effectIntensityMap = new HashMap<String, Float>();
         effectIntensityMap.put("delay", 0.0F);
         effectIntensityMap.put("flanger", 0.0F);
+        effectIntensityMap.put("placebo", 0.0F);
+        effectIntensityMap.put("PLACEHOLDER", 0.0F);
+        effectIntensityMap.put("PLACEHOLDER2", 0.0F);
 
         audioPlayer1 = new MediaPlayer();
         audioPlayer2 = new MediaPlayer();
@@ -57,7 +60,7 @@ public class Controller {
         timerThreadTwo = new TimerThreadTwo();
         frame = new MainFrame(this);
         playlistManager = new PlaylistManager(frame);
-        frame.registerPlaylistManager(playlistManager);
+        frame.setPlaylistManager(playlistManager);
         this.currentEffect = "delay";
         startUp(primaryStage);
     }
@@ -74,14 +77,24 @@ public class Controller {
     private void preloadSongData() {
         ObservableList<String> songFileNames = playlistManager.getSongsGUI();
         for (int i = 0; i < songFileNames.size(); i++) {
-            int pos = i;
-            new Thread(() -> {
-                String songName = songFileNames.get(pos);
+            if (i == songFileNames.size() -1) {
+                String songName = songFileNames.get(i);
                 float[] songData = extract(songName);
                 synchronized (lock) {
                     songsData.put(songName, songData);
                 }
-            }).start();
+            } else {
+                int pos = i;
+                Thread extractor = new Thread(() -> {
+                    String songName = songFileNames.get(pos);
+                    float[] songData = extract(songName);
+                    synchronized (lock) {
+                        songsData.put(songName, songData);
+                    }
+                });
+                extractor.setDaemon(true);
+                extractor.start();
+            }
         }
     }
 
@@ -89,9 +102,11 @@ public class Controller {
      * Method for cleaning up resources and stopping the playback of any audio
      */
     public void shutDown() {
-        if (audioPlayer1 != null && audioPlayer2 != null) {
-            audioPlayer2.shutDown();
+        if (audioPlayer1 != null) {
             audioPlayer1.shutDown();
+        }
+        if (audioPlayer2 != null) {
+            audioPlayer2.shutDown();
         }
         if (timerOne != null) {
             timerOne.cancel();
@@ -99,10 +114,12 @@ public class Controller {
         if (timerTwo != null) {
             timerTwo.cancel();
         }
-        if (dispatcherOne != null)
+        if (dispatcherOne != null) {
             dispatcherOne.stop();
-        if (dispatcherTwo != null)
+        }
+        if (dispatcherTwo != null) {
             dispatcherTwo.stop();
+        }
     }
 
     public void setSong(int channel, String songPath) {
@@ -170,13 +187,13 @@ public class Controller {
                 this.currentEffect = "flanger";
                 break;
             case 135:
-                System.out.println("Effect nr 3");
+                this.currentEffect = "placebo";
                 break;
             case 204:
-                System.out.println("Effect nr 4 ");
+                this.currentEffect = "PLACEHOLDER";
                 break;
             case 270:
-                System.out.println("Effect nr 5");
+                this.currentEffect = "PLACEHOLDER2";
                 break;
             default:
                 System.out.println("Something went wrong...");
@@ -188,7 +205,7 @@ public class Controller {
                 0.0F);
     }
 
-    public void nextSong(int channel) { // TODO: Update GUI with names etc
+    public void nextSong(int channel) {
         if (playlistSongPaths != null) {
             if (!(currentPosInPlaylist >= playlistSongPaths.size() - 1)) {
                 currentPosInPlaylist++;
@@ -209,6 +226,7 @@ public class Controller {
     }
 
     public void setChannelOneVolume(float volume) {
+
         audioPlayer1.setVolume((volume * masterModifier) * crossfaderModifier1);
         latestVolume1 = volume;
     }
@@ -254,7 +272,7 @@ public class Controller {
         audioPlayer1.setPlaybackSpeed(speedFactor);
     }
 
-    public void ssetPlaybackSpeedCh2(double speedFactor) {
+    public void setPlaybackSpeedCh2(double speedFactor) {
         audioPlayer2.setPlaybackSpeed(speedFactor);
     }
 

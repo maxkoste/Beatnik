@@ -61,9 +61,10 @@ public class MediaPlayer {
              * suuuper weird when doing this.. this needs to be fixed!!
              */
 
-            //File audioFile = new File(fullPath);
-            //playbackDispatcher = AudioDispatcherFactory.fromFile(audioFile, 4096, 512);
-            //playbackDispatcher = DispatcherFactory.fromPipeStereo(fullPath, 48000, 4096, 0);
+            // File audioFile = new File(fullPath);
+            // playbackDispatcher = AudioDispatcherFactory.fromFile(audioFile, 4096, 512);
+            // playbackDispatcher = DispatcherFactory.fromPipeStereo(fullPath, 48000, 4096,
+            // 0);
 
             playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath,
                     48000, 4096, 0);
@@ -136,6 +137,7 @@ public class MediaPlayer {
         if (!started) {
             this.audioThread = new Thread(playbackDispatcher, "Playback Thread");
             audioThread.setPriority(Thread.MAX_PRIORITY);
+            audioThread.setDaemon(true);
             audioThread.start();
             started = true;
             isPlaying = true;
@@ -152,7 +154,9 @@ public class MediaPlayer {
     }
 
     public void setPlaybackSpeed(double speedFactor) {
-        rateTransposer.setFactor(speedFactor);
+        if (rateTransposer != null) {
+            rateTransposer.setFactor(speedFactor);
+        }
     }
 
     public void setVolume(float volume) {
@@ -164,11 +168,15 @@ public class MediaPlayer {
     }
 
     public void setTreble(float trebleGain) {
-        trebleEqualizer.setGain(trebleGain);
+        if (trebleEqualizer != null) {
+            trebleEqualizer.setGain(trebleGain);
+        }
     }
 
     public void setBass(float bassGain) {
-        bassEqualizer.setGain(bassGain);
+        if (bassEqualizer != null) {
+            bassEqualizer.setGain(bassGain);
+        }
     }
 
     /**
@@ -202,7 +210,10 @@ public class MediaPlayer {
      *         audio.
      */
     public AudioDispatcher getAudioDispatcher() {
-        return playbackDispatcher;
+        if (playbackDispatcher != null) {
+            return playbackDispatcher;
+        } else
+            return null;
     }
 
     /**
