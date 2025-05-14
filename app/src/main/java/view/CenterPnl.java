@@ -63,14 +63,14 @@ public class CenterPnl {
     channelOneCue.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     channelOneCue.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
     channelOneCue.setBackground(Background.EMPTY);
-    primaryPane.add(channelOneCue, 3, maxCols);
+    primaryPane.add(channelOneCue, 3, maxCols - 1);
 
     // Image overlay for channel one
     ImageView channelOneCueImage = new ImageView("/Buttons/cue-passive.png");
     channelOneCueImage.fitWidthProperty().bind(channelOneCue.widthProperty());
     channelOneCueImage.fitHeightProperty().bind(channelOneCue.heightProperty());
     channelOneCueImage.setMouseTransparent(true); // Allow mouse events to pass through
-    primaryPane.add(channelOneCueImage, 3, maxCols);
+    primaryPane.add(channelOneCueImage, 3, maxCols - 1);
 
     // Toggle image on button state change
     channelOneCue.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
@@ -90,7 +90,7 @@ public class CenterPnl {
     channelOneVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     channelOneVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
     GridPane.setRowSpan(channelOneVolume, 3);
-    primaryPane.add(channelOneVolume, 3, maxCols -3);
+    primaryPane.add(channelOneVolume, 3, maxCols -4);
 
     CircularSlider channelOneBass = new CircularSlider(9, false, "/Knobs/knob-blue-fg.png");
     channelOneBass.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -170,7 +170,7 @@ public class CenterPnl {
       VBox.setVgrow(circleWrapper, Priority.ALWAYS);
 
       // Bind the radius to a fraction of the container height
-      dot.radiusProperty().bind(audioIndicatorOne.heightProperty().multiply(0.03));
+      dot.radiusProperty().bind(audioIndicatorOne.heightProperty().multiply(0.015));
       audioIndicatorOne.getChildren().add(circleWrapper);
 
       auIndicatorCirclesOne[i] = dot;
@@ -185,14 +185,14 @@ public class CenterPnl {
     channelTwoCue.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     channelTwoCue.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
     channelTwoCue.setBackground(Background.EMPTY);
-    primaryPane.add(channelTwoCue, maxCols -3, maxCols);
+    primaryPane.add(channelTwoCue, maxCols -3, maxCols - 1);
 
     // Image overlay for channel one
     ImageView channelTwoCueImage = new ImageView("/Buttons/cue-passive.png");
     channelTwoCueImage.fitWidthProperty().bind(channelTwoCue.widthProperty());
     channelTwoCueImage.fitHeightProperty().bind(channelTwoCue.heightProperty());
     channelTwoCueImage.setMouseTransparent(true); // Allow mouse events to pass through
-    primaryPane.add(channelTwoCueImage, maxCols -3, maxCols);
+    primaryPane.add(channelTwoCueImage, maxCols -3, maxCols - 1);
 
     // Toggle image on button state change
     channelTwoCue.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
@@ -213,7 +213,7 @@ public class CenterPnl {
     channelTwoVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
     channelTwoVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
     GridPane.setRowSpan(channelTwoVolume, 3);
-    primaryPane.add(channelTwoVolume, maxCols -3, maxCols -3);
+    primaryPane.add(channelTwoVolume, maxCols -3, maxCols -4);
 
     CircularSlider channelTwoBass = new CircularSlider(9, false, "/Knobs/knob-blue-fg.png");
     channelTwoBass.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -301,7 +301,7 @@ public class CenterPnl {
       VBox.setVgrow(circleWrapper, Priority.ALWAYS);
 
       // Bind the radius to a fraction of the container height
-      dot.radiusProperty().bind(audioIndicatorTwo.heightProperty().multiply(0.03));
+      dot.radiusProperty().bind(audioIndicatorTwo.heightProperty().multiply(0.015));
       audioIndicatorTwo.getChildren().add(circleWrapper);
 
       auIndicatorCirclesTwo[i] = dot;
