@@ -18,8 +18,8 @@ public class CenterPnl {
     private Controller controller;
     private GridPane primaryPane;
     private int maxCols;
-    private Circle[] auIndicatorCirclesOne = new Circle[10];
-    private Circle[] auIndicatorCirclesTwo = new Circle[10];
+    private Circle[] auIndicatorCirclesOne = new Circle[15];
+    private Circle[] auIndicatorCirclesTwo = new Circle[15];
 
     public CenterPnl(Controller controller, GridPane primaryPane, int maxCols) {
         this.controller = controller;
@@ -189,14 +189,14 @@ public class CenterPnl {
             VBox.setVgrow(circleWrapper, Priority.ALWAYS);
 
             // Bind the radius to a fraction of the container height
-            dot.radiusProperty().bind(audioIndicatorOne.heightProperty().multiply(0.020));
+            dot.radiusProperty().bind(audioIndicatorOne.heightProperty().multiply(0.012));
             audioIndicatorOne.getChildren().add(circleWrapper);
 
             auIndicatorCirclesOne[i] = dot;
         }
 
-        GridPane.setRowSpan(audioIndicatorOne, 3);
-        primaryPane.add(audioIndicatorOne, 4, maxCols - 4);
+        GridPane.setRowSpan(audioIndicatorOne, 5);
+        primaryPane.add(audioIndicatorOne, 4, maxCols - 6);
     }
 
     private void initializeChannelTwo() {
@@ -342,14 +342,14 @@ public class CenterPnl {
             VBox.setVgrow(circleWrapper, Priority.ALWAYS);
 
             // Bind the radius to a fraction of the container height
-            dot.radiusProperty().bind(audioIndicatorTwo.heightProperty().multiply(0.020));
+            dot.radiusProperty().bind(audioIndicatorTwo.heightProperty().multiply(0.012));
             audioIndicatorTwo.getChildren().add(circleWrapper);
 
             auIndicatorCirclesTwo[i] = dot;
         }
 
-        GridPane.setRowSpan(audioIndicatorTwo, 3);
-        primaryPane.add(audioIndicatorTwo, maxCols - 4, maxCols - 4);
+        GridPane.setRowSpan(audioIndicatorTwo, 5);
+        primaryPane.add(audioIndicatorTwo, maxCols - 4, maxCols - 6);
     }
 
     public void updateAudioIndicatorOne(double rms) {
@@ -361,7 +361,7 @@ public class CenterPnl {
                 Color targetColor;
 
                 if (i < activeDots) {
-                    targetColor = (i < 5) ? Color.LIGHTGREEN : (i < 8) ? Color.GOLD : Color.RED;
+                    targetColor = (i < 8) ? Color.LIGHTGREEN : (i < 13) ? Color.GOLD : Color.RED;
                 } else {
                     targetColor = Color.GRAY;
                 }
@@ -381,7 +381,7 @@ public class CenterPnl {
                 Color targetColor;
 
                 if (i < activeDots) {
-                    targetColor = (i < 5) ? Color.LIGHTGREEN : (i < 8) ? Color.GOLD : Color.RED;
+                    targetColor = (i < 8) ? Color.LIGHTGREEN : (i < 13) ? Color.GOLD : Color.RED;
                 } else {
                     targetColor = Color.GRAY;
                 }
