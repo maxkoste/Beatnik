@@ -47,28 +47,6 @@ public class MediaPlayer {
                 playbackDispatcher.stop();
                 playbackDispatcher = null;
             }
-
-            /**
-             * TODO: Stereo playback
-             * 
-             * For some stupid reason AudioDispatchFactory.fromPipe() creates a mono audio
-             * stream
-             * which in turn results in all audio playback being in mono instead of stereo.
-             * 
-             * Alternative is to create a audio file, File audioFile = new File(fullPath);
-             * and pass it to the
-             * AudioDispatcherFactory with: AudioDispatcherFactory.fromFile(audioFile, 2048,
-             * 0);
-             * This will give us stereo audio, BUT for some reason the audio playback is
-             * laggy and
-             * suuuper weird when doing this.. this needs to be fixed!!
-             */
-
-            // File audioFile = new File(fullPath);
-            // playbackDispatcher = AudioDispatcherFactory.fromFile(audioFile, 4096, 512);
-            // playbackDispatcher = DispatcherFactory.fromPipeStereo(fullPath, 48000, 4096,
-            // 0);
-
             playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath,
                     48000, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
