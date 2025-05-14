@@ -78,24 +78,16 @@ public class Controller {
     private void preloadSongData() {
         ObservableList<String> songFileNames = playlistManager.getSongsGUI();
         for (int i = 0; i < songFileNames.size(); i++) {
-            if (i == songFileNames.size() -1) {
-                String songName = songFileNames.get(i);
+            int pos = i;
+            Thread extractor = new Thread(() -> {
+                String songName = songFileNames.get(pos);
                 float[] songData = extract(songName);
                 synchronized (lock) {
                     songsData.put(songName, songData);
                 }
-            } else {
-                int pos = i;
-                Thread extractor = new Thread(() -> {
-                    String songName = songFileNames.get(pos);
-                    float[] songData = extract(songName);
-                    synchronized (lock) {
-                        songsData.put(songName, songData);
-                    }
-                });
-                extractor.setDaemon(true);
-                extractor.start();
-            }
+            });
+            extractor.setDaemon(true);
+            extractor.start();
         }
     }
 

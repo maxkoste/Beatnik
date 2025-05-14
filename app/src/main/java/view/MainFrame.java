@@ -65,6 +65,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         playlistStage.setResizable(true);
 
         StackPane root = new StackPane(); // Root layout with padding background
+        BorderPane startUpPane = new BorderPane(); // Pane which contains startup content
         primaryPane = new GridPane(); // Pane which contains all content
         songsPane = new BorderPane(); // Pane which contains songs popup content
         playlistsPane = new BorderPane(); // Pane which contains currentPlaylist popup content
@@ -98,12 +99,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         initializeSongsPane();
         initializePlaylistPane();
-        topPnl = new TopPnl(this, controller, primaryPane, numCols);
-        leftPnl = new LeftPnl(this, primaryPane, numCols);
-        rightPnl = new RightPnl(this, primaryPane, numCols);
-        centerPnl = new CenterPnl(controller, primaryPane, numCols);
+        //topPnl = new TopPnl(this, controller, primaryPane, numCols);
+        //leftPnl = new LeftPnl(this, primaryPane, numCols);
+        //rightPnl = new RightPnl(this, primaryPane, numCols);
+        //centerPnl = new CenterPnl(controller, primaryPane, numCols);
 
         Scene primaryScene = new Scene(root, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
+        Scene startUpScene = new Scene(startUpPane, (screenHeight * 0.9), (screenHeight * 0.9));
 
         songsScene = new Scene(songsPane, (screenHeight * 0.7), (screenHeight * 0.7));
         playlistsScene = new Scene(playlistsPane, (screenHeight * 0.7), (screenHeight * 0.7));
