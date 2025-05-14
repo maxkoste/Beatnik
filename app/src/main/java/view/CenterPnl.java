@@ -170,7 +170,7 @@ public class CenterPnl {
             VBox.setVgrow(circleWrapper, Priority.ALWAYS);
 
             // Bind the radius to a fraction of the container height
-            dot.radiusProperty().bind(audioIndicatorOne.heightProperty().multiply(0.015));
+            dot.radiusProperty().bind(audioIndicatorOne.heightProperty().multiply(0.025));
             audioIndicatorOne.getChildren().add(circleWrapper);
 
             auIndicatorCirclesOne[i] = dot;
@@ -301,7 +301,7 @@ public class CenterPnl {
             VBox.setVgrow(circleWrapper, Priority.ALWAYS);
 
             // Bind the radius to a fraction of the container height
-            dot.radiusProperty().bind(audioIndicatorTwo.heightProperty().multiply(0.015));
+            dot.radiusProperty().bind(audioIndicatorTwo.heightProperty().multiply(0.025));
             audioIndicatorTwo.getChildren().add(circleWrapper);
 
             auIndicatorCirclesTwo[i] = dot;
