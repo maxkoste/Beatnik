@@ -5,26 +5,24 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.DoublePropertyBase;
 import javafx.scene.AccessibleAttribute;
 import javafx.scene.control.Control;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class CircularSlider extends Control {
 
-    private double angle = 0;
+    private double angle;
     private DoubleProperty max;
     private DoubleProperty min;
     private DoubleProperty value;
     private CircularSliderSkin skin;
 
-    public CircularSlider(int tickCount, boolean snapToTick) {
+    public CircularSlider(int tickCount, boolean snapToTick, String imageUrl) {
+        this.skin = new CircularSliderSkin(this, tickCount, snapToTick, imageUrl);
+        setSkin(this.skin);
         setAngle(0.0); // Set twice because of bad design, give me a break
         setMin(0.0);
         setMax(270.0);
         setAngle(135.0); // Could be made into a parameter to allow custom start position
-        this.skin = new CircularSliderSkin(this, tickCount, snapToTick);
-        setSkin(this.skin);
-    }
-    
-    public void updateAngle(double angle){
-        this.skin.drawKnob(angle);
     }
 
     public double getValue() {
@@ -44,6 +42,8 @@ public class CircularSlider extends Control {
     void setAngle(double angle) {
         this.angle = angle;
         setValue(angle);
+        skin.drawKnob(angle);
+        skin.setLastAngle(angle);
     }
 
     public final DoubleProperty valueProperty() {
@@ -139,4 +139,8 @@ public class CircularSlider extends Control {
         return this.max;
     }
 
+    @Override
+    public boolean isResizable() {
+        return true;
+    }
 }

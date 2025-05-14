@@ -3,6 +3,7 @@ package controller;
 import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
+import be.tarsos.dsp.effects.FlangerEffect;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
@@ -40,6 +41,9 @@ public class Controller {
     private String currentEffect;
     private Map<String, Float> effectIntensityMap;
     private Map<String, float[]> songsData = new HashMap<>();
+    private final Object lock = new Object();
+    private Timer timerOne;
+    private Timer timerTwo;
 
     public Controller(Stage primaryStage) {
         // HashMap saves the state of the Effect-selector knob & the Effect-intensity
@@ -47,6 +51,9 @@ public class Controller {
         effectIntensityMap = new HashMap<String, Float>();
         effectIntensityMap.put("delay", 0.0F);
         effectIntensityMap.put("flanger", 0.0F);
+        effectIntensityMap.put("filter", 0.0F); 
+        effectIntensityMap.put("PLACEHOLDER", 0.0F);
+        effectIntensityMap.put("PLACEHOLDER2", 0.0F);
 
         audioPlayer1 = new MediaPlayer();
         audioPlayer2 = new MediaPlayer();
@@ -54,8 +61,9 @@ public class Controller {
         timerThreadTwo = new TimerThreadTwo();
         frame = new MainFrame(this);
         playlistManager = new PlaylistManager(frame);
-        frame.registerPlaylistManager(playlistManager);
-        this.currentEffect = "delay";
+        frame.setPlaylistManager(playlistManager);
+        this.currentEffect = "filter"; //the knob for the effect selector starts at 12 o clock 
+                                       // which is the filter effect 
         startUp(primaryStage);
     }
 
@@ -68,12 +76,20 @@ public class Controller {
         timerThreadTwo.start();
     }
 
-    private void preloadSongData() { // TODO: Allow for imports
+    private void preloadSongData() {
         ObservableList<String> songFileNames = playlistManager.getSongsGUI();
         for (int i = 0; i < songFileNames.size(); i++) {
-            String songName = songFileNames.get(i);
-            float[] songData = extract(songName);
-            songsData.put(songName, songData);
+            int pos = i;
+            Thread extractor = new Thread(() -> {
+                String songName = songFileNames.get(pos);
+                float[] songData = extract(songName);
+                synchronized (lock) {
+                    songsData.put(songName, songData);
+                    frame.updateLoading(songFileNames.size());
+                }
+            });
+            extractor.setDaemon(true);
+            extractor.start();
         }
     }
 
@@ -81,9 +97,23 @@ public class Controller {
      * Method for cleaning up resources and stopping the playback of any audio
      */
     public void shutDown() {
-        if (audioPlayer1 != null && audioPlayer2 != null) {
-            audioPlayer2.shutDown();
+        if (audioPlayer1 != null) {
             audioPlayer1.shutDown();
+        }
+        if (audioPlayer2 != null) {
+            audioPlayer2.shutDown();
+        }
+        if (timerOne != null) {
+            timerOne.cancel();
+        }
+        if (timerTwo != null) {
+            timerTwo.cancel();
+        }
+        if (dispatcherOne != null) {
+            dispatcherOne.stop();
+        }
+        if (dispatcherTwo != null) {
+            dispatcherTwo.stop();
         }
     }
 
@@ -99,7 +129,7 @@ public class Controller {
 
     public void startPlaylist(int channel, int selectedIndex,
             ObservableList<String> songPaths) {
-        playlistSongPaths = songPaths; 
+        playlistSongPaths = songPaths;
         currentPosInPlaylist = selectedIndex;
         setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
     }
@@ -152,13 +182,13 @@ public class Controller {
                 this.currentEffect = "flanger";
                 break;
             case 135:
-                System.out.println("Effect nr 3");
+                this.currentEffect = "filter";
                 break;
             case 204:
-                System.out.println("Effect nr 4 ");
+                this.currentEffect = "PLACEHOLDER";
                 break;
             case 270:
-                System.out.println("Effect nr 5");
+                this.currentEffect = "PLACEHOLDER2";
                 break;
             default:
                 System.out.println("Something went wrong...");
@@ -170,7 +200,7 @@ public class Controller {
                 0.0F);
     }
 
-    public void nextSong(int channel) { // TODO: Update GUI with names etc
+    public void nextSong(int channel) {
         if (playlistSongPaths != null) {
             if (!(currentPosInPlaylist >= playlistSongPaths.size() - 1)) {
                 currentPosInPlaylist++;
@@ -191,6 +221,7 @@ public class Controller {
     }
 
     public void setChannelOneVolume(float volume) {
+
         audioPlayer1.setVolume((volume * masterModifier) * crossfaderModifier1);
         latestVolume1 = volume;
     }
@@ -200,7 +231,7 @@ public class Controller {
         latestVolume2 = volume;
     }
 
-    public void setMasterVolume(float masterModifier) { 
+    public void setMasterVolume(float masterModifier) {
         this.masterModifier = masterModifier;
         setChannelOneVolume(latestVolume1);
         setChannelTwoVolume(latestVolume2);
@@ -236,7 +267,7 @@ public class Controller {
         audioPlayer1.setPlaybackSpeed(speedFactor);
     }
 
-    public void ssetPlaybackSpeedCh2(double speedFactor) {
+    public void setPlaybackSpeedCh2(double speedFactor) {
         audioPlayer2.setPlaybackSpeed(speedFactor);
     }
 
@@ -261,6 +292,9 @@ public class Controller {
                 audioPlayer1.setFlangerEffectMix(mix);
                 audioPlayer2.setFlangerEffectMix(mix);
                 break;
+            case "filter":
+                audioPlayer1.setFilterFrequency(mix);
+                audioPlayer2.setFilterFrequency(mix);
             default:
                 break;
         }
@@ -272,11 +306,13 @@ public class Controller {
         System.out.println(sourceFile.toPath());
         System.out.println(desinationFile.toPath());
         Files.copy(sourceFile.toPath(), desinationFile.toPath());
-        playlistManager.getSongsGUI().add(desinationFile.getName());
+        String fileName = desinationFile.getName();
+        playlistManager.getSongsGUI().add(fileName);
+        songsData.put(fileName, extract(fileName));
         System.out.println("File moved into the songsGUI folder");
     }
 
-    private float[] extract(String filePath) { 
+    private float[] extract(String filePath) {
         List<Float> audioSamples = new ArrayList<>();
         try {
             String path = new File("src/main/resources/songs/" + filePath)
@@ -335,8 +371,8 @@ public class Controller {
 
     public class TimerThreadOne extends Thread {
         public void run() {
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
+            timerOne = new Timer();
+            timerOne.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     if (dispatcherOne != null) {
@@ -349,8 +385,8 @@ public class Controller {
 
     public class TimerThreadTwo extends Thread {
         public void run() {
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
+            timerTwo = new Timer();
+            timerTwo.schedule(new TimerTask() {
                 @Override
                 public void run() {
                     if (dispatcherTwo != null) {

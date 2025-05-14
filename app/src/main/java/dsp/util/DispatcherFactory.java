@@ -1,18 +1,26 @@
 package dsp.util;
 
 import be.tarsos.dsp.AudioDispatcher;
+import be.tarsos.dsp.io.PipedAudioStream;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
+import be.tarsos.dsp.io.TarsosDSPAudioInputStream;
 import be.tarsos.dsp.io.UniversalAudioInputStream;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.TargetDataLine;
+
 public class DispatcherFactory {
-    
+
     /**
-     * Custom implementation that tries to send a custom script to ffmpeg to make it play in stereo. Messes up the audio !... 
-     * Not ideal 
+     * Custom implementation that tries to send a custom script to ffmpeg to make it
+     * play in stereo. Messes up the audio !...
+     * Not ideal
      */
 
     public static AudioDispatcher fromPipeStereo(String audioFilePath, int sampleRate, int bufferSize,

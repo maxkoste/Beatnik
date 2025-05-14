@@ -4,6 +4,7 @@ import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.GainProcessor;
+import be.tarsos.dsp.effects.FlangerEffect;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
@@ -32,6 +33,10 @@ public class MediaPlayer {
     private Thread audioThread;
     private final Object lock = new Object();
     private RateTransposer rateTransposer;
+    private LowPassEqualizer lowPassFilter;
+
+    private float smoothedFrequency = -1; // -1 indicates not initialized
+    private final float smoothingFactor = 0.1f; // Smaller = smoother
 
     public MediaPlayer() {
 
@@ -44,26 +49,6 @@ public class MediaPlayer {
                 playbackDispatcher.stop();
                 playbackDispatcher = null;
             }
-
-            /**
-             * TODO: Stereo playback
-             * 
-             * For some stupid reason AudioDispatchFactory.fromPipe() creates a mono audio
-             * stream
-             * which in turn results in all audio playback being in mono instead of stereo.
-             * 
-             * Alternative is to create a audio file, File audioFile = new File(fullPath);
-             * and pass it to the
-             * AudioDispatcherFactory with: AudioDispatcherFactory.fromFile(audioFile, 2048,
-             * 0);
-             * This will give us stereo audio, BUT for some reason the audio playback is
-             * laggy and
-             * suuuper weird when doing this.. this needs to be fixed!!
-             */
-
-            // File audioFile = new File(fullPath);
-            // playbackDispatcher = AudioDispatcherFactory.fromFile(audioFile, 4096, 0);
-
             playbackDispatcher = AudioDispatcherFactory.fromPipe(fullPath,
                     48000, 4096, 0);
             TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
@@ -77,6 +62,8 @@ public class MediaPlayer {
                     5000, 7000); // 7khz center, 5kHz bandwidth
             delayEffect = new Delay(0.5, 0.6, format.getSampleRate());
             rateTransposer = new RateTransposer(1.0F);
+            lowPassFilter = new LowPassEqualizer(20000f, format.getSampleRate());
+
             // Add volume controll first
             volumeProcessor = new GainProcessor(0.0f);
             playbackDispatcher.addAudioProcessor(volumeProcessor);
@@ -87,7 +74,7 @@ public class MediaPlayer {
             playbackDispatcher.addAudioProcessor(bassEqualizer);
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
             playbackDispatcher.addAudioProcessor(rateTransposer);
-
+            playbackDispatcher.addAudioProcessor(lowPassFilter);
             playbackDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
                 public boolean process(AudioEvent audioEvent) {
@@ -136,6 +123,7 @@ public class MediaPlayer {
         if (!started) {
             this.audioThread = new Thread(playbackDispatcher, "Playback Thread");
             audioThread.setPriority(Thread.MAX_PRIORITY);
+            audioThread.setDaemon(true);
             audioThread.start();
             started = true;
             isPlaying = true;
@@ -151,8 +139,32 @@ public class MediaPlayer {
         }
     }
 
+    /**
+     * Helper method to map the value 0.0 - 1.0 to 20 000 hz-70hz
+     * 
+     * @param normalizedValue
+     * @return
+     */
+    public float mapNormalizedToFrequency(float normalizedValue) {
+        normalizedValue = Math.max(0.0f, Math.min(1.0f, normalizedValue));
+
+        float minFreq = 70.0f;
+        float maxFreq = 20000.0f;
+
+        double minLog = Math.log10(minFreq);
+        double maxLog = Math.log10(maxFreq);
+
+        // Shape the input to make upper values less sensitive
+        float shaped = normalizedValue * normalizedValue;
+
+        double logFreq = maxLog - shaped * (maxLog - minLog);
+        return (float) Math.pow(10, logFreq);
+    }
+
     public void setPlaybackSpeed(double speedFactor) {
-        rateTransposer.setFactor(speedFactor);
+        if (rateTransposer != null) {
+            rateTransposer.setFactor(speedFactor);
+        }
     }
 
     public void setVolume(float volume) {
@@ -163,12 +175,42 @@ public class MediaPlayer {
         }
     }
 
+    /**
+     * Takes the mix value between 0.0 and 1.0 from the effect-selector
+     * passes it to a helper function which maps it to a frequency and
+     * applies it to the filter
+     * Smoothes out the jumps in frequency if the user is turning the knob 
+     * aggressivly or making big jumps. This is to avoid harsh noises 
+     * or clicks that are an effect of big jumps near the lower end of the 
+     * frequency spectrum.
+     * 
+     * @param frequency
+     */
+    public void setFilterFrequency(float frequency) {
+        if (lowPassFilter != null) {
+            float targetFreq = mapNormalizedToFrequency(frequency);
+
+            if (smoothedFrequency < 0) {
+                smoothedFrequency = targetFreq; // initialize on first call
+            } else {
+                // Apply exponential smoothing
+                smoothedFrequency += smoothingFactor * (targetFreq - smoothedFrequency);
+            }
+
+            lowPassFilter.setFrequency(smoothedFrequency);
+        }
+    }
+
     public void setTreble(float trebleGain) {
-        trebleEqualizer.setGain(trebleGain);
+        if (trebleEqualizer != null) {
+            trebleEqualizer.setGain(trebleGain);
+        }
     }
 
     public void setBass(float bassGain) {
-        bassEqualizer.setGain(bassGain);
+        if (bassEqualizer != null) {
+            bassEqualizer.setGain(bassGain);
+        }
     }
 
     /**
@@ -202,7 +244,10 @@ public class MediaPlayer {
      *         audio.
      */
     public AudioDispatcher getAudioDispatcher() {
-        return playbackDispatcher;
+        if (playbackDispatcher != null) {
+            return playbackDispatcher;
+        } else
+            return null;
     }
 
     /**
