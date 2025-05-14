@@ -1,10 +1,8 @@
 package dsp;
 
 import be.tarsos.dsp.filters.IIRFilter;
-import be.tarsos.dsp.filters.LowPassFS;
 
 public class LowPassEqualizer extends IIRFilter {
-    private LowPassFS lPassFS;
 
     public LowPassEqualizer(float frequency, float sampleRate) {
         super(frequency > 60.0F ? frequency : 60.0F, sampleRate);
