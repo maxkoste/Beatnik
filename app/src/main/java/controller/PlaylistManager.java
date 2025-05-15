@@ -161,9 +161,7 @@ public class PlaylistManager {
         }
     }
 
-    public void removeSongsFromPlaylist(String playlistName, ObservableList<String> selectedItems) { // Playlist finder
-                                                                                                     // method for
-                                                                                                     // code-reuse
+    public void removeSongsFromPlaylist(String playlistName, ObservableList<String> selectedItems) { // Playlist finder method for code-reuse
         Playlist playlist = findPlaylist(playlistName);
         for (int j = 0; j < selectedItems.size(); j++) {
             playlist.removeSong(selectedItems.get(j));

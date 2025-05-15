@@ -7,6 +7,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -18,8 +19,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.*;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -62,6 +63,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private RightPnl rightPnl;
     private CenterPnl centerPnl;
     private int progressCounter;
+    private String draggedItem;
 
     public MainFrame(Controller controller) {
         this.controller = controller;
@@ -236,6 +238,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     public void initializePlaylistPane() {
         currentPlaylist = new ListView<>();
+        activateDragAndDrop();
         playlistSongSelector = currentPlaylist.getSelectionModel();
         playlistSongSelector.setSelectionMode(SelectionMode.MULTIPLE);
         currentPlaylist.setOnMouseClicked(this::handlePlaylistSongSelection);
@@ -341,6 +344,90 @@ public class MainFrame implements EventHandler<ActionEvent> {
         playlistManager.addToPlaylist(playlistSelected, songSelector.getSelectedIndices());
         playlistManager.savePlaylistData();
     }
+
+    private void activateDragAndDrop() {
+        ObservableList<String> playlist = currentPlaylist.getItems();
+
+        currentPlaylist.setCellFactory(lv -> {
+            ListCell<String> cell = new ListCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? null : item);
+                }
+            };
+
+            cell.setOnDragDetected(event -> {
+                if (!cell.isEmpty()) {
+                    Dragboard db = cell.startDragAndDrop(TransferMode.MOVE);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(cell.getItem());
+                    db.setContent(content);
+                    event.consume();
+                }
+            });
+
+            cell.setOnDragOver(event -> {
+                if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+                event.consume();
+            });
+
+            cell.setOnDragEntered(event -> {
+                if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
+                    cell.setStyle("-fx-background-color: lightgray;");
+                }
+            });
+
+            cell.setOnDragExited(event -> {
+                cell.setStyle("");
+            });
+
+            cell.setOnDragDropped(event -> {
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+                if (db.hasString()) {
+                    int draggedIdx = currentPlaylist.getItems().indexOf(db.getString());
+                    int thisIdx = cell.getIndex();
+
+                    if (draggedIdx != thisIdx) {
+                        String temp = currentPlaylist.getItems().remove(draggedIdx);
+                        currentPlaylist.getItems().add(thisIdx, temp);
+                    }
+                    success = true;
+                }
+                event.setDropCompleted(success);
+                event.consume();
+            });
+
+            cell.setOnDragDone(DragEvent::consume);
+
+            return cell;
+        });
+
+        // Handle drop on empty space (e.g., below all cells)
+        currentPlaylist.setOnDragOver(event -> {
+            if (event.getDragboard().hasString()) {
+                event.acceptTransferModes(TransferMode.MOVE);
+            }
+            event.consume();
+        });
+
+        currentPlaylist.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+            if (db.hasString() && draggedItem != null) {
+                // If it's not already removed, remove it
+                playlist.remove(draggedItem);
+                playlist.add(draggedItem); // Add to end
+                success = true;
+            }
+            event.setDropCompleted(success);
+            event.consume();
+        });
+    }
+
 
     public void handleChannelSwitch(ActionEvent actionEvent) {
         if (channelOneActive) {
