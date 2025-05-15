@@ -31,8 +31,8 @@ public class RightPnl {
         });
         effectIntensity.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         effectIntensity.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        //effectIntensity.setScaleX(0.8);
-        //effectIntensity.setScaleY(0.8);
+        // effectIntensity.setScaleX(0.8);
+        // effectIntensity.setScaleY(0.8);
 
         primaryPane.add(effectIntensity, maxCols - 1, 5);
 
@@ -40,8 +40,8 @@ public class RightPnl {
         effectIntensityImg.fitWidthProperty().bind(effectIntensity.widthProperty());
         effectIntensityImg.fitHeightProperty().bind(effectIntensity.heightProperty());
         effectIntensityImg.setMouseTransparent(true);
-        //effectIntensityImg.setScaleX(0.8);
-        //effectIntensityImg.setScaleY(0.8);
+        // effectIntensityImg.setScaleX(0.8);
+        // effectIntensityImg.setScaleY(0.8);
         primaryPane.add(effectIntensityImg, maxCols - 1, 5);
 
         Label effectIntensityLabel = new Label("Effect Intensity");

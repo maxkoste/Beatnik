@@ -2,6 +2,9 @@ package view;
 
 import controller.Controller;
 import controller.PlaylistManager;
+import javafx.animation.Animation;
+import javafx.animation.Interpolator;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
@@ -15,13 +18,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.awt.*;
 import java.io.File;
@@ -136,7 +144,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     public void updateLoading(double nbrOfSongsToLoad) {
         Platform.runLater(() -> {
             progressCounter++;
-            progressBar.setProgress(progressCounter/nbrOfSongsToLoad);
+            progressBar.setProgress(progressCounter / nbrOfSongsToLoad);
             if (progressCounter >= nbrOfSongsToLoad) {
                 primaryStage.setScene(primaryScene);
             }
@@ -155,20 +163,35 @@ public class MainFrame implements EventHandler<ActionEvent> {
     }
 
     public void initializeStartUpPane(double screenHeight) {
-        ImageView logo = new ImageView(new Image("/Logo/beatnik-logo.png"));
+        ImageView logo = new ImageView(new Image("/Logo/beatnik-logo2.png"));
+        ImageView logoText = new ImageView(new Image("/Logo/beatnik-logo3.png"));
+
         logo.setFitHeight(screenHeight * 0.35);
         logo.setFitWidth(screenHeight * 0.35);
 
+        logoText.setScaleX(0.4);
+        logoText.setScaleY(0.4);
+
         progressBar = new ProgressBar();
+
         progressBar.setPrefWidth(screenHeight * 0.35);
-        progressBar.setScaleX(0.90);
+        progressBar.setScaleX(1.0);
+
         HBox progressBarContainer = new HBox(progressBar);
         progressBarContainer.setAlignment(Pos.CENTER);
 
-        VBox container = new VBox(logo, progressBarContainer);
+        VBox logoBox = new VBox(logoText, logo);
+        logoBox.setAlignment(Pos.CENTER);
+
+        logoBox.setSpacing(-95);
+
+        // logoTextContainer.setAlignment(Pos.TOP_CENTER);
+        VBox container = new VBox(logoBox, progressBarContainer);
+        container.setSpacing(40);
         container.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         startUpPane.setAlignment(Pos.CENTER);
         startUpPane.getChildren().add(container);
+        // startUpPane.getChildren().add(logoTextContainer);
     }
 
     public void initializeSongsPane() {
@@ -208,6 +231,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
         ToolBar songsMenu = new ToolBar(importSongs, viewPlaylist, addToPlaylist, playlistBox, switchChannelOne);
         songsPane.setTop(songsMenu);
     }
+
+
 
     public void initializePlaylistPane() {
         currentPlaylist = new ListView<>();
