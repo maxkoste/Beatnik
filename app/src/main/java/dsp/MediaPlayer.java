@@ -4,6 +4,7 @@ import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.GainProcessor;
+import be.tarsos.dsp.effects.FlangerEffect;
 import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
@@ -33,6 +34,7 @@ public class MediaPlayer {
     private final Object lock = new Object();
     private RateTransposer rateTransposer;
     private LowPassEqualizer lowPassFilter;
+
     private float smoothedFrequency = -1; // -1 indicates not initialized
     private final float smoothingFactor = 0.1f; // Smaller = smoother
 

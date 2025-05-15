@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Semaphore;
 
 import dsp.MediaPlayer;
 
@@ -43,6 +44,7 @@ public class Controller {
     private final Object lock = new Object();
     private Timer timerOne;
     private Timer timerTwo;
+    private Semaphore nbrOfThreads = new Semaphore(7);
 
     public Controller(Stage primaryStage) {
         // HashMap saves the state of the Effect-selector knob & the Effect-intensity
@@ -78,24 +80,18 @@ public class Controller {
     private void preloadSongData() {
         ObservableList<String> songFileNames = playlistManager.getSongsGUI();
         for (int i = 0; i < songFileNames.size(); i++) {
-            if (i == songFileNames.size() -1) {
-                String songName = songFileNames.get(i);
+            int pos = i;
+            Thread extractor = new Thread(() -> {
+                String songName = songFileNames.get(pos);
                 float[] songData = extract(songName);
                 synchronized (lock) {
                     songsData.put(songName, songData);
+                    frame.updateLoading(songFileNames.size());
+                    nbrOfThreads.release();
                 }
-            } else {
-                int pos = i;
-                Thread extractor = new Thread(() -> {
-                    String songName = songFileNames.get(pos);
-                    float[] songData = extract(songName);
-                    synchronized (lock) {
-                        songsData.put(songName, songData);
-                    }
-                });
-                extractor.setDaemon(true);
-                extractor.start();
-            }
+            });
+            extractor.setDaemon(true);
+            extractor.start();
         }
     }
 
@@ -321,6 +317,7 @@ public class Controller {
     private float[] extract(String filePath) {
         List<Float> audioSamples = new ArrayList<>();
         try {
+            nbrOfThreads.acquire();
             String path = new File("src/main/resources/songs/" + filePath)
                     .getAbsolutePath();
             AudioDispatcher audioDataGetter = AudioDispatcherFactory.fromPipe(path,

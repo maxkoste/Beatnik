@@ -97,7 +97,8 @@ public class WaveFormCanvas extends Canvas {
             gc.setFill(Color.web("#191c2b"));
             gc.fillRect(0, 0, width, height);
             // gc.clearRect(0, 0, width, height);
-            gc.setStroke(Color.RED);
+            gc.setStroke(Color.web("#444857"));
+            gc.strokeLine(width/2, height, width/2, 0);
 
             double midY = height / 2;
             int widthX = (int) width;
