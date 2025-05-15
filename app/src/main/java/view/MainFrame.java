@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -156,13 +157,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
     public void initializeStartUpPane(double screenHeight) {
         ImageView logo = new ImageView(new Image("/Logo/beatnik-logo.png"));
         logo.setFitHeight(screenHeight * 0.35);
-        logo.setPreserveRatio(true);
+        logo.setFitWidth(screenHeight * 0.35);
 
         progressBar = new ProgressBar();
         progressBar.setPrefWidth(screenHeight * 0.35);
+        progressBar.setScaleX(0.90);
         HBox progressBarContainer = new HBox(progressBar);
         progressBarContainer.setAlignment(Pos.CENTER);
-        progressBarContainer.setScaleX(0.91);
 
         VBox container = new VBox(logo, progressBarContainer);
         container.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
