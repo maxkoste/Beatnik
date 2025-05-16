@@ -120,10 +120,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
         initializeSongsPane();
         initializePlaylistPane();
         topPnl = new TopPnl(this, controller, primaryPane, numCols);
-        leftPnl = new LeftPnl(this, primaryPane, numCols);
+        soundboard = new Soundboard(this, controller, 10);
+        leftPnl = new LeftPnl(soundboard, this, primaryPane, numCols);
         rightPnl = new RightPnl(this, primaryPane, numCols);
         centerPnl = new CenterPnl(controller, primaryPane, numCols);
-        soundboard = new Soundboard(controller, 10);
 
         primaryScene = new Scene(root, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
         Scene startUpScene = new Scene(startUpPane, (screenHeight * 0.9), (screenHeight * 0.9));
@@ -325,10 +325,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
         playlistStage.setScene(songsScene);
     }
     
-    public void handleViewSoundboard(Action actionEvent){
-        
-    }
-
     public void handleEditPlaylistName(ActionEvent actionEvent) {
         playlistStage.setTitle(playlistManager.editPlaylistName(playlistSelector.getSelectedItem()));
         playlistManager.savePlaylistData();

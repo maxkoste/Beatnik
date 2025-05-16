@@ -10,8 +10,10 @@ public class LeftPnl {
     private MainFrame mainFrame;
     private GridPane primaryPane;
     private int maxCols;
+    private Soundboard soundboard;
 
-    public LeftPnl(MainFrame mainFrame, GridPane primaryPane, int maxCols) {
+    public LeftPnl(Soundboard soundboard, MainFrame mainFrame, GridPane primaryPane, int maxCols) {
+        this.soundboard = soundboard;
         this.mainFrame = mainFrame;
         this.primaryPane = primaryPane;
         this.maxCols = maxCols - 1;
@@ -31,6 +33,7 @@ public class LeftPnl {
         Button soundboardButton = new Button("FART");
         soundboardButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         soundboardButton.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+        soundboardButton.setOnAction(soundboard);
         // quantize.setScaleX(0.8);
         // quantize.setScaleY(0.8);
         primaryPane.add(soundboardButton, 1, 7);

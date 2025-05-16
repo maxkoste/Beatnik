@@ -1,13 +1,16 @@
 package view;
 
+import javafx.event.ActionEvent;
+
 import controller.Controller;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class Soundboard {
+public class Soundboard implements EventHandler<ActionEvent> {
     private Controller controller;
     private Scene soundbarScene;
     private int gridSize;
@@ -38,7 +41,9 @@ public class Soundboard {
         stage.setScene(soundbarScene);
     }
     
-    public void show(){
-        stage.show();
+
+    @Override
+    public void handle(ActionEvent arg0) {
+        this.stage.show();
     }
 }
