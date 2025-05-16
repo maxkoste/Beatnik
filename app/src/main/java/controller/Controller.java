@@ -20,6 +20,7 @@ import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 
 import dsp.MediaPlayer;
+import dsp.SoundPlayer;
 
 public class Controller {
     private MediaPlayer audioPlayer1;
@@ -45,6 +46,10 @@ public class Controller {
     private Timer timerOne;
     private Timer timerTwo;
     private Semaphore nbrOfThreads = new Semaphore(7);
+    private SoundPlayer soundEffect1;
+    private SoundPlayer soundEffect2;
+    private SoundPlayer soundEffect3;
+    private SoundPlayer soundEffect4;
 
     public Controller(Stage primaryStage) {
         // HashMap saves the state of the Effect-selector knob & the Effect-intensity
@@ -52,7 +57,7 @@ public class Controller {
         effectIntensityMap = new HashMap<String, Float>();
         effectIntensityMap.put("delay", 0.0F);
         effectIntensityMap.put("flanger", 0.0F);
-        effectIntensityMap.put("filter", 0.0F); 
+        effectIntensityMap.put("filter", 0.0F);
         effectIntensityMap.put("PLACEHOLDER", 0.0F);
         effectIntensityMap.put("PLACEHOLDER2", 0.0F);
 
@@ -63,8 +68,8 @@ public class Controller {
         frame = new MainFrame(this);
         playlistManager = new PlaylistManager(frame);
         frame.setPlaylistManager(playlistManager);
-        this.currentEffect = "filter"; //the knob for the effect selector starts at 12 o clock 
-                                       // which is the filter effect 
+        this.currentEffect = "filter"; // the knob for the effect selector starts at 12 o clock
+                                       // which is the filter effect
         startUp(primaryStage);
     }
 
@@ -75,6 +80,11 @@ public class Controller {
         preloadSongData();
         timerThreadOne.start();
         timerThreadTwo.start();
+
+        soundEffect1 = new SoundPlayer("/SoundEffects/daddy_chill.wav");
+        soundEffect2 = new SoundPlayer("/SoundEffects/dundun.wav");
+        soundEffect3 = new SoundPlayer("/SoundEffects/fart.wav");
+        soundEffect4 = new SoundPlayer("/SoundEffects/yippi.wav");
     }
 
     private void preloadSongData() {
@@ -165,6 +175,23 @@ public class Controller {
             audioPlayer2.resetSong();
         }
         playSong(channel);
+    }
+
+    public void playSoundEffect(int button) {
+        switch (button) {
+            case 1:
+                soundEffect1.play();
+                break;
+            case 2:
+                soundEffect2.play();
+                break;
+            case 3:
+                soundEffect3.play();
+                break;
+            case 4:
+                soundEffect4.play();
+                break;
+        }
     }
 
     public void setEffect(int effectSelectorValue) {
