@@ -9,7 +9,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class Soundboard implements EventHandler<ActionEvent> {
@@ -17,10 +16,8 @@ public class Soundboard implements EventHandler<ActionEvent> {
     private Scene soundbarScene;
     private int gridSize;
     private Stage stage;
-    private MainFrame mainFrame;
+    public Soundboard( Controller controller) {
 
-    public Soundboard(MainFrame mainFrame, Controller controller) {
-        this.mainFrame = mainFrame;
         this.gridSize = 4;
         this.controller = controller;
 
@@ -52,19 +49,23 @@ public class Soundboard implements EventHandler<ActionEvent> {
         soundbarScene.getStylesheets().addAll("styles.css");
         stage.setScene(soundbarScene);
 
-        Button btn1 = new Button("1");
-        Button btn2 = new Button("2");
-        Button btn3 = new Button("3");
-        Button btn4 = new Button("4");
+        Button[] buttons = new Button[4];
 
-        btn1.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn2.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn3.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn4.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        btn1.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        btn2.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        btn3.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        btn4.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+        Button btn1 = new Button("1");
+        buttons[0] = btn1;
+        Button btn2 = new Button("2");
+        buttons[1] = btn2;
+        Button btn3 = new Button("3");
+        buttons[2] = btn3;
+        Button btn4 = new Button("4");
+        buttons[3] = btn4;
+
+        for (Button button : buttons) {
+            button.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            button.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+            button.setScaleX(0.8);
+            button.setScaleY(0.8);
+        }
 
         btn1.setOnAction(e -> controller.playSoundEffect(1));
         btn2.setOnAction(e -> controller.playSoundEffect(2));

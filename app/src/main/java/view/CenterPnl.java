@@ -215,8 +215,8 @@ public class CenterPnl {
         channelTwoCueImage.fitWidthProperty().bind(channelTwoCue.widthProperty());
         channelTwoCueImage.fitHeightProperty().bind(channelTwoCue.heightProperty());
         channelTwoCueImage.setMouseTransparent(true); // Allow mouse events to pass through
-        //channelTwoCueImage.setScaleX(0.8);
-        //channelTwoCueImage.setScaleY(0.8);
+        channelTwoCueImage.setScaleX(0.9);
+        channelTwoCueImage.setScaleY(0.9);
         primaryPane.add(channelTwoCueImage, maxCols - 3, maxCols - 1);
 
         // Toggle image on button state change

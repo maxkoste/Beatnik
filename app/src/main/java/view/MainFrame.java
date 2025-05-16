@@ -120,7 +120,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         initializeSongsPane();
         initializePlaylistPane();
         topPnl = new TopPnl(this, controller, primaryPane, numCols);
-        soundboard = new Soundboard(this, controller);
+        soundboard = new Soundboard(controller);
         leftPnl = new LeftPnl(soundboard, this, primaryPane, numCols);
         rightPnl = new RightPnl(this, primaryPane, numCols);
         centerPnl = new CenterPnl(controller, primaryPane, numCols);
@@ -237,8 +237,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
         songsPane.setTop(songsMenu);
     }
 
-
-
     public void initializePlaylistPane() {
         currentPlaylist = new ListView<>();
         activateDragAndDrop();
@@ -324,7 +322,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         playlistStage.setTitle("All Songs");
         playlistStage.setScene(songsScene);
     }
-    
+
     public void handleEditPlaylistName(ActionEvent actionEvent) {
         playlistStage.setTitle(playlistManager.editPlaylistName(playlistSelector.getSelectedItem()));
         playlistManager.savePlaylistData();
@@ -430,7 +428,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
             event.consume();
         });
     }
-
 
     public void handleChannelSwitch(ActionEvent actionEvent) {
         if (channelOneActive) {
