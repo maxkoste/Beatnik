@@ -18,6 +18,8 @@ public class Soundboard {
         this.mainFrame = mainFrame;
         this.gridSize = gridSize;
         this.controller = controller;
+        
+        initializeSoundBoard();
     }
     
     private void initializeSoundBoard(){
