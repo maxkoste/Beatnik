@@ -27,32 +27,14 @@ public class LeftPnl {
 
         primaryPane.add(songsButton, 1, 5);
 
-        CircularSlider quantize = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
-        quantize.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double volume = newValue.doubleValue();
-            System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
-        });
-        quantize.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        quantize.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+
+        Button soundboardButton = new Button("FART");
+        soundboardButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+        soundboardButton.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
         // quantize.setScaleX(0.8);
         // quantize.setScaleY(0.8);
-        primaryPane.add(quantize, 1, 8);
-
-        // image for the knob
-        ImageView quantizeImg = new ImageView("/Knobs/knob-bg.png");
-        quantizeImg.fitWidthProperty().bind(quantize.widthProperty());
-        quantizeImg.fitHeightProperty().bind(quantize.heightProperty());
-        quantizeImg.setMouseTransparent(true);
-        // quantizeImg.setScaleX(0.8);
-        // quantizeImg.setScaleY(0.8);
-        primaryPane.add(quantizeImg, 1, 8);
-
-        Label quantizeLabel = new Label("Quantizer");
-        quantizeLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        quantizeLabel.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        quantizeLabel.setAlignment(Pos.TOP_CENTER);
-        GridPane.setColumnSpan(quantizeLabel, 3);
-        primaryPane.add(quantizeLabel, 0, 9);
+        primaryPane.add(soundboardButton, 1, 7);
+        
 
         CircularSlider cueVolume = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
         cueVolume.valueProperty().addListener((observable, oldValue, newValue) -> {

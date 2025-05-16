@@ -33,6 +33,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.awt.*;
+import java.awt.Desktop.Action;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -64,6 +65,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private CenterPnl centerPnl;
     private int progressCounter;
     private String draggedItem;
+    private Soundboard soundboard;
 
     public MainFrame(Controller controller) {
         this.controller = controller;
@@ -121,6 +123,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
         leftPnl = new LeftPnl(this, primaryPane, numCols);
         rightPnl = new RightPnl(this, primaryPane, numCols);
         centerPnl = new CenterPnl(controller, primaryPane, numCols);
+        soundboard = new Soundboard(controller, 10);
 
         primaryScene = new Scene(root, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
         Scene startUpScene = new Scene(startUpPane, (screenHeight * 0.9), (screenHeight * 0.9));
@@ -320,6 +323,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
     public void handleViewSongs(ActionEvent actionEvent) {
         playlistStage.setTitle("All Songs");
         playlistStage.setScene(songsScene);
+    }
+    
+    public void handleViewSoundboard(Action actionEvent){
+        
     }
 
     public void handleEditPlaylistName(ActionEvent actionEvent) {
