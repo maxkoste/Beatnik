@@ -11,7 +11,7 @@
 .button {
     -fx-text-fill: #f7f9fc;
     /* Eggshell white text */
-    -fx-background-color: #4bc17a;
+    -fx-background-color: #d85959;
     /* Optional: darker background */
     -fx-font-weight: bold;
     /* Optional: bold text */
@@ -19,16 +19,16 @@
     -fx-background-radius: 20;
     -fx-border-radius: 20;
 
-    -fx-effect: dropshadow(gaussian, #4ac57d, 1, 1.0, 0, 10);
+    -fx-effect: dropshadow(gaussian, #914751, 1, 1.0, 0, 10);
 }
 
 .button:hover {
-    -fx-background-color: #57df8d;
+    -fx-background-color: #d8696b;
     -fx-cursor: hand;
 }
 
 .button:pressed {
-    -fx-background-color: #40a367;
+    -fx-background-color: #a94d4f;
     -fx-translate-y: 2px;
     /* subtle "press" movement */
     -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.4), 6, 0.4, 0, 2);
@@ -39,7 +39,7 @@
 }
 
 .slider .track {
-    -fx-background-color: #626262;
+    -fx-background-color: #323234;
     /* Track background */
     -fx-background-insets: 0;
     -fx-background-radius: 2;
@@ -47,7 +47,7 @@
 }
 
 .slider .thumb {
-    -fx-background-color: #f0e6d2;
+    -fx-background-color: #e96567;
     /* Eggshell white thumb */
     -fx-background-insets: 0;
     -fx-background-radius: 50%;

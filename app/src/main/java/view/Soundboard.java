@@ -24,7 +24,7 @@ public class Soundboard implements EventHandler<ActionEvent> {
 
     public Soundboard(Controller controller) {
 
-        this.gridSize = 3;
+        this.gridSize = 4;
         this.controller = controller;
 
         initializeSoundBoard();
@@ -52,7 +52,7 @@ public class Soundboard implements EventHandler<ActionEvent> {
 
         grid.setGridLinesVisible(true);
 
-        this.soundbarScene = new Scene(grid, 500, 500);
+        this.soundbarScene = new Scene(grid, 600, 600);
         soundbarScene.getStylesheets().addAll("soundboard.css");
         stage.setScene(soundbarScene);
 
@@ -69,7 +69,7 @@ public class Soundboard implements EventHandler<ActionEvent> {
         buttons[3] = btn4;
 
         int counter = 0;
-        String[] resources = { "/Symbols/daddy.png", "/Symbols/horns.png", "/Symbols/fart.png", "/Symbols/yipi.png" };
+        String[] resources = { "/Symbols/daddy.png", "/Symbols/fart.png", "/Symbols/horns.png", "/Symbols/yipi.png" };
 
         for (Button button : buttons) {
             button.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -92,10 +92,10 @@ public class Soundboard implements EventHandler<ActionEvent> {
         btn3.setOnAction(e -> controller.playSoundEffect(3));
         btn4.setOnAction(e -> controller.playSoundEffect(4));
 
-        grid.add(btn1, 0, 1);
-        grid.add(btn2, 0, 2);
-        grid.add(btn3, 1, 1);
-        grid.add(btn4, 1, 2);
+        grid.add(btn1, 1, 1);
+        grid.add(btn2, 1, 2);
+        grid.add(btn3, 2, 1);
+        grid.add(btn4, 2, 2);
 
         // Slider
         Slider masterVolume = new Slider();
@@ -111,7 +111,7 @@ public class Soundboard implements EventHandler<ActionEvent> {
         masterVolume.setValue(50);
 
         GridPane.setRowSpan(masterVolume, 2);
-        grid.add(masterVolume, 2, 1);
+        grid.add(masterVolume, 3, 1);
     }
 
     @Override
