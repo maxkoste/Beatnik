@@ -4,8 +4,12 @@ import javafx.event.ActionEvent;
 
 import controller.Controller;
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Slider;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -13,12 +17,14 @@ import javafx.stage.Stage;
 
 public class Soundboard implements EventHandler<ActionEvent> {
     private Controller controller;
+    private ImageView[] images;
     private Scene soundbarScene;
     private int gridSize;
     private Stage stage;
-    public Soundboard( Controller controller) {
 
-        this.gridSize = 4;
+    public Soundboard(Controller controller) {
+
+        this.gridSize = 3;
         this.controller = controller;
 
         initializeSoundBoard();
@@ -27,6 +33,7 @@ public class Soundboard implements EventHandler<ActionEvent> {
     private void initializeSoundBoard() {
         this.stage = new Stage();
         stage.setTitle("Soundboard");
+        stage.setResizable(false);
         GridPane grid = new GridPane();
 
         for (int i = 0; i < this.gridSize; i++) {
@@ -45,11 +52,12 @@ public class Soundboard implements EventHandler<ActionEvent> {
 
         grid.setGridLinesVisible(true);
 
-        this.soundbarScene = new Scene(grid, 400, 400);
-        soundbarScene.getStylesheets().addAll("styles.css");
+        this.soundbarScene = new Scene(grid, 500, 500);
+        soundbarScene.getStylesheets().addAll("soundboard.css");
         stage.setScene(soundbarScene);
 
         Button[] buttons = new Button[4];
+        this.images = new ImageView[8];
 
         Button btn1 = new Button("1");
         buttons[0] = btn1;
@@ -60,11 +68,23 @@ public class Soundboard implements EventHandler<ActionEvent> {
         Button btn4 = new Button("4");
         buttons[3] = btn4;
 
+        int counter = 0;
+        String[] resources = { "/Symbols/daddy.png", "/Symbols/horns.png", "/Symbols/fart.png", "/Symbols/yipi.png" };
+
         for (Button button : buttons) {
             button.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             button.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-            button.setScaleX(0.8);
-            button.setScaleY(0.8);
+            button.setScaleX(0.6);
+            button.setScaleY(0.6);
+            button.setText("");
+            ImageView image = new ImageView(new Image(resources[counter]));
+            counter++;
+            image.setScaleX(0.2);
+            image.setScaleY(0.2);
+            image.setFitWidth(button.getWidth());
+            image.setFitHeight(button.getHeight());
+            image.setPreserveRatio(true);
+            button.setGraphic(image);
         }
 
         btn1.setOnAction(e -> controller.playSoundEffect(1));
@@ -72,10 +92,26 @@ public class Soundboard implements EventHandler<ActionEvent> {
         btn3.setOnAction(e -> controller.playSoundEffect(3));
         btn4.setOnAction(e -> controller.playSoundEffect(4));
 
-        grid.add(btn1, 1, 1);
-        grid.add(btn2, 1, 2);
-        grid.add(btn3, 2, 1);
-        grid.add(btn4, 2, 2);
+        grid.add(btn1, 0, 1);
+        grid.add(btn2, 0, 2);
+        grid.add(btn3, 1, 1);
+        grid.add(btn4, 1, 2);
+
+        // Slider
+        Slider masterVolume = new Slider();
+        masterVolume.setOrientation(Orientation.VERTICAL);
+        masterVolume.setMax(100.0);
+        masterVolume.setBlockIncrement(20);
+        masterVolume.setShowTickMarks(true);
+        masterVolume.setShowTickLabels(true);
+        masterVolume.setMinorTickCount(0);
+        masterVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
+            controller.setSoundboardVolume(newValue.floatValue() / 100);
+        });
+        masterVolume.setValue(50);
+
+        GridPane.setRowSpan(masterVolume, 2);
+        grid.add(masterVolume, 2, 1);
     }
 
     @Override

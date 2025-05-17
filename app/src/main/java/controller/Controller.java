@@ -50,6 +50,7 @@ public class Controller {
     private SoundPlayer soundEffect2;
     private SoundPlayer soundEffect3;
     private SoundPlayer soundEffect4;
+    private SoundPlayer[] soundEffects;
 
     public Controller(Stage primaryStage) {
         // HashMap saves the state of the Effect-selector knob & the Effect-intensity
@@ -85,6 +86,12 @@ public class Controller {
         soundEffect2 = new SoundPlayer("/SoundEffects/dundun.wav");
         soundEffect3 = new SoundPlayer("/SoundEffects/fart.wav");
         soundEffect4 = new SoundPlayer("/SoundEffects/yippi.wav");
+
+        this.soundEffects = new SoundPlayer[4];
+        soundEffects[0] = soundEffect1;
+        soundEffects[1] = soundEffect2;
+        soundEffects[2] = soundEffect3;
+        soundEffects[3] = soundEffect4;
     }
 
     private void preloadSongData() {
@@ -137,6 +144,12 @@ public class Controller {
         }
         playSong(channel);
         frame.setWaveformAudioData(songsData.get(songPath), channel);
+    }
+
+    public void setSoundboardVolume(float volume) {
+        for (SoundPlayer player : soundEffects) {
+            player.setVolume(volume);
+        }
     }
 
     public void startPlaylist(int channel, int selectedIndex,
