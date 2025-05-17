@@ -33,6 +33,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.awt.*;
+import java.awt.Desktop.Action;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -64,6 +65,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private CenterPnl centerPnl;
     private int progressCounter;
     private String draggedItem;
+    private Soundboard soundboard;
 
     public MainFrame(Controller controller) {
         this.controller = controller;
@@ -118,7 +120,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
         initializeSongsPane();
         initializePlaylistPane();
         topPnl = new TopPnl(this, controller, primaryPane, numCols);
-        leftPnl = new LeftPnl(this, primaryPane, numCols);
+        soundboard = new Soundboard(controller);
+        leftPnl = new LeftPnl(soundboard, this, primaryPane, numCols);
         rightPnl = new RightPnl(this, primaryPane, numCols);
         centerPnl = new CenterPnl(controller, primaryPane, numCols);
 
@@ -233,8 +236,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
         ToolBar songsMenu = new ToolBar(importSongs, viewPlaylist, addToPlaylist, playlistBox, switchChannelOne);
         songsPane.setTop(songsMenu);
     }
-
-
 
     public void initializePlaylistPane() {
         currentPlaylist = new ListView<>();
@@ -427,7 +428,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
             event.consume();
         });
     }
-
 
     public void handleChannelSwitch(ActionEvent actionEvent) {
         if (channelOneActive) {
