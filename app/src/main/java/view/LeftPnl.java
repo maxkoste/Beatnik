@@ -1,5 +1,6 @@
 package view;
 
+import controller.Controller;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -9,12 +10,14 @@ import javafx.scene.layout.GridPane;
 public class LeftPnl {
     private MainFrame mainFrame;
     private GridPane primaryPane;
+    private Controller controller;
     private int maxCols;
 
-    public LeftPnl(MainFrame mainFrame, GridPane primaryPane, int maxCols) {
+    public LeftPnl(MainFrame mainFrame, GridPane primaryPane, int maxCols, Controller controller) {
         this.mainFrame = mainFrame;
         this.primaryPane = primaryPane;
         this.maxCols = maxCols - 1;
+        this.controller = controller;
 
         initialize();
     }
@@ -56,8 +59,12 @@ public class LeftPnl {
 
         CircularSlider cueVolume = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
         cueVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
-            double volume = newValue.doubleValue();
-            System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
+
+            double value = newValue.doubleValue();
+            int volume = (int) (Math.ceil(value / 2.7)); // 0–100 skala
+            System.out.println("volume: " + volume);
+            controller.setCueVolume(1, volume); // eller 2, beroende på spelare
+
         });
         cueVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         cueVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);

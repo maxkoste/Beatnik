@@ -5,6 +5,7 @@ import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.effects.FlangerEffect;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
+import dsp.TestMediaPlayer;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
@@ -21,9 +22,13 @@ import java.util.TimerTask;
 
 import dsp.MediaPlayer;
 
+import javax.sound.sampled.*;
+
 public class Controller {
-    private MediaPlayer audioPlayer1;
-    private MediaPlayer audioPlayer2;
+    //private MediaPlayer audioPlayer1;
+   // private MediaPlayer audioPlayer2;
+    TestMediaPlayer audioPlayer1;
+    TestMediaPlayer audioPlayer2;
     private MainFrame frame;
     private PlaylistManager playlistManager;
     private TimerThreadOne timerThreadOne;
@@ -55,8 +60,15 @@ public class Controller {
         effectIntensityMap.put("PLACEHOLDER", 0.0F);
         effectIntensityMap.put("PLACEHOLDER2", 0.0F);
 
-        audioPlayer1 = new MediaPlayer();
-        audioPlayer2 = new MediaPlayer();
+        Mixer masterMixer = getPlayableMixerByName("Speakers (Realtek(R) Audio)");
+        Mixer cueMixer = getPlayableMixerByName("Headphones (Realtek(R) Audio)");
+
+        audioPlayer1 = new TestMediaPlayer(masterMixer, cueMixer);
+        audioPlayer2 = new TestMediaPlayer(masterMixer, cueMixer);
+
+
+     //   audioPlayer1 = new MediaPlayer();
+       // audioPlayer2 = new MediaPlayer();
         timerThreadOne = new TimerThreadOne();
         timerThreadTwo = new TimerThreadTwo();
         frame = new MainFrame(this);
@@ -91,6 +103,32 @@ public class Controller {
             extractor.setDaemon(true);
             extractor.start();
         }
+    }
+    public void toggleCue(int playerNumber) {
+        if (playerNumber == 1) {
+            audioPlayer1.setCueEnabled(!audioPlayer1.isCueEnabled());
+        } else if (playerNumber == 2) {
+            audioPlayer2.setCueEnabled(!audioPlayer2.isCueEnabled());
+        }
+    }
+    public void setCueVolume(int playerNumber, float volume) {
+        audioPlayer1.setCueVolume(volume);
+        audioPlayer2.setCueVolume(volume);
+    }
+
+    private  Mixer getPlayableMixerByName(String namePart) {
+        AudioFormat format = new AudioFormat(44100, 16, 2, true, false);
+        DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
+
+        for (Mixer.Info mixerInfo : AudioSystem.getMixerInfo()) {
+            if (mixerInfo.getName().toLowerCase().contains(namePart.toLowerCase())) {
+                Mixer mixer = AudioSystem.getMixer(mixerInfo);
+                if (mixer.isLineSupported(info)) {
+                    return mixer;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -293,8 +331,8 @@ public class Controller {
                 audioPlayer2.setFlangerEffectMix(mix);
                 break;
             case "filter":
-                audioPlayer1.setFilterFrequency(mix);
-                audioPlayer2.setFilterFrequency(mix);
+          //      audioPlayer1.setFilterFrequency(mix);
+            //    audioPlayer2.setFilterFrequency(mix);
             default:
                 break;
         }

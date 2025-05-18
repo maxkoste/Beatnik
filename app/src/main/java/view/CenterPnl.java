@@ -26,6 +26,7 @@ public class CenterPnl {
         this.primaryPane = primaryPane;
         this.maxCols = maxCols - 1;
 
+
         initializeCrossfader();
         initializeChannelOne();
         initializeChannelTwo();
@@ -79,6 +80,9 @@ public class CenterPnl {
 
         // Toggle image on button state change
         channelOneCue.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+            boolean cueEnabled = channelOneCue.isSelected();
+            controller.toggleCue(1);
+            System.out.println("Pressed cue");
             String imagePath = isNowSelected ? "/Buttons/cue-engaged.png" : "/Buttons/cue-passive.png";
             channelOneCueImage.setImage(new Image(getClass().getResourceAsStream(imagePath)));
         });
@@ -221,6 +225,8 @@ public class CenterPnl {
 
         // Toggle image on button state change
         channelTwoCue.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+            boolean cueEnabled = channelTwoCue.isSelected();
+            controller.toggleCue(2);
             String imagePath = isNowSelected ? "/Buttons/cue-engaged.png" : "/Buttons/cue-passive.png";
             channelTwoCueImage.setImage(new Image(getClass().getResourceAsStream(imagePath)));
         });
