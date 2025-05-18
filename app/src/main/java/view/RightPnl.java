@@ -99,8 +99,8 @@ public class RightPnl {
         masterVolume.setMax(100.0);
         masterVolume.setBlockIncrement(20);
         masterVolume.setMinorTickCount(0);
-        masterVolume.setShowTickLabels(true);
-        masterVolume.setShowTickMarks(true);
+        // masterVolume.setShowTickLabels(true);
+        // masterVolume.setShowTickMarks(true);
         masterVolume.showTickLabelsProperty();
         masterVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
             mainFrame.setMasterVolume(newValue.floatValue() / 100);
