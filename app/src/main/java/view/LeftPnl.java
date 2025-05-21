@@ -61,9 +61,9 @@ public class LeftPnl {
         cueVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
 
             double value = newValue.doubleValue();
-            int volume = (int) (Math.ceil(value / 2.7)); // 0–100 skala
+            int volume = (int) (Math.ceil(value / 2.7));
             System.out.println("volume: " + volume);
-            controller.setCueVolume(1, volume); // eller 2, beroende på spelare
+            controller.setCueVolume(1, volume);
 
         });
         cueVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);

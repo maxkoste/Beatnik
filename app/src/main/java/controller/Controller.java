@@ -6,6 +6,7 @@ import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.effects.FlangerEffect;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import dsp.TestMediaPlayer;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
@@ -21,14 +22,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import dsp.MediaPlayer;
+import view.MixerSelectionView;
 
 import javax.sound.sampled.*;
 
 public class Controller {
-    //private MediaPlayer audioPlayer1;
-   // private MediaPlayer audioPlayer2;
-    TestMediaPlayer audioPlayer1;
-    TestMediaPlayer audioPlayer2;
+    private MediaPlayer audioPlayer1;
+    private MediaPlayer audioPlayer2;
+
     private MainFrame frame;
     private PlaylistManager playlistManager;
     private TimerThreadOne timerThreadOne;
@@ -60,15 +61,24 @@ public class Controller {
         effectIntensityMap.put("PLACEHOLDER", 0.0F);
         effectIntensityMap.put("PLACEHOLDER2", 0.0F);
 
-        Mixer masterMixer = getPlayableMixerByName("Speakers (Realtek(R) Audio)");
-        Mixer cueMixer = getPlayableMixerByName("Headphones (Realtek(R) Audio)");
+        MixerSelectionView mixerSelectionView = new MixerSelectionView();
+        mixerSelectionView.showAndWait(primaryStage);
 
-        audioPlayer1 = new TestMediaPlayer(masterMixer, cueMixer);
-        audioPlayer2 = new TestMediaPlayer(masterMixer, cueMixer);
+        Mixer masterMixer = mixerSelectionView.getSelectedMasterMixer();
+        Mixer cueMixer = mixerSelectionView.getSelectedCueMixer();
+
+        if (masterMixer == null || cueMixer == null) {
+            System.err.println("❌ Inga giltiga mixrar valdes – avslutar.");
+            Platform.exit();
+            return;
+        }
 
 
-     //   audioPlayer1 = new MediaPlayer();
-       // audioPlayer2 = new MediaPlayer();
+        audioPlayer1 = new MediaPlayer(masterMixer, cueMixer);
+        audioPlayer2 = new MediaPlayer(masterMixer, cueMixer);
+
+
+
         timerThreadOne = new TimerThreadOne();
         timerThreadTwo = new TimerThreadTwo();
         frame = new MainFrame(this);
@@ -116,20 +126,6 @@ public class Controller {
         audioPlayer2.setCueVolume(volume);
     }
 
-    private  Mixer getPlayableMixerByName(String namePart) {
-        AudioFormat format = new AudioFormat(44100, 16, 2, true, false);
-        DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
-
-        for (Mixer.Info mixerInfo : AudioSystem.getMixerInfo()) {
-            if (mixerInfo.getName().toLowerCase().contains(namePart.toLowerCase())) {
-                Mixer mixer = AudioSystem.getMixer(mixerInfo);
-                if (mixer.isLineSupported(info)) {
-                    return mixer;
-                }
-            }
-        }
-        return null;
-    }
 
     /**
      * Method for cleaning up resources and stopping the playback of any audio
@@ -331,8 +327,8 @@ public class Controller {
                 audioPlayer2.setFlangerEffectMix(mix);
                 break;
             case "filter":
-          //      audioPlayer1.setFilterFrequency(mix);
-            //    audioPlayer2.setFilterFrequency(mix);
+                audioPlayer1.setFilterFrequency(mix);
+                audioPlayer2.setFilterFrequency(mix);
             default:
                 break;
         }
