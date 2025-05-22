@@ -1,6 +1,6 @@
 # Beatnik - DJ Software
 
-# Welcome to **Beatnik**, your next-generation DJ software for seamless mixing, beatmatching, and live performances.
+Welcome to **Beatnik**, your next-generation DJ software for seamless mixing, beatmatching, and live performances.
 
 ![Beatnik_Poster_A2](https://github.com/user-attachments/assets/4dc967bd-f801-4f3c-b442-595c75da3564)
 
