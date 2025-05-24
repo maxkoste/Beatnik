@@ -223,3 +223,13 @@
 .text-area .scroll-bar {
     -fx-background-color: #2a2e3d;
 }
+
+.progress-bar > .bar {
+    -fx-background-color: linear-gradient(to right, #005fcc, #009944);
+}
+
+.progress-bar > .track {
+    -fx-background-color: #222531;
+    -fx-background-insets: 0;
+    -fx-background-radius: 5;
+}

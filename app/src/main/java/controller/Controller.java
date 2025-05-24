@@ -17,8 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Semaphore;
 
 import dsp.MediaPlayer;
+import dsp.SoundPlayer;
 
 public class Controller {
     private MediaPlayer audioPlayer1;
@@ -43,6 +45,12 @@ public class Controller {
     private final Object lock = new Object();
     private Timer timerOne;
     private Timer timerTwo;
+    private Semaphore nbrOfThreads = new Semaphore(7);
+    private SoundPlayer soundEffect1;
+    private SoundPlayer soundEffect2;
+    private SoundPlayer soundEffect3;
+    private SoundPlayer soundEffect4;
+    private SoundPlayer[] soundEffects;
 
     public Controller(Stage primaryStage) {
         // HashMap saves the state of the Effect-selector knob & the Effect-intensity
@@ -50,7 +58,7 @@ public class Controller {
         effectIntensityMap = new HashMap<String, Float>();
         effectIntensityMap.put("delay", 0.0F);
         effectIntensityMap.put("flanger", 0.0F);
-        effectIntensityMap.put("filter", 0.0F); 
+        effectIntensityMap.put("filter", 0.0F);
         effectIntensityMap.put("PLACEHOLDER", 0.0F);
         effectIntensityMap.put("PLACEHOLDER2", 0.0F);
 
@@ -61,8 +69,8 @@ public class Controller {
         frame = new MainFrame(this);
         playlistManager = new PlaylistManager(frame);
         frame.setPlaylistManager(playlistManager);
-        this.currentEffect = "filter"; //the knob for the effect selector starts at 12 o clock 
-                                       // which is the filter effect 
+        this.currentEffect = "filter"; // the knob for the effect selector starts at 12 o clock
+                                       // which is the filter effect
         startUp(primaryStage);
     }
 
@@ -73,29 +81,34 @@ public class Controller {
         preloadSongData();
         timerThreadOne.start();
         timerThreadTwo.start();
+
+        soundEffect1 = new SoundPlayer("/SoundEffects/daddy_chill.wav");
+        soundEffect2 = new SoundPlayer("/SoundEffects/dundun.wav");
+        soundEffect3 = new SoundPlayer("/SoundEffects/fart.wav");
+        soundEffect4 = new SoundPlayer("/SoundEffects/yippi.wav");
+
+        this.soundEffects = new SoundPlayer[4];
+        soundEffects[0] = soundEffect1;
+        soundEffects[1] = soundEffect2;
+        soundEffects[2] = soundEffect3;
+        soundEffects[3] = soundEffect4;
     }
 
     private void preloadSongData() {
         ObservableList<String> songFileNames = playlistManager.getSongsGUI();
         for (int i = 0; i < songFileNames.size(); i++) {
-            if (i == songFileNames.size() -1) {
-                String songName = songFileNames.get(i);
+            int pos = i;
+            Thread extractor = new Thread(() -> {
+                String songName = songFileNames.get(pos);
                 float[] songData = extract(songName);
                 synchronized (lock) {
                     songsData.put(songName, songData);
+                    frame.updateLoading(songFileNames.size());
+                    nbrOfThreads.release();
                 }
-            } else {
-                int pos = i;
-                Thread extractor = new Thread(() -> {
-                    String songName = songFileNames.get(pos);
-                    float[] songData = extract(songName);
-                    synchronized (lock) {
-                        songsData.put(songName, songData);
-                    }
-                });
-                extractor.setDaemon(true);
-                extractor.start();
-            }
+            });
+            extractor.setDaemon(true);
+            extractor.start();
         }
     }
 
@@ -131,6 +144,12 @@ public class Controller {
         }
         playSong(channel);
         frame.setWaveformAudioData(songsData.get(songPath), channel);
+    }
+
+    public void setSoundboardVolume(float volume) {
+        for (SoundPlayer player : soundEffects) {
+            player.setVolume(volume);
+        }
     }
 
     public void startPlaylist(int channel, int selectedIndex,
@@ -169,6 +188,23 @@ public class Controller {
             audioPlayer2.resetSong();
         }
         playSong(channel);
+    }
+
+    public void playSoundEffect(int button) {
+        switch (button) {
+            case 1:
+                soundEffect1.play();
+                break;
+            case 2:
+                soundEffect2.play();
+                break;
+            case 3:
+                soundEffect3.play();
+                break;
+            case 4:
+                soundEffect4.play();
+                break;
+        }
     }
 
     public void setEffect(int effectSelectorValue) {
@@ -321,6 +357,7 @@ public class Controller {
     private float[] extract(String filePath) {
         List<Float> audioSamples = new ArrayList<>();
         try {
+            nbrOfThreads.acquire();
             String path = new File("src/main/resources/songs/" + filePath)
                     .getAbsolutePath();
             AudioDispatcher audioDataGetter = AudioDispatcherFactory.fromPipe(path,

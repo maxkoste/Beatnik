@@ -2,10 +2,15 @@ package view;
 
 import controller.Controller;
 import controller.PlaylistManager;
+import javafx.animation.Animation;
+import javafx.animation.Interpolator;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -13,15 +18,22 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.*;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.awt.*;
+import java.awt.Desktop.Action;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -31,9 +43,13 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private GridPane primaryPane;
     private BorderPane songsPane;
     private BorderPane playlistsPane;
+    private StackPane startUpPane;
+    private Stage primaryStage;
     private Stage playlistStage;
+    private Scene primaryScene;
     private Scene songsScene;
     private Scene playlistsScene;
+    private ProgressBar progressBar;
     private MultipleSelectionModel<String> songSelector;
     private SelectionModel<String> playlistSelector;
     private ListView<String> currentPlaylist;
@@ -47,6 +63,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
     private LeftPnl leftPnl;
     private RightPnl rightPnl;
     private CenterPnl centerPnl;
+    private int progressCounter;
+    private String draggedItem;
+    private Soundboard soundboard;
 
     public MainFrame(Controller controller) {
         this.controller = controller;
@@ -62,9 +81,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
         playlistStage = new Stage();
         playlistStage.setTitle("All Songs");
-        playlistStage.setResizable(true);
+        playlistStage.setResizable(false);
 
         StackPane root = new StackPane(); // Root layout with padding background
+        startUpPane = new StackPane(); // Pane which contains startup content
         primaryPane = new GridPane(); // Pane which contains all content
         songsPane = new BorderPane(); // Pane which contains songs popup content
         playlistsPane = new BorderPane(); // Pane which contains currentPlaylist popup content
@@ -96,29 +116,44 @@ public class MainFrame implements EventHandler<ActionEvent> {
             primaryPane.getRowConstraints().add(rowConst);
         }
 
+        initializeStartUpPane(screenHeight);
         initializeSongsPane();
         initializePlaylistPane();
         topPnl = new TopPnl(this, controller, primaryPane, numCols);
-        leftPnl = new LeftPnl(this, primaryPane, numCols);
+        soundboard = new Soundboard(controller);
+        leftPnl = new LeftPnl(soundboard, this, primaryPane, numCols);
         rightPnl = new RightPnl(this, primaryPane, numCols);
         centerPnl = new CenterPnl(controller, primaryPane, numCols);
 
-        Scene primaryScene = new Scene(root, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
+        primaryScene = new Scene(root, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
+        Scene startUpScene = new Scene(startUpPane, (screenHeight * 0.9), (screenHeight * 0.9));
 
         songsScene = new Scene(songsPane, (screenHeight * 0.7), (screenHeight * 0.7));
         playlistsScene = new Scene(playlistsPane, (screenHeight * 0.7), (screenHeight * 0.7));
 
+        startUpScene.getStylesheets().add("styles.css");
+        primaryScene.getStylesheets().add("styles.css");
         playlistsScene.getStylesheets().add("styles.css");
         songsScene.getStylesheets().add("styles.css");
         primaryStage.getIcons().add(new Image("/Logo/beatnik-logo.png"));
-        primaryStage.setScene(primaryScene); // Finalize window to be shown
-        primaryScene.getStylesheets().add("styles.css");
+        primaryStage.setScene(startUpScene); // Finalize window to be shown
         primaryStage.show();
 
         playlistStage.setScene(songsScene);
         playlistStage.initModality(Modality.APPLICATION_MODAL);
 
         onClose(primaryStage);
+        this.primaryStage = primaryStage;
+    }
+
+    public void updateLoading(double nbrOfSongsToLoad) {
+        Platform.runLater(() -> {
+            progressCounter++;
+            progressBar.setProgress(progressCounter / nbrOfSongsToLoad);
+            if (progressCounter >= nbrOfSongsToLoad) {
+                primaryStage.setScene(primaryScene);
+            }
+        });
     }
 
     /**
@@ -130,6 +165,38 @@ public class MainFrame implements EventHandler<ActionEvent> {
         primaryStage.setOnCloseRequest(event -> {
             controller.shutDown();
         });
+    }
+
+    public void initializeStartUpPane(double screenHeight) {
+        ImageView logo = new ImageView(new Image("/Logo/beatnik-logo2.png"));
+        ImageView logoText = new ImageView(new Image("/Logo/beatnik-logo3.png"));
+
+        logo.setFitHeight(screenHeight * 0.35);
+        logo.setFitWidth(screenHeight * 0.35);
+
+        logoText.setScaleX(0.4);
+        logoText.setScaleY(0.4);
+
+        progressBar = new ProgressBar();
+
+        progressBar.setPrefWidth(screenHeight * 0.35);
+        progressBar.setScaleX(1.0);
+
+        HBox progressBarContainer = new HBox(progressBar);
+        progressBarContainer.setAlignment(Pos.CENTER);
+
+        VBox logoBox = new VBox(logoText, logo);
+        logoBox.setAlignment(Pos.CENTER);
+
+        logoBox.setSpacing(-95);
+
+        // logoTextContainer.setAlignment(Pos.TOP_CENTER);
+        VBox container = new VBox(logoBox, progressBarContainer);
+        container.setSpacing(40);
+        container.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+        startUpPane.setAlignment(Pos.CENTER);
+        startUpPane.getChildren().add(container);
+        // startUpPane.getChildren().add(logoTextContainer);
     }
 
     public void initializeSongsPane() {
@@ -172,6 +239,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
     public void initializePlaylistPane() {
         currentPlaylist = new ListView<>();
+        activateDragAndDrop();
         playlistSongSelector = currentPlaylist.getSelectionModel();
         playlistSongSelector.setSelectionMode(SelectionMode.MULTIPLE);
         currentPlaylist.setOnMouseClicked(this::handlePlaylistSongSelection);
@@ -276,6 +344,89 @@ public class MainFrame implements EventHandler<ActionEvent> {
         String playlistSelected = playlistSelector.getSelectedItem();
         playlistManager.addToPlaylist(playlistSelected, songSelector.getSelectedIndices());
         playlistManager.savePlaylistData();
+    }
+
+    private void activateDragAndDrop() {
+        ObservableList<String> playlist = currentPlaylist.getItems();
+
+        currentPlaylist.setCellFactory(lv -> {
+            ListCell<String> cell = new ListCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setText(empty ? null : item);
+                }
+            };
+
+            cell.setOnDragDetected(event -> {
+                if (!cell.isEmpty()) {
+                    Dragboard db = cell.startDragAndDrop(TransferMode.MOVE);
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(cell.getItem());
+                    db.setContent(content);
+                    event.consume();
+                }
+            });
+
+            cell.setOnDragOver(event -> {
+                if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
+                    event.acceptTransferModes(TransferMode.MOVE);
+                }
+                event.consume();
+            });
+
+            cell.setOnDragEntered(event -> {
+                if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
+                    cell.setStyle("-fx-background-color: lightgray;");
+                }
+            });
+
+            cell.setOnDragExited(event -> {
+                cell.setStyle("");
+            });
+
+            cell.setOnDragDropped(event -> {
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+                if (db.hasString()) {
+                    int draggedIdx = currentPlaylist.getItems().indexOf(db.getString());
+                    int thisIdx = cell.getIndex();
+
+                    if (draggedIdx != thisIdx) {
+                        String temp = currentPlaylist.getItems().remove(draggedIdx);
+                        currentPlaylist.getItems().add(thisIdx, temp);
+                    }
+                    success = true;
+                }
+                event.setDropCompleted(success);
+                event.consume();
+            });
+
+            cell.setOnDragDone(DragEvent::consume);
+
+            return cell;
+        });
+
+        // Handle drop on empty space (e.g., below all cells)
+        currentPlaylist.setOnDragOver(event -> {
+            if (event.getDragboard().hasString()) {
+                event.acceptTransferModes(TransferMode.MOVE);
+            }
+            event.consume();
+        });
+
+        currentPlaylist.setOnDragDropped(event -> {
+            Dragboard db = event.getDragboard();
+            boolean success = false;
+            if (db.hasString() && draggedItem != null) {
+                // If it's not already removed, remove it
+                playlist.remove(draggedItem);
+                playlist.add(draggedItem); // Add to end
+                success = true;
+            }
+            event.setDropCompleted(success);
+            event.consume();
+        });
     }
 
     public void handleChannelSwitch(ActionEvent actionEvent) {

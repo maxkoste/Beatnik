@@ -31,12 +31,17 @@ public class RightPnl {
         });
         effectIntensity.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         effectIntensity.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+        // effectIntensity.setScaleX(0.8);
+        // effectIntensity.setScaleY(0.8);
+
         primaryPane.add(effectIntensity, maxCols - 1, 5);
 
         ImageView effectIntensityImg = new ImageView("/Knobs/knob-bg.png");
         effectIntensityImg.fitWidthProperty().bind(effectIntensity.widthProperty());
         effectIntensityImg.fitHeightProperty().bind(effectIntensity.heightProperty());
         effectIntensityImg.setMouseTransparent(true);
+        // effectIntensityImg.setScaleX(0.8);
+        // effectIntensityImg.setScaleY(0.8);
         primaryPane.add(effectIntensityImg, maxCols - 1, 5);
 
         Label effectIntensityLabel = new Label("Effect Intensity");
@@ -59,12 +64,16 @@ public class RightPnl {
         });
         effectSelector.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         effectSelector.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+        // effectSelector.setScaleX(0.8);
+        // effectSelector.setScaleY(0.8);
         primaryPane.add(effectSelector, maxCols - 1, 8);
 
         ImageView effectSelectorImg = new ImageView("/Knobs/effect-selector-bg.png");
         effectSelectorImg.fitWidthProperty().bind(effectSelector.widthProperty());
         effectSelectorImg.fitHeightProperty().bind(effectSelector.heightProperty());
         effectSelectorImg.setMouseTransparent(true);
+        // effectSelectorImg.setScaleY(0.8);
+        // effectSelectorImg.setScaleX(0.8);
         primaryPane.add(effectSelectorImg, maxCols - 1, 8);
 
         Label echo = new Label("Echo");
@@ -90,6 +99,9 @@ public class RightPnl {
         masterVolume.setMax(100.0);
         masterVolume.setBlockIncrement(20);
         masterVolume.setMinorTickCount(0);
+        // masterVolume.setShowTickLabels(true);
+        // masterVolume.setShowTickMarks(true);
+        masterVolume.showTickLabelsProperty();
         masterVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
             mainFrame.setMasterVolume(newValue.floatValue() / 100);
         });
