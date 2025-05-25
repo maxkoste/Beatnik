@@ -4,19 +4,18 @@ import controller.Controller;
 import controller.PlaylistManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -28,352 +27,491 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 public class MainFrame implements EventHandler<ActionEvent> {
-    private GridPane primaryPane;
-    private BorderPane songsPane;
-    private BorderPane playlistsPane;
-    private Stage playlistStage;
-    private Scene songsScene;
-    private Scene playlistsScene;
-    private MultipleSelectionModel<String> songSelector;
-    private SelectionModel<String> playlistSelector;
-    private ListView<String> currentPlaylist;
-    private MultipleSelectionModel<String> playlistSongSelector;
-    private Boolean channelOneActive = true;
-    private Controller controller;
-    private PlaylistManager playlistManager;
-    private Button switchChannelOne;
-    private Button switchChannelTwo;
-    private TopPnl topPnl;
-    private LeftPnl leftPnl;
-    private RightPnl rightPnl;
-    private CenterPnl centerPnl;
+	private GridPane primaryPane;
+	private BorderPane songsPane;
+	private BorderPane playlistsPane;
+	private StackPane startUpPane;
+	private Stage primaryStage;
+	private Stage playlistStage;
+	private Scene primaryScene;
+	private Scene songsScene;
+	private Scene playlistsScene;
+	private ProgressBar progressBar;
+	private MultipleSelectionModel<String> songSelector;
+	private SelectionModel<String> playlistSelector;
+	private ListView<String> currentPlaylist;
+	private MultipleSelectionModel<String> playlistSongSelector;
+	private Boolean channelOneActive = true;
+	private Controller controller;
+	private PlaylistManager playlistManager;
+	private Button switchChannelOne;
+	private Button switchChannelTwo;
+	private TopPnl topPnl;
+	private LeftPnl leftPnl;
+	private RightPnl rightPnl;
+	private CenterPnl centerPnl;
+	private int progressCounter;
+	private String draggedItem;
+	private Soundboard soundboard;
 
-    public MainFrame(Controller controller) {
-        this.controller = controller;
-    }
+	public MainFrame(Controller controller) {
+		this.controller = controller;
+	}
 
-    public void start(Stage primaryStage) {
-        Dimension screenResolution = Toolkit.getDefaultToolkit().getScreenSize();
-        double screenHeight = screenResolution.getHeight();
+	public void start(Stage primaryStage) {
+		Dimension screenResolution = Toolkit.getDefaultToolkit().getScreenSize();
+		double screenHeight = screenResolution.getHeight();
 
-        primaryStage.setTitle("Beatnik");
-        primaryStage.setResizable(true);
-        primaryStage.getIcons().add(new Image("/Logo/beatnik-logo.png"));
+		primaryStage.setTitle("Beatnik");
+		primaryStage.setResizable(true);
+		primaryStage.getIcons().add(new Image("/Logo/beatnik-logo.png"));
 
-        playlistStage = new Stage();
-        playlistStage.setTitle("All Songs");
-        playlistStage.setResizable(true);
+		playlistStage = new Stage();
+		playlistStage.setTitle("All Songs");
+		playlistStage.setResizable(false);
 
-        StackPane root = new StackPane(); // Root layout with padding background
-        primaryPane = new GridPane(); // Pane which contains all content
-        songsPane = new BorderPane(); // Pane which contains songs popup content
-        playlistsPane = new BorderPane(); // Pane which contains currentPlaylist popup content
+		StackPane root = new StackPane(); // Root layout with padding background
+		startUpPane = new StackPane(); // Pane which contains startup content
+		primaryPane = new GridPane(); // Pane which contains all content
+		songsPane = new BorderPane(); // Pane which contains songs popup content
+		playlistsPane = new BorderPane(); // Pane which contains currentPlaylist popup content
 
-        primaryPane.maxWidthProperty().bind(Bindings.createDoubleBinding(
-                () -> Math.min(root.getWidth(), root.getHeight()), root.widthProperty(), root.heightProperty()));
+		primaryPane.maxWidthProperty().bind(Bindings.createDoubleBinding(
+				() -> Math.min(root.getWidth(), root.getHeight()), root.widthProperty(), root.heightProperty()));
 
-        primaryPane.maxHeightProperty().bind(primaryPane.maxWidthProperty());
-        primaryPane.minWidthProperty().bind(primaryPane.maxWidthProperty());
-        primaryPane.minHeightProperty().bind(primaryPane.maxHeightProperty());
+		primaryPane.maxHeightProperty().bind(primaryPane.maxWidthProperty());
+		primaryPane.minWidthProperty().bind(primaryPane.maxWidthProperty());
+		primaryPane.minHeightProperty().bind(primaryPane.maxHeightProperty());
 
-        primaryPane.setAlignment(Pos.CENTER);
-        primaryPane.setGridLinesVisible(true); // TODO: TEMPORARY?
+		primaryPane.setAlignment(Pos.CENTER);
+		primaryPane.setGridLinesVisible(true);
 
-        root.getChildren().add(primaryPane);
+		root.getChildren().add(primaryPane);
 
-        final int numCols = 13;
-        final int numRows = 13;
-        for (int i = 0; i < numCols; i++) {
-            ColumnConstraints colConst = new ColumnConstraints();
-            colConst.setPercentWidth(100.0 / numCols);
-            colConst.setFillWidth(true);
-            primaryPane.getColumnConstraints().add(colConst);
-        }
-        for (int i = 0; i < numRows; i++) {
-            RowConstraints rowConst = new RowConstraints();
-            rowConst.setPercentHeight(100.0 / numRows);
-            rowConst.setFillHeight(true);
-            primaryPane.getRowConstraints().add(rowConst);
-        }
+		final int numCols = 13;
+		final int numRows = 13;
+		for (int i = 0; i < numCols; i++) {
+			ColumnConstraints colConst = new ColumnConstraints();
+			colConst.setPercentWidth(100.0 / numCols);
+			colConst.setFillWidth(true);
+			primaryPane.getColumnConstraints().add(colConst);
+		}
+		for (int i = 0; i < numRows; i++) {
+			RowConstraints rowConst = new RowConstraints();
+			rowConst.setPercentHeight(100.0 / numRows);
+			rowConst.setFillHeight(true);
+			primaryPane.getRowConstraints().add(rowConst);
+		}
 
-        initializeSongsPane();
-        initializePlaylistPane();
-        topPnl = new TopPnl(this, controller, primaryPane, numCols);
-        leftPnl = new LeftPnl(this, primaryPane, numCols);
-        rightPnl = new RightPnl(this, primaryPane, numCols);
-        centerPnl = new CenterPnl(controller, primaryPane, numCols);
+		initializeStartUpPane(screenHeight);
+		initializeSongsPane();
+		initializePlaylistPane();
+		topPnl = new TopPnl(this, controller, primaryPane, numCols);
+		soundboard = new Soundboard(controller);
+		leftPnl = new LeftPnl(soundboard, this, primaryPane, numCols);
+		rightPnl = new RightPnl(this, primaryPane, numCols);
+		centerPnl = new CenterPnl(controller, primaryPane, numCols);
 
-        Scene primaryScene = new Scene(root, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
+		primaryScene = new Scene(root, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
+		Scene startUpScene = new Scene(startUpPane, (screenHeight * 0.9), (screenHeight * 0.9));
 
-        songsScene = new Scene(songsPane, (screenHeight * 0.7), (screenHeight * 0.7));
-        playlistsScene = new Scene(playlistsPane, (screenHeight * 0.7), (screenHeight * 0.7));
+		songsScene = new Scene(songsPane, (screenHeight * 0.7), (screenHeight * 0.7));
+		playlistsScene = new Scene(playlistsPane, (screenHeight * 0.7), (screenHeight * 0.7));
 
-        playlistsScene.getStylesheets().add("styles.css");
-        songsScene.getStylesheets().add("styles.css");
-        primaryStage.getIcons().add(new Image("/Logo/beatnik-logo.png"));
-        primaryStage.setScene(primaryScene); // Finalize window to be shown
-        primaryScene.getStylesheets().add("styles.css");
-        primaryStage.show();
+		startUpScene.getStylesheets().add("styles.css");
+		primaryScene.getStylesheets().add("styles.css");
+		playlistsScene.getStylesheets().add("styles.css");
+		songsScene.getStylesheets().add("styles.css");
+		primaryStage.getIcons().add(new Image("/Logo/beatnik-logo.png"));
+		primaryStage.setScene(startUpScene); // Finalize window to be shown
+		primaryStage.show();
 
-        playlistStage.setScene(songsScene);
-        playlistStage.initModality(Modality.APPLICATION_MODAL);
+		playlistStage.setScene(songsScene);
+		playlistStage.initModality(Modality.APPLICATION_MODAL);
 
-        onClose(primaryStage);
-    }
+		onClose(primaryStage);
+		this.primaryStage = primaryStage;
+	}
 
-    /**
-     * Closes resources in the controller before exiting
-     * 
-     * @param primaryStage
-     */
-    private void onClose(Stage primaryStage) {
-        primaryStage.setOnCloseRequest(event -> {
-            controller.shutDown();
-        });
-    }
+	public void updateLoading(double nbrOfSongsToLoad) {
+		Platform.runLater(() -> {
+			progressCounter++;
+			progressBar.setProgress(progressCounter / nbrOfSongsToLoad);
+			if (progressCounter >= nbrOfSongsToLoad) {
+				primaryStage.setScene(primaryScene);
+			}
+		});
+	}
 
-    public void initializeSongsPane() {
-        ListView<String> songList = new ListView<>(playlistManager.getSongsGUI());
-        songSelector = songList.getSelectionModel();
-        songSelector.setSelectionMode(SelectionMode.MULTIPLE);
-        songList.setOnMouseClicked(this::handleSongSelection);
-        songsPane.setCenter(songList);
+	/**
+	 * Closes resources in the controller before exiting
+	 * 
+	 * @param primaryStage
+	 */
+	private void onClose(Stage primaryStage) {
+		primaryStage.setOnCloseRequest(event -> {
+			controller.shutDown();
+		});
+	}
 
-        Label infoLabel = new Label("Double Click To Pick Song — Hold CTRL for Multiple Selections");
-        infoLabel.setAlignment(Pos.CENTER);
-        infoLabel.setPrefHeight(50);
-        infoLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        infoLabel.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        songsPane.setBottom(infoLabel);
+	public void initializeStartUpPane(double screenHeight) {
+		ImageView logo = new ImageView(new Image("/Logo/beatnik-logo2.png"));
+		ImageView logoText = new ImageView(new Image("/Logo/beatnik-logo3.png"));
 
-        Button importSongs = new Button("Import");
-        importSongs.setOnAction(this::handleImport);
+		logo.setFitHeight(screenHeight * 0.35);
+		logo.setFitWidth(screenHeight * 0.35);
 
-        Button viewPlaylist = new Button("View Playlist");
-        viewPlaylist.setOnAction(this::handleViewPlaylist);
+		logoText.setScaleX(0.4);
+		logoText.setScaleY(0.4);
 
-        Button addToPlaylist = new Button("Add to Playlist");
-        addToPlaylist.setOnAction(this::handleAddToPlaylist);
+		progressBar = new ProgressBar();
 
-        ChoiceBox<String> playlistBox = new ChoiceBox<>();
-        playlistBox.setPrefSize(122, 10);
-        HBox.setHgrow(playlistBox, Priority.ALWAYS);
-        playlistBox.setMaxWidth(Double.MAX_VALUE);
-        playlistBox.setItems(playlistManager.getPlaylistsGUI());
-        playlistSelector = playlistBox.getSelectionModel();
-        selectPlaylistIndex(0);
+		progressBar.setPrefWidth(screenHeight * 0.35);
+		progressBar.setScaleX(1.0);
 
-        switchChannelOne = new Button("1");
-        switchChannelOne.setOnAction(this::handleChannelSwitch);
+		HBox progressBarContainer = new HBox(progressBar);
+		progressBarContainer.setAlignment(Pos.CENTER);
 
-        ToolBar songsMenu = new ToolBar(importSongs, viewPlaylist, addToPlaylist, playlistBox, switchChannelOne);
-        songsPane.setTop(songsMenu);
-    }
+		VBox logoBox = new VBox(logoText, logo);
+		logoBox.setAlignment(Pos.CENTER);
 
-    public void initializePlaylistPane() {
-        currentPlaylist = new ListView<>();
-        playlistSongSelector = currentPlaylist.getSelectionModel();
-        playlistSongSelector.setSelectionMode(SelectionMode.MULTIPLE);
-        currentPlaylist.setOnMouseClicked(this::handlePlaylistSongSelection);
-        playlistsPane.setCenter(currentPlaylist);
+		logoBox.setSpacing(-95);
 
-        Label infoLabel = new Label("Double Click To Pick Song — Hold CTRL for Multiple Selections");
-        infoLabel.setAlignment(Pos.CENTER);
-        infoLabel.setPrefHeight(50);
-        infoLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        infoLabel.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        playlistsPane.setBottom(infoLabel);
+		// logoTextContainer.setAlignment(Pos.TOP_CENTER);
+		VBox container = new VBox(logoBox, progressBarContainer);
+		container.setSpacing(40);
+		container.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
+		startUpPane.setAlignment(Pos.CENTER);
+		startUpPane.getChildren().add(container);
+		// startUpPane.getChildren().add(logoTextContainer);
+	}
 
-        Button viewSongs = new Button("View Songs");
-        viewSongs.setOnAction(this::handleViewSongs);
+	public void initializeSongsPane() {
+		ListView<String> songList = new ListView<>(playlistManager.getSongsGUI());
+		songSelector = songList.getSelectionModel();
+		songSelector.setSelectionMode(SelectionMode.MULTIPLE);
+		songList.setOnMouseClicked(this::handleSongSelection);
+		songsPane.setCenter(songList);
 
-        Button editName = new Button("Edit Name");
-        editName.setOnAction(this::handleEditPlaylistName);
+		Label infoLabel = new Label("Double Click To Pick Song — Hold CTRL for Multiple Selections");
+		infoLabel.setAlignment(Pos.CENTER);
+		infoLabel.setPrefHeight(50);
+		infoLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+		infoLabel.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+		songsPane.setBottom(infoLabel);
 
-        Button removeSongsFromPlaylist = new Button("Remove Songs");
-        HBox.setHgrow(removeSongsFromPlaylist, Priority.ALWAYS);
-        removeSongsFromPlaylist.setMaxWidth(Double.MAX_VALUE);
-        removeSongsFromPlaylist.setOnAction(this::handleRemoveSongsFromPlaylist);
+		Button importSongs = new Button("Import");
+		importSongs.setOnAction(this::handleImport);
 
-        Button deletePlaylist = new Button("Delete Playlist");
-        deletePlaylist.setOnAction(this::handleDeletePlaylist);
+		Button viewPlaylist = new Button("View Playlist");
+		viewPlaylist.setOnAction(this::handleViewPlaylist);
 
-        switchChannelTwo = new Button("1");
-        switchChannelTwo.setOnAction(this::handleChannelSwitch);
+		Button addToPlaylist = new Button("Add to Playlist");
+		addToPlaylist.setOnAction(this::handleAddToPlaylist);
 
-        ToolBar playlistMenu = new ToolBar(viewSongs, editName, removeSongsFromPlaylist, deletePlaylist,
-                switchChannelTwo);
-        playlistsPane.setTop(playlistMenu);
-    }
+		ChoiceBox<String> playlistBox = new ChoiceBox<>();
+		playlistBox.setPrefSize(122, 10);
+		HBox.setHgrow(playlistBox, Priority.ALWAYS);
+		playlistBox.setMaxWidth(Double.MAX_VALUE);
+		playlistBox.setItems(playlistManager.getPlaylistsGUI());
+		playlistSelector = playlistBox.getSelectionModel();
+		selectPlaylistIndex(0);
 
-    @Override
-    public void handle(ActionEvent actionEvent) { // Songsbutton method, basic name from interface
-        playlistStage.showAndWait();
-    }
+		switchChannelOne = new Button("1");
+		switchChannelOne.setOnAction(this::handleChannelSwitch);
 
-    public void handleSongSelection(MouseEvent mouseEvent) {
-        if (mouseEvent.getClickCount() == 2) {
-            if (channelOneActive) {
-                controller.setSong(1, songSelector.getSelectedItem());
-                setInfoText(false, songSelector.getSelectedItem(), 1);
-            } else {
-                controller.setSong(2, songSelector.getSelectedItem());
-                setInfoText(false, songSelector.getSelectedItem(), 2);
-            }
-        }
-    }
+		ToolBar songsMenu = new ToolBar(importSongs, viewPlaylist, addToPlaylist, playlistBox, switchChannelOne);
+		songsPane.setTop(songsMenu);
+	}
 
-    public void handleImport(ActionEvent actionEvent) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Import a song");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Audio Files", "*.wav", "*.mp3"));
-        File selectedFile = fileChooser.showOpenDialog(playlistStage);
-        if (selectedFile != null) {
-            try {
-                controller.moveFile(selectedFile,
-                        String.valueOf(Paths.get("src/main/resources/songs/" + selectedFile.getName())));
-            } catch (IOException e) {
-                System.out.println("File could not be moved");
-            }
-        }
-    }
+	public void initializePlaylistPane() {
+		currentPlaylist = new ListView<>();
+		activateDragAndDrop();
+		playlistSongSelector = currentPlaylist.getSelectionModel();
+		playlistSongSelector.setSelectionMode(SelectionMode.MULTIPLE);
+		currentPlaylist.setOnMouseClicked(this::handlePlaylistSongSelection);
+		playlistsPane.setCenter(currentPlaylist);
 
-    public void handleViewPlaylist(ActionEvent actionEvent) {
-        String playlistName = playlistSelector.getSelectedItem();
-        if (playlistName.equals("New Playlist")) {
-            userMessage(Alert.AlertType.INFORMATION, "No Playlist Selected");
-        } else {
-            currentPlaylist.setItems(playlistManager.getPlaylistSongs(playlistName));
-            playlistStage.setTitle(playlistName);
-            playlistStage.setScene(playlistsScene);
-        }
-    }
+		Label infoLabel = new Label("Double Click To Pick Song — Hold CTRL for Multiple Selections");
+		infoLabel.setAlignment(Pos.CENTER);
+		infoLabel.setPrefHeight(50);
+		infoLabel.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+		infoLabel.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+		playlistsPane.setBottom(infoLabel);
 
-    public void handleViewSongs(ActionEvent actionEvent) {
-        playlistStage.setTitle("All Songs");
-        playlistStage.setScene(songsScene);
-    }
+		Button viewSongs = new Button("View Songs");
+		viewSongs.setOnAction(this::handleViewSongs);
 
-    public void handleEditPlaylistName(ActionEvent actionEvent) {
-        playlistStage.setTitle(playlistManager.editPlaylistName(playlistSelector.getSelectedItem()));
-        playlistManager.savePlaylistData();
-    }
+		Button editName = new Button("Edit Name");
+		editName.setOnAction(this::handleEditPlaylistName);
 
-    public void handleDeletePlaylist(ActionEvent actionEvent) {
-        playlistManager.deletePlaylist(playlistStage.getTitle());
-        handleViewSongs(actionEvent);
-        playlistManager.savePlaylistData();
-    }
+		Button removeSongsFromPlaylist = new Button("Remove Songs");
+		HBox.setHgrow(removeSongsFromPlaylist, Priority.ALWAYS);
+		removeSongsFromPlaylist.setMaxWidth(Double.MAX_VALUE);
+		removeSongsFromPlaylist.setOnAction(this::handleRemoveSongsFromPlaylist);
 
-    public void handleRemoveSongsFromPlaylist(ActionEvent actionEvent) {
-        playlistManager.removeSongsFromPlaylist(playlistStage.getTitle(), playlistSongSelector.getSelectedItems());
-        currentPlaylist.getItems().removeAll(playlistSongSelector.getSelectedItem());
-        playlistManager.savePlaylistData();
-    }
+		Button deletePlaylist = new Button("Delete Playlist");
+		deletePlaylist.setOnAction(this::handleDeletePlaylist);
 
-    public void handleAddToPlaylist(ActionEvent actionEvent) {
-        String playlistSelected = playlistSelector.getSelectedItem();
-        playlistManager.addToPlaylist(playlistSelected, songSelector.getSelectedIndices());
-        playlistManager.savePlaylistData();
-    }
+		switchChannelTwo = new Button("1");
+		switchChannelTwo.setOnAction(this::handleChannelSwitch);
 
-    public void handleChannelSwitch(ActionEvent actionEvent) {
-        if (channelOneActive) {
-            channelOneActive = false;
-            switchChannelOne.setText("2");
-            switchChannelTwo.setText("2");
-        } else {
-            channelOneActive = true;
-            switchChannelOne.setText("1");
-            switchChannelTwo.setText("1");
-        }
-    }
+		ToolBar playlistMenu = new ToolBar(viewSongs, editName, removeSongsFromPlaylist, deletePlaylist,
+				switchChannelTwo);
+		playlistsPane.setTop(playlistMenu);
+	}
 
-    public void handlePlaylistSongSelection(MouseEvent mouseEvent) {
-        if (mouseEvent.getClickCount() == 2) {
-            if (channelOneActive) {
-                controller.startPlaylist(1, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
-                setInfoText(true, playlistSongSelector.getSelectedItem(), 1);
-            } else {
-                controller.startPlaylist(2, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
-                setInfoText(true, playlistSongSelector.getSelectedItem(), 2);
-            }
-        }
-    }
+	@Override
+	public void handle(ActionEvent actionEvent) { // Songsbutton method, basic name from interface
+		playlistStage.showAndWait();
+	}
 
-    public String promptUserInput(String title, String headerText) {
-        TextInputDialog inputPlaylistName = new TextInputDialog();
-        inputPlaylistName.setTitle(title);
-        inputPlaylistName.setHeaderText(headerText);
-        Optional<String> name = inputPlaylistName.showAndWait();
+	public void handleSongSelection(MouseEvent mouseEvent) {
+		if (mouseEvent.getClickCount() == 2) {
+			if (channelOneActive) {
+				controller.setSong(1, songSelector.getSelectedItem());
+				setInfoText(false, songSelector.getSelectedItem(), 1);
+			} else {
+				controller.setSong(2, songSelector.getSelectedItem());
+				setInfoText(false, songSelector.getSelectedItem(), 2);
+			}
+		}
+	}
 
-        return name.orElse(null); // A Java-suggested improvement to an isPresent check. Returns null if the user
-        // closed the window etc instead of throwing an exception.
-    }
+	public void handleImport(ActionEvent actionEvent) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Import a song");
+		fileChooser.getExtensionFilters().addAll(
+				new FileChooser.ExtensionFilter("Audio Files", "*.wav", "*.mp3"));
+		File selectedFile = fileChooser.showOpenDialog(playlistStage);
+		if (selectedFile != null) {
+			try {
+				controller.moveFile(selectedFile,
+						String.valueOf(Paths.get("src/main/resources/songs/" + selectedFile.getName())));
+			} catch (IOException e) {
+				System.out.println("File could not be moved");
+			}
+		}
+	}
 
-    public void userMessage(Alert.AlertType alertType, String headerText) {
-        Alert message = new Alert(alertType);
-        message.setHeaderText(headerText);
-        message.showAndWait();
-    }
+	public void handleViewPlaylist(ActionEvent actionEvent) {
+		String playlistName = playlistSelector.getSelectedItem();
+		if (playlistName.equals("New Playlist")) {
+			userMessage(Alert.AlertType.INFORMATION, "No Playlist Selected");
+		} else {
+			currentPlaylist.setItems(playlistManager.getPlaylistSongs(playlistName));
+			playlistStage.setTitle(playlistName);
+			playlistStage.setScene(playlistsScene);
+		}
+	}
 
-    public boolean userConfirm(String headerText) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-        confirm.setHeaderText(headerText);
-        confirm.showAndWait();
-        return confirm.getResult() == ButtonType.OK;
-    }
+	public void handleViewSongs(ActionEvent actionEvent) {
+		playlistStage.setTitle("All Songs");
+		playlistStage.setScene(songsScene);
+	}
 
-    public void selectPlaylistIndex(int index) {
-        playlistSelector.select(index);
-    }
+	public void handleEditPlaylistName(ActionEvent actionEvent) {
+		playlistStage.setTitle(playlistManager.editPlaylistName(playlistSelector.getSelectedItem()));
+		playlistManager.savePlaylistData();
+	}
 
-    public void updateAudioIndicatorOne(double rms) {
-        centerPnl.updateAudioIndicatorOne(rms);
-    }
+	public void handleDeletePlaylist(ActionEvent actionEvent) {
+		playlistManager.deletePlaylist(playlistStage.getTitle());
+		handleViewSongs(actionEvent);
+		playlistManager.savePlaylistData();
+	}
 
-    public void updateAudioIndicatorTwo(double rms) {
-        centerPnl.updateAudioIndicatorTwo(rms);
-    }
+	public void handleRemoveSongsFromPlaylist(ActionEvent actionEvent) {
+		playlistManager.removeSongsFromPlaylist(playlistStage.getTitle(), playlistSongSelector.getSelectedItems());
+		currentPlaylist.getItems().removeAll(playlistSongSelector.getSelectedItem());
+		playlistManager.savePlaylistData();
+	}
 
-    public void updateWaveformOne(float currentSecond) {
-        topPnl.updateWaveformOne(currentSecond);
-    }
+	public void handleAddToPlaylist(ActionEvent actionEvent) {
+		String playlistSelected = playlistSelector.getSelectedItem();
+		playlistManager.addToPlaylist(playlistSelected, songSelector.getSelectedIndices());
+		playlistManager.savePlaylistData();
+	}
 
-    public void updateWaveformTwo(float currentSecond) {
-        topPnl.updateWaveformTwo(currentSecond);
-    }
+	private void activateDragAndDrop() {
+		ObservableList<String> playlist = currentPlaylist.getItems();
 
-    public void setPlaylistManager(PlaylistManager playlistManager) {
-        this.playlistManager = playlistManager;
-    }
+		currentPlaylist.setCellFactory(lv -> {
+			ListCell<String> cell = new ListCell<>() {
+				@Override
+				protected void updateItem(String item, boolean empty) {
+					super.updateItem(item, empty);
+					setText(empty ? null : item);
+				}
+			};
 
-    public void setWaveformAudioData(float[] originalAudioData, int channel) {
-        topPnl.setWaveformAudioData(originalAudioData, channel);
-    }
+			cell.setOnDragDetected(event -> {
+				if (!cell.isEmpty()) {
+					Dragboard db = cell.startDragAndDrop(TransferMode.MOVE);
+					ClipboardContent content = new ClipboardContent();
+					content.putString(cell.getItem());
+					db.setContent(content);
+					event.consume();
+				}
+			});
 
-    public void setInfoText(boolean playlist, String song, int channel) {
-        topPnl.setInfoText(playlist, song, channel);
-    }
+			cell.setOnDragOver(event -> {
+				if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
+					event.acceptTransferModes(TransferMode.MOVE);
+				}
+				event.consume();
+			});
 
-    public void setEffectMix(float mix) {
-        controller.setEffectMix(mix);
-    }
+			cell.setOnDragEntered(event -> {
+				if (event.getGestureSource() != cell && event.getDragboard().hasString()) {
+					cell.setStyle("-fx-background-color: lightgray;");
+				}
+			});
 
-    public void setEffect(int effectSelectorValue) {
-        controller.setEffect(effectSelectorValue);
-    }
+			cell.setOnDragExited(event -> {
+				cell.setStyle("");
+			});
 
-    public void setMasterVolume(float masterVolume) {
-        controller.setMasterVolume(masterVolume);
-    }
+			cell.setOnDragDropped(event -> {
+				Dragboard db = event.getDragboard();
+				boolean success = false;
+				if (db.hasString()) {
+					int draggedIdx = currentPlaylist.getItems().indexOf(db.getString());
+					int thisIdx = cell.getIndex();
 
-    public float getCurrentEffectMix() {
-        return controller.getCurrentEffectMix();
-    }
+					if (draggedIdx != thisIdx) {
+						String temp = currentPlaylist.getItems().remove(draggedIdx);
+						currentPlaylist.getItems().add(thisIdx, temp);
+					}
+					success = true;
+				}
+				event.setDropCompleted(success);
+				event.consume();
+			});
 
-    public String getSelectedPlaylist() {
-        return playlistSelector.getSelectedItem();
-    }
+			cell.setOnDragDone(DragEvent::consume);
+
+			return cell;
+		});
+
+		// Handle drop on empty space (e.g., below all cells)
+		currentPlaylist.setOnDragOver(event -> {
+			if (event.getDragboard().hasString()) {
+				event.acceptTransferModes(TransferMode.MOVE);
+			}
+			event.consume();
+		});
+
+		currentPlaylist.setOnDragDropped(event -> {
+			Dragboard db = event.getDragboard();
+			boolean success = false;
+			if (db.hasString() && draggedItem != null) {
+				// If it's not already removed, remove it
+				playlist.remove(draggedItem);
+				playlist.add(draggedItem); // Add to end
+				success = true;
+			}
+			event.setDropCompleted(success);
+			event.consume();
+		});
+	}
+
+	public void handleChannelSwitch(ActionEvent actionEvent) {
+		if (channelOneActive) {
+			channelOneActive = false;
+			switchChannelOne.setText("2");
+			switchChannelTwo.setText("2");
+		} else {
+			channelOneActive = true;
+			switchChannelOne.setText("1");
+			switchChannelTwo.setText("1");
+		}
+	}
+
+	public void handlePlaylistSongSelection(MouseEvent mouseEvent) {
+		if (mouseEvent.getClickCount() == 2) {
+			if (channelOneActive) {
+				controller.startPlaylist(1, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
+				setInfoText(true, playlistSongSelector.getSelectedItem(), 1);
+			} else {
+				controller.startPlaylist(2, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
+				setInfoText(true, playlistSongSelector.getSelectedItem(), 2);
+			}
+		}
+	}
+
+	public String promptUserInput(String title, String headerText) {
+		TextInputDialog inputPlaylistName = new TextInputDialog();
+		inputPlaylistName.setTitle(title);
+		inputPlaylistName.setHeaderText(headerText);
+		Optional<String> name = inputPlaylistName.showAndWait();
+
+		return name.orElse(null); // A Java-suggested improvement to an isPresent check. Returns null if the user
+		// closed the window etc instead of throwing an exception.
+	}
+
+	public void userMessage(Alert.AlertType alertType, String headerText) {
+		Alert message = new Alert(alertType);
+		message.setHeaderText(headerText);
+		message.showAndWait();
+	}
+
+	public boolean userConfirm(String headerText) {
+		Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+		confirm.setHeaderText(headerText);
+		confirm.showAndWait();
+		return confirm.getResult() == ButtonType.OK;
+	}
+
+	public void selectPlaylistIndex(int index) {
+		playlistSelector.select(index);
+	}
+
+	public void updateAudioIndicatorOne(double rms) {
+		centerPnl.updateAudioIndicatorOne(rms);
+	}
+
+	public void updateAudioIndicatorTwo(double rms) {
+		centerPnl.updateAudioIndicatorTwo(rms);
+	}
+
+	public void updateWaveformOne(float currentSecond) {
+		topPnl.updateWaveformOne(currentSecond);
+	}
+
+	public void updateWaveformTwo(float currentSecond) {
+		topPnl.updateWaveformTwo(currentSecond);
+	}
+
+	public void setPlaylistManager(PlaylistManager playlistManager) {
+		this.playlistManager = playlistManager;
+	}
+
+	public void setWaveformAudioData(float[] originalAudioData, int channel) {
+		topPnl.setWaveformAudioData(originalAudioData, channel);
+	}
+
+	public void setInfoText(boolean playlist, String song, int channel) {
+		topPnl.setInfoText(playlist, song, channel);
+	}
+
+	public void setEffectMix(float mix) {
+		controller.setEffectMix(mix);
+	}
+
+	public void setEffect(int effectSelectorValue) {
+		controller.setEffect(effectSelectorValue);
+	}
+
+	public void setMasterVolume(float masterVolume) {
+		controller.setMasterVolume(masterVolume);
+	}
+
+	public float getCurrentEffectMix() {
+		return controller.getCurrentEffectMix();
+	}
+
+	public String getSelectedPlaylist() {
+		return playlistSelector.getSelectedItem();
+	}
 }
