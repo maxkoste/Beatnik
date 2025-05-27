@@ -2,12 +2,15 @@ package view;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -16,18 +19,19 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * {@code MixerSelectionView} displays a JavaFX dialog allowing the user to select
- * output audio devices (Mixers) for master and cue channels.
+ * {@code MixerSelectionView} displays a dialog for choosing audio output devices
+ * (mixers) for master and cue channels.
  */
 public class MixerSelectionView {
 
     private Mixer selectedMaster;
     private Mixer selectedCue;
+
     /**
-     * Shows a modal dialog that lets the user choose a master and cue audio output device.
+     * Displays a modal dialog for choosing audio devices for output.
      * Blocks until the dialog is closed.
      *
-     * @param parentStage the parent stage from which this dialog is shown
+     * @param parentStage the stage that owns the dialog
      */
     public void showAndWait(Stage parentStage) {
         Stage dialog = new Stage();
@@ -35,63 +39,59 @@ public class MixerSelectionView {
         dialog.initOwner(parentStage);
         dialog.setTitle("Välj ljudutgångar");
 
-        GridPane pane = new GridPane();
-        pane.setPadding(new Insets(15));
-        pane.setHgap(10);
-        pane.setVgap(10);
-
-        Label masterLabel = new Label("Master Output:");
-        Label cueLabel = new Label("Cue Output:");
-
-        ComboBox<Mixer.Info> masterBox = new ComboBox<>();
-        ComboBox<Mixer.Info> cueBox = new ComboBox<>();
-
-        // Endast kompatibla mixrar
+        // Audio setup
         AudioFormat format = new AudioFormat(44100, 16, 2, true, false);
         DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
 
         List<Mixer.Info> compatibleMixers = Arrays.stream(AudioSystem.getMixerInfo())
-                .filter(mixerInfo -> {
-                    Mixer mixer = AudioSystem.getMixer(mixerInfo);
-                    return mixer.isLineSupported(info);
-                })
+                .filter(mixerInfo -> AudioSystem.getMixer(mixerInfo).isLineSupported(info))
                 .toList();
 
-        masterBox.setItems(FXCollections.observableArrayList(compatibleMixers));
-        cueBox.setItems(FXCollections.observableArrayList(compatibleMixers));
+        // UI Elements
+        Label masterLabel = new Label("Master Output:");
+        Label cueLabel = new Label("Cue Output:");
+        ComboBox<Mixer.Info> masterBox = new ComboBox<>(FXCollections.observableArrayList(compatibleMixers));
+        ComboBox<Mixer.Info> cueBox = new ComboBox<>(FXCollections.observableArrayList(compatibleMixers));
+        Button confirmBtn = new Button("Bekräfta");
 
-        // Cell rendering
+        // Set up ComboBoxes
         setComboBoxCellFactory(masterBox);
         setComboBoxCellFactory(cueBox);
-
-        // Välj första som standard
         if (!compatibleMixers.isEmpty()) {
             masterBox.getSelectionModel().selectFirst();
             cueBox.getSelectionModel().selectFirst();
         }
 
-        Button confirmBtn = new Button("Bekräfta");
+        // Confirm action
         confirmBtn.setOnAction(e -> {
             selectedMaster = AudioSystem.getMixer(masterBox.getSelectionModel().getSelectedItem());
             selectedCue = AudioSystem.getMixer(cueBox.getSelectionModel().getSelectedItem());
             dialog.close();
         });
 
-        pane.add(masterLabel, 0, 0);
-        pane.add(masterBox, 1, 0);
-        pane.add(cueLabel, 0, 1);
-        pane.add(cueBox, 1, 1);
-        pane.add(confirmBtn, 0, 2, 2, 1);
+        // Layout
+        GridPane grid = new GridPane();
+        grid.setHgap(15);
+        grid.setVgap(15);
+        grid.setPadding(new Insets(20));
+        grid.add(masterLabel, 0, 0);
+        grid.add(masterBox, 1, 0);
+        grid.add(cueLabel, 0, 1);
+        grid.add(cueBox, 1, 1);
 
-        Scene scene = new Scene(pane, 400, 180);
+        HBox buttonBox = new HBox(confirmBtn);
+        buttonBox.setAlignment(Pos.CENTER_RIGHT);
+
+        VBox layout = new VBox(grid, buttonBox);
+        layout.setSpacing(20);
+        layout.setPadding(new Insets(10));
+
+        Scene scene = new Scene(layout, 450, 200);
+        scene.getStylesheets().add("styles.css");
         dialog.setScene(scene);
         dialog.showAndWait();
     }
-    /**
-     * Sets a custom cell factory to display only the name of the audio device in the ComboBox.
-     *
-     * @param comboBox the ComboBox to apply the custom renderer to
-     */
+
     private void setComboBoxCellFactory(ComboBox<Mixer.Info> comboBox) {
         comboBox.setCellFactory(cb -> new ListCell<>() {
             @Override

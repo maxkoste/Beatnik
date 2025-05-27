@@ -5,7 +5,6 @@ import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.effects.FlangerEffect;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
-import dsp.TestMediaPlayer;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;

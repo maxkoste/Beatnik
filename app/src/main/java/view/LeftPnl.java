@@ -59,9 +59,15 @@ public class LeftPnl {
 
         CircularSlider cueVolume = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
         cueVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
-
             double value = newValue.doubleValue();
-            int volume = (int) (Math.ceil(value / 2.7));
+
+            int volume;
+            if (value < 0.2) {
+                volume = 0;
+            } else {
+                volume = (int) Math.ceil(value / 2.7);
+            }
+
             System.out.println("volume: " + volume);
             controller.setCueVolume(1, volume);
 
