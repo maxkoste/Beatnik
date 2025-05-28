@@ -62,8 +62,8 @@ public class Controller {
 		effectIntensityMap.put("PLACEHOLDER", 0.0F);
 		effectIntensityMap.put("PLACEHOLDER2", 0.0F);
 
-		audioPlayer1 = new MediaPlayer();
-		audioPlayer2 = new MediaPlayer();
+		audioPlayer1 = new MediaPlayer(this, 1);
+		audioPlayer2 = new MediaPlayer(this, 2);
 		timerThreadOne = new TimerThreadOne();
 		timerThreadTwo = new TimerThreadTwo();
 		frame = new MainFrame(this);
