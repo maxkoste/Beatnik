@@ -378,6 +378,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
 				if (db.hasString()) {
 					int draggedIdx = currentPlaylist.getItems().indexOf(db.getString());
 					int thisIdx = cell.getIndex();
+					if (cell.isEmpty()) {
+						event.setDropCompleted(false);
+						event.consume();
+						return;
+					}
 
 					if (draggedIdx != thisIdx) {
 						String temp = currentPlaylist.getItems().remove(draggedIdx);
@@ -392,27 +397,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
 			cell.setOnDragDone(DragEvent::consume);
 
 			return cell;
-		});
-
-		// Handle drop on empty space (e.g., below all cells)
-		currentPlaylist.setOnDragOver(event -> {
-			if (event.getDragboard().hasString()) {
-				event.acceptTransferModes(TransferMode.MOVE);
-			}
-			event.consume();
-		});
-
-		currentPlaylist.setOnDragDropped(event -> {
-			Dragboard db = event.getDragboard();
-			boolean success = false;
-			if (db.hasString() && draggedItem != null) {
-				// If it's not already removed, remove it
-				playlist.remove(draggedItem);
-				playlist.add(draggedItem); // Add to end
-				success = true;
-			}
-			event.setDropCompleted(success);
-			event.consume();
 		});
 	}
 

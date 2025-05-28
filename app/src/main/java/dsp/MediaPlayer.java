@@ -116,6 +116,7 @@ public class MediaPlayer {
      * Closing stream and stopping any playback of audio
      */
     public void shutDown() {
+        started = false;
         if (playbackDispatcher != null) {
             System.out.println("Shutting down audioDispatcher");
             playbackDispatcher.stop();
