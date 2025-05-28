@@ -9,6 +9,7 @@ import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
 import be.tarsos.dsp.resample.RateTransposer;
+import controller.Controller;
 import dsp.Effects.Delay;
 import dsp.Effects.Flanger;
 //Custom Dispatcher factory might be part of a solution for stereo
@@ -34,12 +35,15 @@ public class MediaPlayer {
     private final Object lock = new Object();
     private RateTransposer rateTransposer;
     private LowPassEqualizer lowPassFilter;
+    private Controller controller;
+    private int channel;
 
     private float smoothedFrequency = -1; // -1 indicates not initialized
     private final float smoothingFactor = 0.1f; // Smaller = smoother
 
-    public MediaPlayer() {
-
+    public MediaPlayer(Controller controller, int channel) {
+        this.controller = controller;
+        this.channel = channel;
     }
 
     public void setUp() {
@@ -92,7 +96,9 @@ public class MediaPlayer {
 
                 @Override
                 public void processingFinished() {
-
+                    if (started) { // If the song finished playing naturally, play the next song.
+                        controller.nextSong(channel);
+                    }
                 }
             });
 
@@ -122,8 +128,8 @@ public class MediaPlayer {
     public void playPause() throws InterruptedException {
         if (!started) {
             this.audioThread = new Thread(playbackDispatcher, "Playback Thread");
-            audioThread.setPriority(Thread.MAX_PRIORITY);
             audioThread.setDaemon(true);
+            audioThread.setPriority(Thread.MAX_PRIORITY);
             audioThread.start();
             started = true;
             isPlaying = true;

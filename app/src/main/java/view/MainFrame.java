@@ -492,7 +492,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
 	}
 
 	public void setInfoText(boolean playlist, String song, int channel) {
-		topPnl.setInfoText(playlist, song, channel);
+		Platform.runLater(() -> {
+			topPnl.setInfoText(playlist, song, channel);
+		});
 	}
 
 	public void setEffectMix(float mix) {
