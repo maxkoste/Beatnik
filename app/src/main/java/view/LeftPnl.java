@@ -10,16 +10,19 @@ import javafx.scene.layout.GridPane;
 public class LeftPnl {
 	private MainFrame mainFrame;
 	private GridPane primaryPane;
+
 	private Controller controller;
 	private int maxCols;
 	private Soundboard soundboard;
 
 	public LeftPnl(Soundboard soundboard, MainFrame mainFrame, GridPane primaryPane, int maxCols,
 			Controller controller) {
+
 		this.soundboard = soundboard;
 		this.mainFrame = mainFrame;
 		this.primaryPane = primaryPane;
 		this.maxCols = maxCols - 1;
+
 		this.controller = controller;
 
 		initialize();
@@ -31,12 +34,18 @@ public class LeftPnl {
 		songsButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		songsButton.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 
+		songsButton.getStylesheets().add("importButton.css");
+		songsButton.setScaleY(0.9);
+		songsButton.setScaleX(0.9);
 		primaryPane.add(songsButton, 1, 5);
 
-		Button soundboardButton = new Button("FART");
+		Button soundboardButton = new Button("");
 		soundboardButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		soundboardButton.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 		soundboardButton.setOnAction(soundboard);
+		soundboardButton.getStylesheets().add("soundboardButton.css");
+		soundboardButton.setScaleY(0.9);
+		soundboardButton.setScaleX(0.9);
 		// quantize.setScaleX(0.8);
 		// quantize.setScaleY(0.8);
 		primaryPane.add(soundboardButton, 1, 7);

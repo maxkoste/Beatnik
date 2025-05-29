@@ -13,40 +13,40 @@ import javax.sound.sampled.FloatControl;
  */
 public class SoundPlayer {
 
-    private Clip clip;
-    private FloatControl gainControl;
+	private Clip clip;
+	private FloatControl gainControl;
 
-    public SoundPlayer(String resourcePath) {
-        try {
-            AudioInputStream audioStream = AudioSystem.getAudioInputStream(
-                    getClass().getResource(resourcePath));
-            clip = AudioSystem.getClip();
-            clip.open(audioStream);
-            this.gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+	public SoundPlayer(String resourcePath) {
+		try {
+			AudioInputStream audioStream = AudioSystem.getAudioInputStream(
+					getClass().getResource(resourcePath));
+			clip = AudioSystem.getClip();
+			clip.open(audioStream);
+			this.gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
 
-            float min = gainControl.getMinimum();
-            float max = gainControl.getMaximum();
-            gainControl.setValue(min + (max - min) * 0.5f); // start at 50% volume
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+			float min = gainControl.getMinimum();
+			float max = gainControl.getMaximum();
+			gainControl.setValue(min + (max - min) * 0.5f); // start at 50% volume
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    public void play() {
-        if (clip.isRunning()) {
-            clip.stop();
-        }
-        clip.setFramePosition(0);
-        clip.start();
-    }
+	public void play() {
+		if (clip.isRunning()) {
+			clip.stop();
+		}
+		clip.setFramePosition(0);
+		clip.start();
+	}
 
-    public void setVolume(float volume) {
-        if (clip == null)
-            return;
+	public void setVolume(float volume) {
+		if (clip == null)
+			return;
 
-        float min = gainControl.getMinimum();
-        float max = gainControl.getMaximum();
-        float dB = min + (max - min) * volume; // interpolate between min and max
-        this.gainControl.setValue(dB);
-    }
+		float min = gainControl.getMinimum();
+		float max = gainControl.getMaximum();
+		float dB = min + (max - min) * volume; // interpolate between min and max
+		this.gainControl.setValue(dB);
+	}
 }
