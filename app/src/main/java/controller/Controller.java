@@ -4,6 +4,7 @@ import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
@@ -61,6 +62,19 @@ public class Controller {
 		effectIntensityMap.put("filter", 0.0F);
 		effectIntensityMap.put("PLACEHOLDER", 0.0F);
 		effectIntensityMap.put("PLACEHOLDER2", 0.0F);
+    
+    
+        MixerSelectionView mixerSelectionView = new MixerSelectionView();
+        mixerSelectionView.showAndWait(primaryStage);
+
+        Mixer masterMixer = mixerSelectionView.getSelectedMasterMixer();
+        Mixer cueMixer = mixerSelectionView.getSelectedCueMixer();
+
+        if (masterMixer == null || cueMixer == null) {
+            System.err.println("❌ Inga giltiga mixrar valdes – avslutar.");
+            Platform.exit();
+            return;
+        }
 
 		audioPlayer1 = new MediaPlayer(this, 1);
 		audioPlayer2 = new MediaPlayer(this, 2);
@@ -93,6 +107,18 @@ public class Controller {
 		this.soundEffects[2] = soundEffect3;
 		this.soundEffects[3] = soundEffect4;
 	}
+  
+      public void toggleCue(int playerNumber) {
+        if (playerNumber == 1) {
+            audioPlayer1.setCueEnabled(!audioPlayer1.isCueEnabled());
+        } else if (playerNumber == 2) {
+            audioPlayer2.setCueEnabled(!audioPlayer2.isCueEnabled());
+        }
+    }
+    public void setCueVolume(int playerNumber, float volume) {
+        audioPlayer1.setCueVolume(volume);
+        audioPlayer2.setCueVolume(volume);
+    }
 
 	private void preloadSongData() {
 		ObservableList<String> songFileNames = playlistManager.getSongsGUI();

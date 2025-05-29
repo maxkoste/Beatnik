@@ -35,14 +35,23 @@ public class MediaPlayer {
     private final Object lock = new Object();
     private RateTransposer rateTransposer;
     private LowPassEqualizer lowPassFilter;
+
+    private CustomAudioPlayer masterPlayer;
+    private  CustomAudioPlayer cuePlayer;
+    private Mixer masterMixer;
+    private Mixer cueMixer;
+    private boolean cueEnabled = false;
+    private GainProcessor cueVolumeProcessor;
     private Controller controller;
     private int channel;
 
     private float smoothedFrequency = -1; // -1 indicates not initialized
     private final float smoothingFactor = 0.1f; // Smaller = smoother
 
-    public MediaPlayer(Controller controller, int channel) {
-        this.controller = controller;
+    public MediaPlayer(Mixer masterMixer, Mixer cueMixer, Controller controller, int channel) {
+        this.masterMixer = masterMixer;
+        this.cueMixer = cueMixer;
+          this.controller = controller;
         this.channel = channel;
     }
 
@@ -68,9 +77,6 @@ public class MediaPlayer {
             rateTransposer = new RateTransposer(1.0F);
             lowPassFilter = new LowPassEqualizer(20000f, format.getSampleRate());
 
-            // Add volume controll first
-            volumeProcessor = new GainProcessor(0.0f);
-            playbackDispatcher.addAudioProcessor(volumeProcessor);
 
             // Add effects-processing
             playbackDispatcher.addAudioProcessor(delayEffect);
@@ -79,6 +85,16 @@ public class MediaPlayer {
             playbackDispatcher.addAudioProcessor(trebleEqualizer);
             playbackDispatcher.addAudioProcessor(rateTransposer);
             playbackDispatcher.addAudioProcessor(lowPassFilter);
+
+            // Add seperate GainProcessors
+            volumeProcessor    = new GainProcessor(1.0f);
+            cueVolumeProcessor = new GainProcessor(0.5f);
+
+            // Create the outputs
+            masterPlayer = new CustomAudioPlayer(masterMixer, format);
+            cuePlayer = new CustomAudioPlayer(cueMixer, format);
+
+
             playbackDispatcher.addAudioProcessor(new AudioProcessor() {
                 @Override
                 public boolean process(AudioEvent audioEvent) {
@@ -91,20 +107,38 @@ public class MediaPlayer {
                             }
                         }
                     }
+                    AudioEvent cueEvent = null;
+                    if (cueEnabled) {
+                        cueEvent = makeCueEvent(audioEvent);
+                    }
+                    // Master signal
+                    if(!cueEnabled){
+                        volumeProcessor.process(audioEvent);
+                        masterPlayer.write(audioEvent.getByteBuffer());
+                    }
+
+
+                    // Cue signal
+                    if (cueEnabled && cueEvent != null) {
+                        cueVolumeProcessor.process(cueEvent);
+                        cuePlayer.write(cueEvent.getByteBuffer());
+                    }
+
                     return true; // continue processing
                 }
 
                 @Override
                 public void processingFinished() {
+
+                    masterPlayer.processingFinished();
+                    cuePlayer.processingFinished();
                     if (started) { // If the song finished playing naturally, play the next song.
                         controller.nextSong(channel);
                     }
                 }
             });
 
-            // Add audio player for final output
-            AudioPlayer audioPlayer = new AudioPlayer(format);
-            playbackDispatcher.addAudioProcessor(audioPlayer);
+
 
         } catch (Exception e) {
             System.err.println("Error setting up audio: " + e.getMessage());
@@ -275,4 +309,36 @@ public class MediaPlayer {
             setUp();
         }
     }
+    public void setCueEnabled(boolean enabled) {
+        this.cueEnabled = enabled;
+    }
+
+    public boolean isCueEnabled() {
+        return cueEnabled;
+    }
+
+    public void setCueVolume(float volume) {
+        if (cueVolumeProcessor != null) {
+            float gain = volume / 100.0f;
+            System.out.println("Setting cue gain to: " + gain);
+            cueVolumeProcessor.setGain(gain);
+        }
+    }
+
+    private AudioEvent makeCueEvent(AudioEvent src) {
+
+        float[] srcFloat = src.getFloatBuffer();
+        float[] cueFloat = new float[srcFloat.length];
+        System.arraycopy(srcFloat, 0, cueFloat, 0, srcFloat.length);
+
+        TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
+        AudioEvent cue = new AudioEvent(format);
+        cue.setFloatBuffer(cueFloat);
+
+        cue.setOverlap(src.getOverlap());
+        cue.setBytesProcessing(src.getByteBuffer().length);
+
+        return cue;
+    }
+
 }
