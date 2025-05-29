@@ -4,6 +4,7 @@ import be.tarsos.dsp.AudioDispatcher;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
@@ -21,6 +22,9 @@ import java.util.concurrent.Semaphore;
 
 import dsp.MediaPlayer;
 import dsp.SoundPlayer;
+import view.MixerSelectionView;
+
+import javax.sound.sampled.Mixer;
 
 public class Controller {
 	private MediaPlayer audioPlayer1;
@@ -52,6 +56,12 @@ public class Controller {
 	private SoundPlayer soundEffect4;
 	private SoundPlayer[] soundEffects;
 
+	/**
+	 * initializes the audioplayers for each channel (1 & 2)
+	 * initializes the mainframe. Calls startup on the rest of the program.
+	 * 
+	 * @param primaryStage
+	 */
 	public Controller(Stage primaryStage) {
 		// HashMap saves the state of the Effect-selector knob & the Effect-intensity
 		// knob from the GUI
@@ -62,8 +72,20 @@ public class Controller {
 		effectIntensityMap.put("PLACEHOLDER", 0.0F);
 		effectIntensityMap.put("PLACEHOLDER2", 0.0F);
 
-		audioPlayer1 = new MediaPlayer(this, 1);
-		audioPlayer2 = new MediaPlayer(this, 2);
+		MixerSelectionView mixerSelectionView = new MixerSelectionView();
+		mixerSelectionView.showAndWait(primaryStage);
+
+		Mixer masterMixer = mixerSelectionView.getSelectedMasterMixer();
+		Mixer cueMixer = mixerSelectionView.getSelectedCueMixer();
+
+		if (masterMixer == null || cueMixer == null) {
+			System.err.println("No valid mixers selected");
+			Platform.exit();
+			return;
+		}
+
+		audioPlayer1 = new MediaPlayer(masterMixer, cueMixer, this, 1);
+		audioPlayer2 = new MediaPlayer(masterMixer, cueMixer, this, 2);
 		timerThreadOne = new TimerThreadOne();
 		timerThreadTwo = new TimerThreadTwo();
 		frame = new MainFrame(this);
@@ -74,6 +96,17 @@ public class Controller {
 		startUp(primaryStage);
 	}
 
+	/**
+	 * Loads the audioplayers with their corresponding sound effects.
+	 * loads values for:
+	 * 
+	 * Playlist
+	 * songs
+	 * soundeffects
+	 *
+	 * Starts the preloading sequence for waveforms and
+	 * starts the timer threads that update the waveforms
+	 */
 	public void startUp(Stage primaryStage) {
 		frame.start(primaryStage);
 		playlistManager.addSongsFromResources();
@@ -94,6 +127,26 @@ public class Controller {
 		this.soundEffects[3] = soundEffect4;
 	}
 
+	public void toggleCue(int playerNumber) {
+		if (playerNumber == 1) {
+			audioPlayer1.setCueEnabled(!audioPlayer1.isCueEnabled());
+		} else if (playerNumber == 2) {
+			audioPlayer2.setCueEnabled(!audioPlayer2.isCueEnabled());
+		}
+	}
+
+	public void setCueVolume(int playerNumber, float volume) {
+		audioPlayer1.setCueVolume(volume);
+		audioPlayer2.setCueVolume(volume);
+	}
+
+	/**
+	 * Creates and starts a thread for each song that preloads waveforms.
+	 * Stores the waveform data in hashmaps with song name and waveform data.
+	 * The semaphore dictates the amount of threads that are allowed to run at the
+	 * same time.
+	 * Releases the semaphore when the task is finished.
+	 */
 	private void preloadSongData() {
 		ObservableList<String> songFileNames = playlistManager.getSongsGUI();
 		for (int i = 0; i < songFileNames.size(); i++) {
@@ -136,6 +189,10 @@ public class Controller {
 		}
 	}
 
+	/**
+	 * Loads the song to the Audio player corresponding to the selected channel
+	 * then plays it and tells the GUI to update waveform data.
+	 */
 	public void setSong(int channel, String songPath) {
 		if (channel == 1) {
 			audioPlayer1.setSong(songPath);
@@ -154,6 +211,15 @@ public class Controller {
 		}
 	}
 
+	/**
+	 * Sets active playlist song paths for the selected playlist, and the index of
+	 * the selected song.
+	 * Sets the song to the corresponding audio channel.
+	 *
+	 * @param songPaths
+	 * @param channel
+	 * @param selectedIndex
+	 */
 	public void startPlaylist(int channel, int selectedIndex,
 			ObservableList<String> songPaths) {
 		playlistSongPaths = songPaths;
@@ -161,6 +227,12 @@ public class Controller {
 		setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
 	}
 
+	/**
+	 * Sets the data for the volume indicators.
+	 * Plays the song through the audio dispatcher for the corresponding channel
+	 *
+	 * @param channel
+	 */
 	public void playSong(int channel) {
 		try {
 			if (channel == 1) {
@@ -183,6 +255,11 @@ public class Controller {
 		}
 	}
 
+	/**
+	 * called when the user pressed track-cue to restart the song from the beginnng
+	 * 
+	 * @param channel
+	 */
 	public void resetSong(int channel) {
 		if (channel == 1) {
 			audioPlayer1.resetSong();
@@ -192,6 +269,12 @@ public class Controller {
 		playSong(channel);
 	}
 
+	/**
+	 * Plays the audio for the corresponding button, called from the soundboard
+	 * class
+	 *
+	 * @param button
+	 */
 	public void playSoundEffect(int button) {
 		switch (button) {
 			case 1:
@@ -209,15 +292,20 @@ public class Controller {
 		}
 	}
 
-	public void setEffect(int effectSelectorValue) {
-		/**
-		 * 0 = 1 delay
-		 * 68 = 2 Flanger
-		 * 135 = 3
-		 * 204 = 4
-		 * 270 = 5
-		 */
+	/**
+	 * Sets the current effect to be manipulated
+	 * called from the mainframes effect selector knob
+	 *
+	 * 0 = 1 delay
+	 * 68 = 2 Flanger
+	 * 135 = 3 Filter effect
+	 * 204 = 4
+	 * 270 = 5
+	 *
+	 * @param effectSelectorValue
+	 */
 
+	public void setEffect(int effectSelectorValue) {
 		switch (effectSelectorValue) {
 			case 0:
 				this.currentEffect = "delay";
@@ -235,7 +323,7 @@ public class Controller {
 				this.currentEffect = "PLACEHOLDER2";
 				break;
 			default:
-				System.out.println("Something went wrong...");
+				System.out.println("Something went seriously wrong...");
 		}
 	}
 
@@ -244,6 +332,14 @@ public class Controller {
 				0.0F);
 	}
 
+	/**
+	 * This method is called when the skip button is pressed.
+	 * gives an alert if the playlist is finished.
+	 * 
+	 * @param channel
+	 */
+	// TODO: implement a circular algorithm for the skip function
+	// ((n + 1) % sizeOfPlaylist)
 	public void nextSong(int channel) {
 		if (playlistSongPaths != null) {
 			if (!(currentPosInPlaylist >= playlistSongPaths.size() - 1)) {
@@ -265,7 +361,6 @@ public class Controller {
 	}
 
 	public void setChannelOneVolume(float volume) {
-
 		audioPlayer1.setVolume((volume * masterModifier) * crossfaderModifier1);
 		latestVolume1 = volume;
 	}
@@ -281,6 +376,12 @@ public class Controller {
 		setChannelTwoVolume(latestVolume2);
 	}
 
+	/**
+	 * Depending on the middle point of the slider - the crossfader changes the
+	 * volume of channel 1 or 2
+	 *
+	 * @param crossfaderValue
+	 */
 	public void setCrossfaderModifier(float crossfaderValue) {
 		if (crossfaderValue < 50) {
 			crossfaderModifier2 = (crossfaderValue / 50.0F);
@@ -344,18 +445,28 @@ public class Controller {
 		}
 	}
 
+	/**
+	 * When importing audio this method is called.
+	 * It gets the file from the filepath and adds it to resources.
+	 *
+	 * @param sourceFile
+	 * @param destinationPath
+	 */
 	public void moveFile(File sourceFile, String destinationPath) throws IOException {
-		System.out.println("File move attempt");
 		File desinationFile = new File(destinationPath);
-		System.out.println(sourceFile.toPath());
-		System.out.println(desinationFile.toPath());
 		Files.copy(sourceFile.toPath(), desinationFile.toPath());
 		String fileName = desinationFile.getName();
 		playlistManager.getSongsGUI().add(fileName);
 		songsData.put(fileName, extract(fileName));
-		System.out.println("File moved into the songsGUI folder");
 	}
 
+	/**
+	 * Dynamically extracts the songs data to be used by the waveforms.
+	 * Collects the data in a float buffer. Only lets n amount of threads use this
+	 * method at the same time with counting semaphores.
+	 *
+	 * @param filePath
+	 */
 	private float[] extract(String filePath) {
 		List<Float> audioSamples = new ArrayList<>();
 		try {
@@ -389,6 +500,17 @@ public class Controller {
 		return audioSamplesFinal;
 	}
 
+	/**
+	 *
+	 * Adds an audio processor to the received AudioDispatcher which calculates
+	 * the volume level (RMS) of the incoming audio and updates the volume
+	 * indicators
+	 * in the GUI based on selected channel.
+	 * 
+	 * @param dispatcher the AudioDispatcher which the processor will be added to.
+	 * @param channel    the audio channel (1 or 2) used to determine which
+	 *                   indicator to update.
+	 */
 	private void volumeIndicator(AudioDispatcher dispatcher, int channel) {
 		dispatcher.addAudioProcessor(new AudioProcessor() {
 			public boolean process(AudioEvent audioEvent) {
@@ -414,6 +536,13 @@ public class Controller {
 		});
 	}
 
+	/**
+	 *
+	 * Timer that calls the waveform to be updated based on the current time of the
+	 * song (Channel 1)
+	 *
+	 * Runs every 5 ms (pretty fucking sick)
+	 */
 	public class TimerThreadOne extends Thread {
 		public void run() {
 			timerOne = new Timer();
@@ -428,6 +557,13 @@ public class Controller {
 		}
 	}
 
+	/**
+	 *
+	 * Timer that calls the waveform to be updated based on the current time of the
+	 * song (Channel 2)
+	 *
+	 * Runs every 5 ms (pretty fucking sick)
+	 */
 	public class TimerThreadTwo extends Thread {
 		public void run() {
 			timerTwo = new Timer();
