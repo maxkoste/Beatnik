@@ -64,7 +64,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
 		primaryStage.setTitle("Beatnik");
 		primaryStage.setResizable(true);
-		primaryStage.getIcons().add(new Image("/Logo/beatnik-logo.png"));
+		primaryStage.getIcons().add(new Image("/Logo/beatnik-logo4.png"));
 
 		playlistStage = new Stage();
 		playlistStage.setTitle("All Songs");
@@ -108,7 +108,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		initializePlaylistPane();
 		topPnl = new TopPnl(this, controller, primaryPane, numCols);
 		soundboard = new Soundboard(controller);
-		leftPnl = new LeftPnl(soundboard, this, primaryPane, numCols);
+		leftPnl = new LeftPnl(soundboard, this, primaryPane, numCols, this.controller);
 		rightPnl = new RightPnl(this, primaryPane, numCols);
 		centerPnl = new CenterPnl(controller, primaryPane, numCols);
 
@@ -122,7 +122,6 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		primaryScene.getStylesheets().add("styles.css");
 		playlistsScene.getStylesheets().add("styles.css");
 		songsScene.getStylesheets().add("styles.css");
-		primaryStage.getIcons().add(new Image("/Logo/beatnik-logo.png"));
 		primaryStage.setScene(startUpScene); // Finalize window to be shown
 		primaryStage.show();
 
@@ -179,6 +178,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
 		// logoTextContainer.setAlignment(Pos.TOP_CENTER);
 		VBox container = new VBox(logoBox, progressBarContainer);
+		container.setTranslateY(-screenHeight * 0.05);
 		container.setSpacing(40);
 		container.setMaxSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
 		startUpPane.setAlignment(Pos.CENTER);

@@ -1,5 +1,6 @@
 package view;
 
+import controller.Controller;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -9,14 +10,20 @@ import javafx.scene.layout.GridPane;
 public class LeftPnl {
 	private MainFrame mainFrame;
 	private GridPane primaryPane;
+
+	private Controller controller;
 	private int maxCols;
 	private Soundboard soundboard;
 
-	public LeftPnl(Soundboard soundboard, MainFrame mainFrame, GridPane primaryPane, int maxCols) {
+	public LeftPnl(Soundboard soundboard, MainFrame mainFrame, GridPane primaryPane, int maxCols,
+			Controller controller) {
+
 		this.soundboard = soundboard;
 		this.mainFrame = mainFrame;
 		this.primaryPane = primaryPane;
 		this.maxCols = maxCols - 1;
+
+		this.controller = controller;
 
 		initialize();
 	}
@@ -26,6 +33,7 @@ public class LeftPnl {
 		songsButton.setOnAction(mainFrame);
 		songsButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		songsButton.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+
 		songsButton.getStylesheets().add("importButton.css");
 		songsButton.setScaleY(0.9);
 		songsButton.setScaleX(0.9);
@@ -44,8 +52,18 @@ public class LeftPnl {
 
 		CircularSlider cueVolume = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
 		cueVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
-			double volume = newValue.doubleValue();
-			System.out.println("volume: " + ((int) (Math.ceil(volume / 2.7))));
+			double value = newValue.doubleValue();
+
+			int volume;
+			if (value < 0.2) {
+				volume = 0;
+			} else {
+				volume = (int) Math.ceil(value / 2.7);
+			}
+
+			System.out.println("volume: " + volume);
+			controller.setCueVolume(1, volume);
+
 		});
 		cueVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		cueVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);

@@ -233,3 +233,25 @@
     -fx-background-insets: 0;
     -fx-background-radius: 5;
 }
+.combo-box {
+    -fx-background-color: #2a2e3d;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #444857;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #ffffff;
+}
+
+.combo-box .list-cell:hover {
+    -fx-background-color: #2a2e3d;
+    -fx-text-fill: #b5efca;
+}
+
+.combo-box .list-cell:selected {
+    -fx-background-color: #444857;
+    -fx-text-fill: #1DB954;
+}
