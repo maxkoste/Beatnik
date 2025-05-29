@@ -62,9 +62,7 @@ public class WaveFormCanvas extends Canvas {
      * Updates the waveform 10 sek before and after what is currently being played.
      * 10 sek before the songs starts and 10 seconds after it ended the array is
      * filled with 0.0f
-     * 
-     * @param currentSecond the current values in the float array, represented by
-     *                      its float value
+     * @param currentSecond the current values in the float array, represented by its float value
      */
     public void update(float currentSecond) {
         if (currentSecond != 0) {

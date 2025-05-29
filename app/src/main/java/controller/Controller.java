@@ -22,6 +22,9 @@ import java.util.concurrent.Semaphore;
 
 import dsp.MediaPlayer;
 import dsp.SoundPlayer;
+import view.MixerSelectionView;
+
+import javax.sound.sampled.Mixer;
 
 public class Controller {
 	private MediaPlayer audioPlayer1;
@@ -76,8 +79,8 @@ public class Controller {
             return;
         }
 
-		audioPlayer1 = new MediaPlayer(this, 1);
-		audioPlayer2 = new MediaPlayer(this, 2);
+		audioPlayer1 = new MediaPlayer(masterMixer, cueMixer, this, 1);
+		audioPlayer2 = new MediaPlayer(masterMixer, cueMixer, this, 2);
 		timerThreadOne = new TimerThreadOne();
 		timerThreadTwo = new TimerThreadTwo();
 		frame = new MainFrame(this);
