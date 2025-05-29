@@ -65,8 +65,8 @@ public class CenterPnl {
         channelOneCue.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelOneCue.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
         channelOneCue.setBackground(Background.EMPTY);
-        //channelOneCue.setScaleX(0.8);
-        //channelOneCue.setScaleY(0.8);
+        channelOneCue.setScaleX(0.8);
+        channelOneCue.setScaleY(0.8);
         primaryPane.add(channelOneCue, 3, maxCols - 1);
 
         // Image overlay for channel one
@@ -74,8 +74,8 @@ public class CenterPnl {
         channelOneCueImage.fitWidthProperty().bind(channelOneCue.widthProperty());
         channelOneCueImage.fitHeightProperty().bind(channelOneCue.heightProperty());
         channelOneCueImage.setMouseTransparent(true); // Allow mouse events to pass through
-        //channelOneCueImage.setScaleX(0.8);
-        //channelOneCueImage.setScaleY(0.8);
+        channelOneCueImage.setScaleX(0.9);
+        channelOneCueImage.setScaleY(0.9);
         primaryPane.add(channelOneCueImage, 3, maxCols - 1);
 
         // Toggle image on button state change
@@ -209,8 +209,8 @@ public class CenterPnl {
         channelTwoCue.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
         channelTwoCue.setBackground(Background.EMPTY);
 
-        //channelTwoCue.setScaleY(0.8);
-        //channelTwoCue.setScaleX(0.8);
+        channelTwoCue.setScaleY(0.9);
+        channelTwoCue.setScaleX(0.9);
 
         primaryPane.add(channelTwoCue, maxCols - 3, maxCols - 1);
 
@@ -219,8 +219,8 @@ public class CenterPnl {
         channelTwoCueImage.fitWidthProperty().bind(channelTwoCue.widthProperty());
         channelTwoCueImage.fitHeightProperty().bind(channelTwoCue.heightProperty());
         channelTwoCueImage.setMouseTransparent(true); // Allow mouse events to pass through
-        //channelTwoCueImage.setScaleX(0.8);
-        //channelTwoCueImage.setScaleY(0.8);
+        channelTwoCueImage.setScaleX(0.9);
+        channelTwoCueImage.setScaleY(0.9);
         primaryPane.add(channelTwoCueImage, maxCols - 3, maxCols - 1);
 
         // Toggle image on button state change

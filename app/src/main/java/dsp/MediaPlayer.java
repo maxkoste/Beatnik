@@ -9,6 +9,7 @@ import be.tarsos.dsp.io.TarsosDSPAudioFormat;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import be.tarsos.dsp.io.jvm.AudioPlayer;
 import be.tarsos.dsp.resample.RateTransposer;
+import controller.Controller;
 import dsp.Effects.Delay;
 import dsp.Effects.Flanger;
 //Custom Dispatcher factory might be part of a solution for stereo
@@ -34,19 +35,24 @@ public class MediaPlayer {
     private final Object lock = new Object();
     private RateTransposer rateTransposer;
     private LowPassEqualizer lowPassFilter;
+
     private CustomAudioPlayer masterPlayer;
     private  CustomAudioPlayer cuePlayer;
     private Mixer masterMixer;
     private Mixer cueMixer;
     private boolean cueEnabled = false;
     private GainProcessor cueVolumeProcessor;
+    private Controller controller;
+    private int channel;
 
     private float smoothedFrequency = -1; // -1 indicates not initialized
     private final float smoothingFactor = 0.1f; // Smaller = smoother
 
-    public MediaPlayer(Mixer masterMixer, Mixer cueMixer) {
+    public MediaPlayer(Mixer masterMixer, Mixer cueMixer, Controller controller, int channel) {
         this.masterMixer = masterMixer;
         this.cueMixer = cueMixer;
+          this.controller = controller;
+        this.channel = channel;
     }
 
     public void setUp() {
@@ -123,8 +129,12 @@ public class MediaPlayer {
 
                 @Override
                 public void processingFinished() {
+
                     masterPlayer.processingFinished();
                     cuePlayer.processingFinished();
+                    if (started) { // If the song finished playing naturally, play the next song.
+                        controller.nextSong(channel);
+                    }
                 }
             });
 
@@ -140,6 +150,7 @@ public class MediaPlayer {
      * Closing stream and stopping any playback of audio
      */
     public void shutDown() {
+        started = false;
         if (playbackDispatcher != null) {
             System.out.println("Shutting down audioDispatcher");
             playbackDispatcher.stop();
@@ -152,8 +163,8 @@ public class MediaPlayer {
     public void playPause() throws InterruptedException {
         if (!started) {
             this.audioThread = new Thread(playbackDispatcher, "Playback Thread");
-            audioThread.setPriority(Thread.MAX_PRIORITY);
             audioThread.setDaemon(true);
+            audioThread.setPriority(Thread.MAX_PRIORITY);
             audioThread.start();
             started = true;
             isPlaying = true;
@@ -292,9 +303,11 @@ public class MediaPlayer {
     }
 
     public void resetSong() {
-        started = false;
-        isPlaying = true;
-        setUp();
+        if (playbackDispatcher != null) {
+            started = false;
+            isPlaying = true;
+            setUp();
+        }
     }
     public void setCueEnabled(boolean enabled) {
         this.cueEnabled = enabled;
