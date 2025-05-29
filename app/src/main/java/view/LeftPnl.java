@@ -4,6 +4,7 @@ import controller.Controller;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
@@ -37,15 +38,32 @@ public class LeftPnl {
 		songsButton.getStylesheets().add("importButton.css");
 		songsButton.setScaleY(0.9);
 		songsButton.setScaleX(0.9);
+
+		songsButton.setText("");
+		ImageView image2 = new ImageView(new Image("/Symbols/audio_files.png"));
+		image2.setFitHeight(songsButton.getHeight());
+		image2.setFitWidth(songsButton.getWidth());
+		image2.setScaleY(0.25);
+		image2.setScaleX(0.25);
+		image2.setPreserveRatio(true);
+		songsButton.setGraphic(image2);
 		primaryPane.add(songsButton, 1, 5);
 
-		Button soundboardButton = new Button("S");
+		Button soundboardButton = new Button("");
 		soundboardButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		soundboardButton.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 		soundboardButton.setOnAction(soundboard);
 		soundboardButton.getStylesheets().add("soundboardButton.css");
 		soundboardButton.setScaleY(0.9);
 		soundboardButton.setScaleX(0.9);
+
+		ImageView image = new ImageView(new Image("/Symbols/soundboard.png"));
+		image.setFitHeight(soundboardButton.getHeight());
+		image.setFitWidth(soundboardButton.getWidth());
+		image.setScaleY(0.25);
+		image.setScaleX(0.25);
+		image.setPreserveRatio(true);
+		soundboardButton.setGraphic(image);
 		// quantize.setScaleX(0.8);
 		// quantize.setScaleY(0.8);
 		primaryPane.add(soundboardButton, 1, 8);

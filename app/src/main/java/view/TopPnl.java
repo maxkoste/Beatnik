@@ -1,8 +1,10 @@
 package view;
 
 import controller.Controller;
+import javafx.scene.image.ImageView;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
+import javafx.scene.image.Image;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
@@ -18,6 +20,7 @@ public class TopPnl {
 	private Label waveformTwoText;
 	private WaveFormCanvas waveFormOne;
 	private WaveFormCanvas waveFormTwo;
+	private Button[] buttons = new Button[6];
 
 	public TopPnl(MainFrame mainFrame, Controller controller, GridPane primaryPane, int maxCols) {
 		this.mainFrame = mainFrame;
@@ -34,24 +37,32 @@ public class TopPnl {
 		channelOnePlayPause.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		channelOnePlayPause.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 		primaryPane.add(channelOnePlayPause, 0, 0);
+		channelOnePlayPause.getStylesheets().add("topPanel.css");
+		buttons[0] = channelOnePlayPause;
 
 		Button channelTwoPlayPause = new Button("⏯");
 		channelTwoPlayPause.setOnAction(this::handleChannelTwoPlayPause);
 		channelTwoPlayPause.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		channelTwoPlayPause.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 		primaryPane.add(channelTwoPlayPause, 0, 2);
+		channelTwoPlayPause.getStylesheets().add("topPanel.css");
+		buttons[1] = channelTwoPlayPause;
 
 		Button channelOneTrackCue = new Button("C");
 		channelOneTrackCue.setOnAction(this::handleChannelOneTrackCue);
 		channelOneTrackCue.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		channelOneTrackCue.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 		primaryPane.add(channelOneTrackCue, 0, 1);
+		channelOneTrackCue.getStylesheets().add("topPanel.css");
+		buttons[2] = channelOneTrackCue;
 
 		Button channelTwoTrackCue = new Button("C");
 		channelTwoTrackCue.setOnAction(this::handleChannelTwoTrackCue);
 		channelTwoTrackCue.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		channelTwoTrackCue.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 		primaryPane.add(channelTwoTrackCue, 0, 3);
+		channelTwoTrackCue.getStylesheets().add("topPanel.css");
+		buttons[3] = channelTwoTrackCue;
 
 		Button channelOneSkip = new Button("⏭");
 		channelOneSkip.setOnAction(this::handleChannelOneSkip);
@@ -59,6 +70,8 @@ public class TopPnl {
 		channelOneSkip.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 		GridPane.setRowSpan(channelOneSkip, 2);
 		primaryPane.add(channelOneSkip, maxCols, 0);
+		channelOneSkip.getStylesheets().add("topPanel.css");
+		buttons[4] = channelOneSkip;
 
 		Button channelTwoSkip = new Button("⏭");
 		channelTwoSkip.setOnAction(this::handleChannelTwoSkip);
@@ -66,6 +79,25 @@ public class TopPnl {
 		channelTwoSkip.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 		GridPane.setRowSpan(channelTwoSkip, 2);
 		primaryPane.add(channelTwoSkip, maxCols, 2);
+		channelTwoSkip.getStylesheets().add("topPanel.css");
+		buttons[5] = channelTwoSkip;
+
+		String[] resources = { "/Symbols/play_pause.png", "/Symbols/play_pause.png", "/Symbols/replay.png",
+				"/Symbols/replay.png", "/Symbols/skip_next.png", "/Symbols/skip_next.png" };
+		int counter = 0;
+
+		for (Button button : buttons) {
+			button.setScaleY(0.8);
+			button.setScaleX(0.8);
+			ImageView image = new ImageView(new Image(resources[counter]));
+			image.setScaleY(0.4);
+			image.setScaleX(0.4);
+			image.setFitHeight(button.getWidth());
+			image.setFitWidth(button.getWidth());
+			image.setPreserveRatio(true);
+			button.setGraphic(image);
+			counter++;
+		}
 	}
 
 	private void initializeWaveForms() {

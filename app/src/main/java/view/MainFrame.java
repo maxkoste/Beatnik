@@ -118,10 +118,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		songsScene = new Scene(songsPane, (screenHeight * 0.7), (screenHeight * 0.7));
 		playlistsScene = new Scene(playlistsPane, (screenHeight * 0.7), (screenHeight * 0.7));
 
-		startUpScene.getStylesheets().add("styles.css");
-		primaryScene.getStylesheets().add("styles.css");
-		playlistsScene.getStylesheets().add("styles.css");
-		songsScene.getStylesheets().add("styles.css");
+		startUpScene.getStylesheets().add("mainStyle.css");
+		primaryScene.getStylesheets().add("mainStyle.css");
+		playlistsScene.getStylesheets().add("mainStyle.css");
+		songsScene.getStylesheets().add("mainStyle.css");
 		primaryStage.setScene(startUpScene); // Finalize window to be shown
 		primaryStage.show();
 
