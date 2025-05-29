@@ -269,8 +269,10 @@ public class MediaPlayer {
     }
 
     public void resetSong() {
-        started = false;
-        isPlaying = true;
-        setUp();
+        if (playbackDispatcher != null) {
+            started = false;
+            isPlaying = true;
+            setUp();
+        }
     }
 }
