@@ -4,10 +4,8 @@ import javafx.event.ActionEvent;
 
 import controller.Controller;
 import javafx.event.EventHandler;
-import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
@@ -22,6 +20,9 @@ public class Soundboard implements EventHandler<ActionEvent> {
 	private int gridSize;
 	private Stage stage;
 
+	/**
+	 * @param controller
+	 */
 	public Soundboard(Controller controller) {
 
 		this.gridSize = 4;
@@ -30,6 +31,12 @@ public class Soundboard implements EventHandler<ActionEvent> {
 		initializeSoundBoard();
 	}
 
+	/**
+	 * Creates a stage for the pop up window that is this class
+	 * populates it with buttons and loads its own .css file for styling
+	 * applies images for the gui artefacts and creates a gridPane layout for
+	 * managing the layout
+	 */
 	private void initializeSoundBoard() {
 		this.stage = new Stage();
 		this.stage.setAlwaysOnTop(true);
@@ -116,30 +123,19 @@ public class Soundboard implements EventHandler<ActionEvent> {
 		cueImg.setScaleX(0.6);
 		cueImg.setScaleY(0.6);
 		grid.add(cueImg, 3, 1);
-
-		// // Slider
-		// Slider masterVolume = new Slider();
-		// masterVolume.setOrientation(Orientation.VERTICAL);
-		// masterVolume.setMax(100.0);
-		// masterVolume.setBlockIncrement(20);
-		// masterVolume.setShowTickMarks(true);
-		// masterVolume.setShowTickLabels(true);
-		// masterVolume.setMinorTickCount(0);
-		// masterVolume.valueProperty().addListener((observable, oldValue, newValue) ->
-		// {
-		// controller.setSoundboardVolume(newValue.floatValue() / 100);
-		// });
-		// masterVolume.setValue(50);
-		//
-		// GridPane.setRowSpan(masterVolume, 2);
-		// grid.add(masterVolume, 3, 1);
 	}
 
+	/**
+	 * Is activated when the button on the leftpanel is pressed
+	 * shows this stage
+	 */
 	@Override
-	public void handle(ActionEvent arg0) {
+	public void handle(ActionEvent actionEvent) {
 		this.stage.show();
 	}
 
 	public void exit() {
+		// TODO: do something here to shut this piece of shit soundboard down when the
+		// main application quits
 	}
 }

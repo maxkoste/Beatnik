@@ -1,7 +1,5 @@
 package dsp;
 
-import java.io.File;
-
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -16,6 +14,9 @@ public class SoundPlayer {
 	private Clip clip;
 	private FloatControl gainControl;
 
+	/**
+	 * @param resourcePath the audio to be played
+	 */
 	public SoundPlayer(String resourcePath) {
 		try {
 			AudioInputStream audioStream = AudioSystem.getAudioInputStream(
@@ -32,6 +33,9 @@ public class SoundPlayer {
 		}
 	}
 
+	/**
+	 * Resets the audios starting position after each play
+	 */
 	public void play() {
 		if (clip.isRunning()) {
 			clip.stop();
@@ -40,6 +44,11 @@ public class SoundPlayer {
 		clip.start();
 	}
 
+	/**
+	 * Normalizes the incomming float value to a dB scale
+	 * 
+	 * @param volume value between 1-100
+	 */
 	public void setVolume(float volume) {
 		if (clip == null)
 			return;

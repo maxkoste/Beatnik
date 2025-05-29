@@ -20,13 +20,22 @@ public class PlaylistManager {
 	Random randomSongPicker = new Random();
 	MainFrame frame;
 
+	/**
+	 * The destinationfile is set to the .dat file where all the playlist objects
+	 * are stored
+	 * 
+	 * @param frame
+	 */
 	public PlaylistManager(MainFrame frame) {
 		this.frame = frame;
 		dataDestinationFile = new File("src/main/resources/data.dat").getAbsoluteFile();
 	}
 
-	public void savePlaylistData() { // TODO: Maybe redo to only save relevant playlist. Downside = find way to not
-										// overwrite file on new call.
+	/**
+	 * Saves the playlist objects to a .dat file in order to maintain state when
+	 * closing the application
+	 */
+	public void savePlaylistData() {
 		try (FileOutputStream fos = new FileOutputStream(dataDestinationFile);
 				BufferedOutputStream bos = new BufferedOutputStream(fos);
 				ObjectOutputStream oos = new ObjectOutputStream(bos)) {
@@ -39,7 +48,11 @@ public class PlaylistManager {
 		}
 	}
 
-	public void loadPlaylistData() { // TODO: Exception handling
+	/**
+	 * Loads the .dat file, checks if the .dat file is corrupted and refreshes the
+	 * GUI
+	 */
+	public void loadPlaylistData() {
 		try (FileInputStream fis = new FileInputStream(dataDestinationFile);
 				BufferedInputStream bis = new BufferedInputStream(fis);
 				ObjectInputStream ois = new ObjectInputStream(bis)) {
@@ -55,6 +68,11 @@ public class PlaylistManager {
 		frame.selectPlaylistIndex(0);
 	}
 
+	/**
+	 * utility method for finding a playlist
+	 * 
+	 * @param playlistName
+	 */
 	public Playlist findPlaylist(String playlistName) { // UTILITY
 		for (int i = 0; i < playlists.size(); i++) {
 			if (playlists.get(i).getName().equals(playlistName)) {
@@ -64,6 +82,11 @@ public class PlaylistManager {
 		return null;
 	}
 
+	/**
+	 *
+	 * @param the name of the playlist
+	 * @return ObservableList with the songs in a playlist
+	 */
 	public ObservableList<String> getPlaylistSongs(String name) {
 		Playlist playlist = findPlaylist(name);
 		ObservableList<String> songs = FXCollections.observableArrayList();
@@ -73,13 +96,16 @@ public class PlaylistManager {
 	}
 
 	public void updatePlaylistGUI() {
-		playlistsGUI.clear(); // TODO: Maybe better way of keeping a playlist "clean"
+		playlistsGUI.clear();
 		playlistsGUI.add("New Playlist");
 		for (int i = 0; i < playlists.size(); i++) {
 			playlistsGUI.add(playlists.get(i).getName());
 		}
 	}
 
+	/**
+	 * loops through the songs folder to load all the songs on startup
+	 */
 	public void addSongsFromResources() {
 		File[] files = new File("src/main/resources/songs/").getAbsoluteFile().listFiles();
 		if (files != null) {
@@ -89,6 +115,13 @@ public class PlaylistManager {
 		}
 	}
 
+	/**
+	 * Creates a new playlist if the user chooses more then one index they are all
+	 * added to the new Playlist
+	 *
+	 * @param name
+	 * @param songIndices
+	 */
 	public void createNewPlaylist(String name, ObservableList<Integer> songIndices) {
 		HashSet<String> songPaths = new HashSet<>();
 		for (int i = 0; i < songIndices.size(); i++) {
@@ -98,6 +131,15 @@ public class PlaylistManager {
 		updatePlaylistGUI();
 		frame.selectPlaylistIndex(0);
 	}
+
+	/**
+	 * adds the songs to a new playlist if the user chooses more then one index they
+	 * are all
+	 * added to the new Playlist
+	 *
+	 * @param playlistName
+	 * @param selectedIndices
+	 */
 
 	public void addToPlaylist(String playlistName, ObservableList<Integer> selectedIndices) {
 		if (playlistName.equals("New Playlist")) {
@@ -113,7 +155,11 @@ public class PlaylistManager {
 		}
 	}
 
-	public String newPlaylistName() { // TODO: Maybe improve various null-checks, feels like too many
+	/**
+	 * Attempts to return a new playlist name, as long as the name isn't taken,
+	 * blank, or "New Playlist".
+	 */
+	public String newPlaylistName() {
 		String input = frame.promptUserInput("New Playlist", "Input Playlist Name");
 		if (input != null) {
 			if (input.isEmpty() || input.isBlank()) {
@@ -131,6 +177,11 @@ public class PlaylistManager {
 		return input;
 	}
 
+	/**
+	 * Changes the name of a playlist to the given string.
+	 *
+	 * @param playlistName
+	 */
 	public String editPlaylistName(String playlistName) {
 		Playlist playlist = findPlaylist(playlistName);
 		String newName = newPlaylistName();
@@ -144,11 +195,15 @@ public class PlaylistManager {
 	}
 
 	public String randomSong() {
-		System.out.println(songsGUI.size());
 		return songsGUI.get(randomSongPicker.nextInt(0, songsGUI.size()));
 	}
 
-	public void deletePlaylist(String playlistName) { // TODO: Remove from .dat
+	/**
+	 * Removes a given playlist from the list of playlists if a user confirms.
+	 *
+	 * @param playlistName
+	 */
+	public void deletePlaylist(String playlistName) {
 		if (frame.userConfirm("Are you sure you want to delete " + playlistName + "?")) {
 			for (int i = 0; i < playlists.size(); i++) {
 				if (playlists.get(i).getName().equals(playlistName)) {
@@ -161,9 +216,13 @@ public class PlaylistManager {
 		}
 	}
 
-	public void removeSongsFromPlaylist(String playlistName, ObservableList<String> selectedItems) { // Playlist finder
-																										// method for
-																										// code-reuse
+	/**
+	 * Removes selected songs from a given playlist.
+	 *
+	 * @param playlistName
+	 * @param selectedItems names of the songs to be removed
+	 */
+	public void removeSongsFromPlaylist(String playlistName, ObservableList<String> selectedItems) {
 		Playlist playlist = findPlaylist(playlistName);
 		for (int j = 0; j < selectedItems.size(); j++) {
 			playlist.removeSong(selectedItems.get(j));

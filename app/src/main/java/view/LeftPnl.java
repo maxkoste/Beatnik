@@ -39,7 +39,7 @@ public class LeftPnl {
 		songsButton.setScaleX(0.9);
 		primaryPane.add(songsButton, 1, 5);
 
-		Button soundboardButton = new Button("");
+		Button soundboardButton = new Button("S");
 		soundboardButton.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		soundboardButton.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 		soundboardButton.setOnAction(soundboard);
@@ -48,7 +48,7 @@ public class LeftPnl {
 		soundboardButton.setScaleX(0.9);
 		// quantize.setScaleX(0.8);
 		// quantize.setScaleY(0.8);
-		primaryPane.add(soundboardButton, 1, 7);
+		primaryPane.add(soundboardButton, 1, 8);
 
 		CircularSlider cueVolume = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
 		cueVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
