@@ -1,0 +1,30 @@
+
+
+.button {
+    -fx-text-fill: #FCF8F5;
+    -fx-background-color: #FC6A6A;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+
+    -fx-pref-width: 20px;
+    -fx-pref-height: 20px;
+    -fx-font-size: 20pt;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, #DB5358, 1, 1.0, 0, 5);
+}
+
+.button:hover {
+    -fx-background-color: #FA6164;
+    -fx-cursor: hand;
+}
+
+.button:pressed {
+    -fx-background-color: #DB5358;
+	-fx-translate-y: 2px;
+    /* subtle "press" movement */
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.4), 6, 0.4, 0, 2);
+}
+
+

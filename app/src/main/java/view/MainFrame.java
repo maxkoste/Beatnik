@@ -84,7 +84,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		primaryPane.minHeightProperty().bind(primaryPane.maxHeightProperty());
 
 		primaryPane.setAlignment(Pos.CENTER);
-		primaryPane.setGridLinesVisible(true);
+		primaryPane.setGridLinesVisible(false);
 
 		root.getChildren().add(primaryPane);
 

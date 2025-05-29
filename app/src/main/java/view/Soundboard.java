@@ -98,21 +98,41 @@ public class Soundboard implements EventHandler<ActionEvent> {
 		grid.add(btn3, 2, 1);
 		grid.add(btn4, 2, 2);
 
-		// Slider
-		Slider masterVolume = new Slider();
-		masterVolume.setOrientation(Orientation.VERTICAL);
-		masterVolume.setMax(100.0);
-		masterVolume.setBlockIncrement(20);
-		masterVolume.setShowTickMarks(true);
-		masterVolume.setShowTickLabels(true);
-		masterVolume.setMinorTickCount(0);
-		masterVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
-			controller.setSoundboardVolume(newValue.floatValue() / 100);
+		CircularSlider cueVolume = new CircularSlider(9, false, "/Knobs/knob-blue-fg.png");
+		cueVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
+			double volume = newValue.doubleValue();
+			controller.setSoundboardVolume(newValue.floatValue() / 270);
 		});
-		masterVolume.setValue(50);
+		cueVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+		cueVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+		cueVolume.setScaleX(0.6);
+		cueVolume.setScaleY(0.6);
+		grid.add(cueVolume, 3, 1);
 
-		GridPane.setRowSpan(masterVolume, 2);
-		grid.add(masterVolume, 3, 1);
+		ImageView cueImg = new ImageView("/Knobs/knob-bg.png");
+		cueImg.fitWidthProperty().bind(cueVolume.widthProperty());
+		cueImg.fitHeightProperty().bind(cueVolume.heightProperty());
+		cueImg.setMouseTransparent(true);
+		cueImg.setScaleX(0.6);
+		cueImg.setScaleY(0.6);
+		grid.add(cueImg, 3, 1);
+
+		// // Slider
+		// Slider masterVolume = new Slider();
+		// masterVolume.setOrientation(Orientation.VERTICAL);
+		// masterVolume.setMax(100.0);
+		// masterVolume.setBlockIncrement(20);
+		// masterVolume.setShowTickMarks(true);
+		// masterVolume.setShowTickLabels(true);
+		// masterVolume.setMinorTickCount(0);
+		// masterVolume.valueProperty().addListener((observable, oldValue, newValue) ->
+		// {
+		// controller.setSoundboardVolume(newValue.floatValue() / 100);
+		// });
+		// masterVolume.setValue(50);
+		//
+		// GridPane.setRowSpan(masterVolume, 2);
+		// grid.add(masterVolume, 3, 1);
 	}
 
 	@Override
