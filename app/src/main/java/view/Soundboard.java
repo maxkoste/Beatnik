@@ -15,7 +15,6 @@ import javafx.stage.Stage;
 
 public class Soundboard implements EventHandler<ActionEvent> {
 	private Controller controller;
-	private ImageView[] images;
 	private Scene soundbarScene;
 	private int gridSize;
 	private Stage stage;
@@ -65,7 +64,6 @@ public class Soundboard implements EventHandler<ActionEvent> {
 		stage.setScene(soundbarScene);
 
 		Button[] buttons = new Button[4];
-		this.images = new ImageView[8];
 
 		Button btn1 = new Button("1");
 		buttons[0] = btn1;
@@ -105,20 +103,19 @@ public class Soundboard implements EventHandler<ActionEvent> {
 		grid.add(btn3, 2, 1);
 		grid.add(btn4, 2, 2);
 
-		CircularSlider cueVolume = new CircularSlider(9, false, "/Knobs/knob-blue-fg.png");
-		cueVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
-			double volume = newValue.doubleValue();
+		CircularSlider volume = new CircularSlider(9, false, "/Knobs/knob-blue-fg.png");
+		volume.valueProperty().addListener((observable, oldValue, newValue) -> {
 			controller.setSoundboardVolume(newValue.floatValue() / 270);
 		});
-		cueVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-		cueVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-		cueVolume.setScaleX(0.6);
-		cueVolume.setScaleY(0.6);
-		grid.add(cueVolume, 3, 1);
+		volume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+		volume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
+		volume.setScaleX(0.6);
+		volume.setScaleY(0.6);
+		grid.add(volume, 3, 1);
 
 		ImageView cueImg = new ImageView("/Knobs/knob-bg.png");
-		cueImg.fitWidthProperty().bind(cueVolume.widthProperty());
-		cueImg.fitHeightProperty().bind(cueVolume.heightProperty());
+		cueImg.fitWidthProperty().bind(volume.widthProperty());
+		cueImg.fitHeightProperty().bind(volume.heightProperty());
 		cueImg.setMouseTransparent(true);
 		cueImg.setScaleX(0.6);
 		cueImg.setScaleY(0.6);

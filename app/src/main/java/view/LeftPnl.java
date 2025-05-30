@@ -40,13 +40,15 @@ public class LeftPnl {
 		songsButton.setScaleX(0.9);
 
 		songsButton.setText("");
-		ImageView image2 = new ImageView(new Image("/Symbols/audio_files.png"));
+		ImageView image2 = new ImageView(new Image("/Symbols/eject.png"));
 		image2.setFitHeight(songsButton.getHeight());
 		image2.setFitWidth(songsButton.getWidth());
 		image2.setScaleY(0.25);
 		image2.setScaleX(0.25);
 		image2.setPreserveRatio(true);
 		songsButton.setGraphic(image2);
+		songsButton.setScaleY(0.8);
+		songsButton.setScaleX(0.8);
 		primaryPane.add(songsButton, 1, 5);
 
 		Button soundboardButton = new Button("");
@@ -54,8 +56,8 @@ public class LeftPnl {
 		soundboardButton.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 		soundboardButton.setOnAction(soundboard);
 		soundboardButton.getStylesheets().add("soundboardButton.css");
-		soundboardButton.setScaleY(0.9);
-		soundboardButton.setScaleX(0.9);
+		soundboardButton.setScaleY(0.8);
+		soundboardButton.setScaleX(0.8);
 
 		ImageView image = new ImageView(new Image("/Symbols/soundboard.png"));
 		image.setFitHeight(soundboardButton.getHeight());
