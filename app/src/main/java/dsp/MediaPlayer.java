@@ -120,15 +120,18 @@ public class MediaPlayer {
 					if (cueEnabled) {
 						cueEvent = makeCueEvent(audioEvent);
 					}
+
+					volumeProcessor.process(audioEvent);
+
 					// Master signal
 					if (!cueEnabled) {
-						volumeProcessor.process(audioEvent);
 						masterPlayer.write(audioEvent.getByteBuffer());
 					}
 
 					// Cue signal
 					if (cueEnabled && cueEvent != null) {
 						cueVolumeProcessor.process(cueEvent);
+						volumeProcessor.process(cueEvent);
 						cuePlayer.write(cueEvent.getByteBuffer());
 					}
 
