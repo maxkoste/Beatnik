@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -38,7 +39,8 @@ public class MixerSelectionView {
 		Stage dialog = new Stage();
 		dialog.initModality(Modality.APPLICATION_MODAL);
 		dialog.initOwner(parentStage);
-		dialog.setTitle("Välj ljudutgångar");
+		dialog.setTitle("Choose output channels");
+		dialog.getIcons().add(new Image("/Logo/beatnik-logo4.png"));
 
 		// Audio setup
 		AudioFormat format = new AudioFormat(44100, 16, 2, true, false);
@@ -53,7 +55,7 @@ public class MixerSelectionView {
 		Label cueLabel = new Label("Cue Output:");
 		ComboBox<Mixer.Info> masterBox = new ComboBox<>(FXCollections.observableArrayList(compatibleMixers));
 		ComboBox<Mixer.Info> cueBox = new ComboBox<>(FXCollections.observableArrayList(compatibleMixers));
-		Button confirmBtn = new Button("Bekräfta");
+		Button confirmBtn = new Button("Confirm");
 
 		// Set up ComboBoxes
 		setComboBoxCellFactory(masterBox);

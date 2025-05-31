@@ -20,6 +20,9 @@ public class RightPnl {
         initialize();
     }
 
+    /**
+     * Creates the GUI elements on the right side of the screen.
+     */
     private void initialize() {
         CircularSlider effectIntensity = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
         effectIntensity.setAngle(0.0); // Starts of at 0 degrees

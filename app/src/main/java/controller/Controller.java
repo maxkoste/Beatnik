@@ -57,7 +57,6 @@ public class Controller {
 	private SoundPlayer[] soundEffects;
 
 	/**
-	 * initializes the audioplayers for each channel (1 & 2)
 	 * initializes the mainframe. Calls startup on the rest of the program.
 	 * 
 	 * @param primaryStage
@@ -72,20 +71,6 @@ public class Controller {
 		effectIntensityMap.put("PLACEHOLDER", 0.0F);
 		effectIntensityMap.put("PLACEHOLDER2", 0.0F);
 
-		MixerSelectionView mixerSelectionView = new MixerSelectionView();
-		mixerSelectionView.showAndWait(primaryStage);
-
-		Mixer masterMixer = mixerSelectionView.getSelectedMasterMixer();
-		Mixer cueMixer = mixerSelectionView.getSelectedCueMixer();
-
-		if (masterMixer == null || cueMixer == null) {
-			System.err.println("No valid mixers selected");
-			Platform.exit();
-			return;
-		}
-
-		audioPlayer1 = new MediaPlayer(masterMixer, cueMixer, this, 1);
-		audioPlayer2 = new MediaPlayer(masterMixer, cueMixer, this, 2);
 		timerThreadOne = new TimerThreadOne();
 		timerThreadTwo = new TimerThreadTwo();
 		frame = new MainFrame(this);
@@ -97,7 +82,8 @@ public class Controller {
 	}
 
 	/**
-	 * Loads the audioplayers with their corresponding sound effects.
+	 * Initializes audioplayers with selected output channels.
+	 * Start the GUI.
 	 * loads values for:
 	 * 
 	 * Playlist
@@ -108,10 +94,23 @@ public class Controller {
 	 * starts the timer threads that update the waveforms
 	 */
 	public void startUp(Stage primaryStage) {
-		frame.start(primaryStage);
+		MixerSelectionView selectedMixers = frame.start(primaryStage);
 		playlistManager.addSongsFromResources();
 		playlistManager.loadPlaylistData();
 		preloadSongData();
+
+		Mixer masterMixer = selectedMixers.getSelectedMasterMixer();
+		Mixer cueMixer = selectedMixers.getSelectedCueMixer();
+
+		if (masterMixer == null || cueMixer == null) {
+			System.err.println("No valid mixers selected");
+			Platform.exit();
+			return;
+		}
+
+		audioPlayer1 = new MediaPlayer(masterMixer, cueMixer, this, 1);
+		audioPlayer2 = new MediaPlayer(masterMixer, cueMixer, this, 2);
+
 		timerThreadOne.start();
 		timerThreadTwo.start();
 
@@ -125,6 +124,11 @@ public class Controller {
 		this.soundEffects[1] = soundEffect2;
 		this.soundEffects[2] = soundEffect3;
 		this.soundEffects[3] = soundEffect4;
+
+		audioPlayer1.setCueVolume(50);
+		audioPlayer1.setVolume(50);
+		audioPlayer2.setCueVolume(50);
+		audioPlayer2.setVolume(50);
 	}
 
 	public void toggleCue(int playerNumber) {
@@ -135,9 +139,11 @@ public class Controller {
 		}
 	}
 
-	public void setCueVolume(int playerNumber, float volume) {
-		audioPlayer1.setCueVolume(volume);
-		audioPlayer2.setCueVolume(volume);
+	public void setCueVolume(float volume) {
+		if (audioPlayer1 != null) { //Set together, one check is enough.
+			audioPlayer1.setCueVolume(volume);
+			audioPlayer2.setCueVolume(volume);
+		}
 	}
 
 	/**
@@ -338,21 +344,11 @@ public class Controller {
 	 * 
 	 * @param channel
 	 */
-	// TODO: implement a circular algorithm for the skip function
-	// ((n + 1) % sizeOfPlaylist)
 	public void nextSong(int channel) {
 		if (playlistSongPaths != null) {
-			if (!(currentPosInPlaylist >= playlistSongPaths.size() - 1)) {
-				currentPosInPlaylist++;
-				setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
-				frame.setInfoText(true, playlistSongPaths
-						.get(currentPosInPlaylist), channel);
-			} else {
-				frame.userMessage(Alert.AlertType.INFORMATION,
-						"Playlist Finished, Skip now Random");
-				playlistSongPaths = null;
-				nextSong(channel);
-			}
+			currentPosInPlaylist = (currentPosInPlaylist +1) % playlistSongPaths.size();
+			setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
+			frame.setInfoText(true, playlistSongPaths.get(currentPosInPlaylist), channel);
 		} else {
 			String song = playlistManager.randomSong();
 			setSong(channel, song);
@@ -361,13 +357,17 @@ public class Controller {
 	}
 
 	public void setChannelOneVolume(float volume) {
-		audioPlayer1.setVolume((volume * masterModifier) * crossfaderModifier1);
-		latestVolume1 = volume;
+		if (audioPlayer1 != null) {
+			audioPlayer1.setVolume((volume * masterModifier) * crossfaderModifier1);
+			latestVolume1 = volume;
+		}
 	}
 
 	public void setChannelTwoVolume(float volume) {
-		audioPlayer2.setVolume((volume * masterModifier) * crossfaderModifier2);
-		latestVolume2 = volume;
+		if (audioPlayer2 != null) {
+			audioPlayer2.setVolume((volume * masterModifier) * crossfaderModifier2);
+			latestVolume2 = volume;
+		}
 	}
 
 	public void setMasterVolume(float masterModifier) {
@@ -414,6 +414,10 @@ public class Controller {
 
 	public void setPlaybackSpeedCh2(double speedFactor) {
 		audioPlayer2.setPlaybackSpeed(speedFactor);
+	}
+
+	public void deactivatePlaylist() {
+		playlistSongPaths = null;
 	}
 
 	/**
@@ -486,7 +490,6 @@ public class Controller {
 
 				@Override
 				public void processingFinished() {
-					System.out.println("File extracted");
 				}
 			});
 			audioDataGetter.run();
@@ -540,8 +543,7 @@ public class Controller {
 	 *
 	 * Timer that calls the waveform to be updated based on the current time of the
 	 * song (Channel 1)
-	 *
-	 * Runs every 5 ms (pretty fucking sick)
+	 * Runs every 5 ms (pretty sick)
 	 */
 	public class TimerThreadOne extends Thread {
 		public void run() {
@@ -561,8 +563,7 @@ public class Controller {
 	 *
 	 * Timer that calls the waveform to be updated based on the current time of the
 	 * song (Channel 2)
-	 *
-	 * Runs every 5 ms (pretty fucking sick)
+	 * Runs every 5 ms (pretty sick)
 	 */
 	public class TimerThreadTwo extends Thread {
 		public void run() {

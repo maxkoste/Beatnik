@@ -29,6 +29,9 @@ public class LeftPnl {
 		initialize();
 	}
 
+	/**
+	 * Creates the GUI elements on the left side of the screen.
+	 */
 	private void initialize() {
 		Button songsButton = new Button("⏏");
 		songsButton.setOnAction(mainFrame);
@@ -66,8 +69,6 @@ public class LeftPnl {
 		image.setScaleX(0.25);
 		image.setPreserveRatio(true);
 		soundboardButton.setGraphic(image);
-		// quantize.setScaleX(0.8);
-		// quantize.setScaleY(0.8);
 		primaryPane.add(soundboardButton, 1, 8);
 
 		CircularSlider cueVolume = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
@@ -81,9 +82,7 @@ public class LeftPnl {
 				volume = (int) Math.ceil(value / 2.7);
 			}
 
-			System.out.println("volume: " + volume);
-			controller.setCueVolume(1, volume);
-
+			controller.setCueVolume(volume);
 		});
 		cueVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		cueVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
