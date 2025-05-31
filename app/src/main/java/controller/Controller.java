@@ -41,6 +41,7 @@ public class Controller {
 	private float crossfaderModifier2 = 1.0F;
 	private float latestVolume1 = 50.0F;
 	private float latestVolume2 = 50.0F;
+	private float latestCueVolume = 50.0F;
 	private AudioDispatcher dispatcherOne;
 	private AudioDispatcher dispatcherTwo;
 	private String currentEffect;
@@ -141,8 +142,9 @@ public class Controller {
 
 	public void setCueVolume(float volume) {
 		if (audioPlayer1 != null) { //Set together, one check is enough.
-			audioPlayer1.setCueVolume(volume);
-			audioPlayer2.setCueVolume(volume);
+			audioPlayer1.setCueVolume(volume * (latestVolume1 / 100));
+			audioPlayer2.setCueVolume(volume * (latestVolume2 / 100));
+			latestCueVolume = volume;
 		}
 	}
 
@@ -360,6 +362,7 @@ public class Controller {
 		if (audioPlayer1 != null) {
 			audioPlayer1.setVolume((volume * masterModifier) * crossfaderModifier1);
 			latestVolume1 = volume;
+			setCueVolume(latestCueVolume);
 		}
 	}
 
@@ -367,6 +370,7 @@ public class Controller {
 		if (audioPlayer2 != null) {
 			audioPlayer2.setVolume((volume * masterModifier) * crossfaderModifier2);
 			latestVolume2 = volume;
+			setCueVolume(latestCueVolume);
 		}
 	}
 
