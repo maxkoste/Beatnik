@@ -302,6 +302,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 				controller.setSong(2, songSelector.getSelectedItem());
 				setInfoText(false, songSelector.getSelectedItem(), 2);
 			}
+			controller.deactivatePlaylist();
 		}
 	}
 

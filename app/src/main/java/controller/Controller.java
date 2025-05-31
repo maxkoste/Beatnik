@@ -344,21 +344,11 @@ public class Controller {
 	 * 
 	 * @param channel
 	 */
-	// TODO: implement a circular algorithm for the skip function
-	// ((n + 1) % sizeOfPlaylist)
 	public void nextSong(int channel) {
 		if (playlistSongPaths != null) {
-			if (!(currentPosInPlaylist >= playlistSongPaths.size() - 1)) {
-				currentPosInPlaylist++;
-				setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
-				frame.setInfoText(true, playlistSongPaths
-						.get(currentPosInPlaylist), channel);
-			} else {
-				frame.userMessage(Alert.AlertType.INFORMATION,
-						"Playlist Finished, Skip now Random");
-				playlistSongPaths = null;
-				nextSong(channel);
-			}
+			currentPosInPlaylist = (currentPosInPlaylist +1) % playlistSongPaths.size();
+			setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
+			frame.setInfoText(true, playlistSongPaths.get(currentPosInPlaylist), channel);
 		} else {
 			String song = playlistManager.randomSong();
 			setSong(channel, song);
@@ -424,6 +414,10 @@ public class Controller {
 
 	public void setPlaybackSpeedCh2(double speedFactor) {
 		audioPlayer2.setPlaybackSpeed(speedFactor);
+	}
+
+	public void deactivatePlaylist() {
+		playlistSongPaths = null;
 	}
 
 	/**
@@ -496,7 +490,6 @@ public class Controller {
 
 				@Override
 				public void processingFinished() {
-					System.out.println("File extracted");
 				}
 			});
 			audioDataGetter.run();
@@ -550,8 +543,7 @@ public class Controller {
 	 *
 	 * Timer that calls the waveform to be updated based on the current time of the
 	 * song (Channel 1)
-	 *
-	 * Runs every 5 ms (pretty fucking sick)
+	 * Runs every 5 ms (pretty sick)
 	 */
 	public class TimerThreadOne extends Thread {
 		public void run() {
@@ -571,8 +563,7 @@ public class Controller {
 	 *
 	 * Timer that calls the waveform to be updated based on the current time of the
 	 * song (Channel 2)
-	 *
-	 * Runs every 5 ms (pretty fucking sick)
+	 * Runs every 5 ms (pretty sick)
 	 */
 	public class TimerThreadTwo extends Thread {
 		public void run() {
