@@ -47,18 +47,20 @@ public class MainFrame implements EventHandler<ActionEvent> {
 	private Button switchChannelOne;
 	private Button switchChannelTwo;
 	private TopPnl topPnl;
-	private LeftPnl leftPnl;
-	private RightPnl rightPnl;
 	private CenterPnl centerPnl;
 	private int progressCounter;
-	private String draggedItem;
 	private Soundboard soundboard;
 
 	public MainFrame(Controller controller) {
 		this.controller = controller;
 	}
 
-	public void start(Stage primaryStage) {
+	/**
+	 * Starts up all windows and graphical elements in the application
+	 * @param primaryStage the main window for the application, created in the Main class
+	 * @return the class that handles selecting mixers.
+	 */
+	public MixerSelectionView start(Stage primaryStage) {
 		Dimension screenResolution = Toolkit.getDefaultToolkit().getScreenSize();
 		double screenHeight = screenResolution.getHeight();
 
@@ -108,8 +110,8 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		initializePlaylistPane();
 		topPnl = new TopPnl(this, controller, primaryPane, numCols);
 		soundboard = new Soundboard(controller);
-		leftPnl = new LeftPnl(soundboard, this, primaryPane, numCols, this.controller);
-		rightPnl = new RightPnl(this, primaryPane, numCols);
+    new LeftPnl(soundboard, this, primaryPane, numCols, this.controller);
+    new RightPnl(this, primaryPane, numCols);
 		centerPnl = new CenterPnl(controller, primaryPane, numCols);
 
 		primaryScene = new Scene(root, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
@@ -130,8 +132,17 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
 		onClose(primaryStage);
 		this.primaryStage = primaryStage;
+
+		MixerSelectionView mixerSelectionView = new MixerSelectionView();
+		mixerSelectionView.showAndWait(primaryStage);
+
+		return mixerSelectionView;
 	}
 
+	/**
+	 * Updates the progress bar of the startup screen.
+	 * @param nbrOfSongsToLoad the total number of songs being loaded
+	 */
 	public void updateLoading(double nbrOfSongsToLoad) {
 		Platform.runLater(() -> {
 			progressCounter++;
@@ -153,6 +164,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		});
 	}
 
+	/**
+	 * Creates the window shown on startup
+	 * @param screenHeight height of the users screen
+	 */
 	public void initializeStartUpPane(double screenHeight) {
 		ImageView logo = new ImageView(new Image("/Logo/beatnik-logo2.png"));
 		ImageView logoText = new ImageView(new Image("/Logo/beatnik-logo3.png"));
@@ -186,6 +201,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		// startUpPane.getChildren().add(logoTextContainer);
 	}
 
+	/**
+	 * Creates the window shown when viewing all songs.
+	 */
 	public void initializeSongsPane() {
 		ListView<String> songList = new ListView<>(playlistManager.getSongsGUI());
 		songSelector = songList.getSelectionModel();
@@ -224,6 +242,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		songsPane.setTop(songsMenu);
 	}
 
+	/**
+	 * Creates the window shown when viewing a playlist
+	 */
 	public void initializePlaylistPane() {
 		currentPlaylist = new ListView<>();
 		activateDragAndDrop();
@@ -261,11 +282,17 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		playlistsPane.setTop(playlistMenu);
 	}
 
+	/**
+	 * Override from eventHandler interface, shows the window with all songs
+	 */
 	@Override
 	public void handle(ActionEvent actionEvent) { // Songsbutton method, basic name from interface
 		playlistStage.showAndWait();
 	}
 
+	/**
+	 * Sets a song outside a playlist if the user double-clicked.
+	 */
 	public void handleSongSelection(MouseEvent mouseEvent) {
 		if (mouseEvent.getClickCount() == 2) {
 			if (channelOneActive) {
@@ -278,6 +305,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		}
 	}
 
+	/**
+	 * Opens an OS window where the user can select a .wav or .mp3 file, then adds it to the "resources" folder.
+	 */
 	public void handleImport(ActionEvent actionEvent) {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Import a song");
@@ -294,6 +324,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		}
 	}
 
+	/**
+	 * Shows the selected playlist if one is selected.
+	 */
 	public void handleViewPlaylist(ActionEvent actionEvent) {
 		String playlistName = playlistSelector.getSelectedItem();
 		if (playlistName.equals("New Playlist")) {
@@ -305,37 +338,55 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		}
 	}
 
+	/**
+	 * Shows the all songs window if the user is in the playlist window
+	 */
 	public void handleViewSongs(ActionEvent actionEvent) {
 		playlistStage.setTitle("All Songs");
 		playlistStage.setScene(songsScene);
 	}
 
+	/**
+	 * Allows the user to attempt to edit the name of a selected playlist
+	 */
 	public void handleEditPlaylistName(ActionEvent actionEvent) {
 		playlistStage.setTitle(playlistManager.editPlaylistName(playlistSelector.getSelectedItem()));
 		playlistManager.savePlaylistData();
 	}
 
+	/**
+	 * Allows the user to attempt to delete a selected playlist then returns to the all songs window
+	 */
 	public void handleDeletePlaylist(ActionEvent actionEvent) {
 		playlistManager.deletePlaylist(playlistStage.getTitle());
 		handleViewSongs(actionEvent);
 		playlistManager.savePlaylistData();
 	}
 
+	/**
+	 * Allows the user to remove any amount of selected songs from a playlist.
+	 */
 	public void handleRemoveSongsFromPlaylist(ActionEvent actionEvent) {
 		playlistManager.removeSongsFromPlaylist(playlistStage.getTitle(), playlistSongSelector.getSelectedItems());
 		currentPlaylist.getItems().removeAll(playlistSongSelector.getSelectedItem());
 		playlistManager.savePlaylistData();
 	}
 
+	/**
+	 * Allows the user to add any amount of songs to a playlist.
+	 */
 	public void handleAddToPlaylist(ActionEvent actionEvent) {
 		String playlistSelected = playlistSelector.getSelectedItem();
 		playlistManager.addToPlaylist(playlistSelected, songSelector.getSelectedIndices());
 		playlistManager.savePlaylistData();
 	}
 
+	/**
+	 * Adds listeners for a variety of mouse movements to allow a user to drag and drop items
+	 * in a playlist. Due to how playlists are shown and stores, the order is not permanently
+	 * changed, but will remain active until the playlist is closed and opened again.
+	 */
 	private void activateDragAndDrop() {
-		ObservableList<String> playlist = currentPlaylist.getItems();
-
 		currentPlaylist.setCellFactory(lv -> {
 			ListCell<String> cell = new ListCell<>() {
 				@Override
@@ -400,6 +451,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		});
 	}
 
+	/**
+	 * Switches which channel is active for both the playlist and all songs windows
+	 */
 	public void handleChannelSwitch(ActionEvent actionEvent) {
 		if (channelOneActive) {
 			channelOneActive = false;
@@ -412,6 +466,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		}
 	}
 
+	/**
+	 * Plays the selected song in a playlist and activates the playlist from the index of the selected
+	 * song if the user double-clicked.
+	 */
 	public void handlePlaylistSongSelection(MouseEvent mouseEvent) {
 		if (mouseEvent.getClickCount() == 2) {
 			if (channelOneActive) {
@@ -424,6 +482,9 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		}
 	}
 
+	/**
+	 * Prompts the user to input a String, currently only used for the playlist name.
+	 */
 	public String promptUserInput(String title, String headerText) {
 		TextInputDialog inputPlaylistName = new TextInputDialog();
 		inputPlaylistName.setTitle(title);
@@ -431,15 +492,22 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		Optional<String> name = inputPlaylistName.showAndWait();
 
 		return name.orElse(null); // A Java-suggested improvement to an isPresent check. Returns null if the user
-		// closed the window etc instead of throwing an exception.
+		// closed the window etc. instead of throwing an exception.
 	}
 
+	/**
+	 * Sends a heads-up message to the user.
+	 * @param alertType type of alert (info, warning, etc.) which changes window design.
+	 */
 	public void userMessage(Alert.AlertType alertType, String headerText) {
 		Alert message = new Alert(alertType);
 		message.setHeaderText(headerText);
 		message.showAndWait();
 	}
 
+	/**
+	 * Allows the user to confirm or exit while performing a risky operation.
+	 */
 	public boolean userConfirm(String headerText) {
 		Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
 		confirm.setHeaderText(headerText);

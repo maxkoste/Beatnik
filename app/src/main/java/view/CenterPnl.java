@@ -32,6 +32,9 @@ public class CenterPnl {
         initializeChannelTwo();
     }
 
+    /**
+     * Creates the crossfader slider and label.
+     */
     private void initializeCrossfader() {
         Slider crossFader = new Slider();
         crossFader.setMax(100);
@@ -60,6 +63,9 @@ public class CenterPnl {
         primaryPane.add(crossFaderLabel, (maxCols / 2) - 1, maxCols);
     }
 
+    /**
+     * Creates the GUI elements in the left channel column.
+     */
     private void initializeChannelOne() {
         ToggleButton channelOneCue = new ToggleButton(); // Button that can be tied to boolean value
         channelOneCue.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -98,7 +104,6 @@ public class CenterPnl {
         });
         channelOneVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelOneVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        // channelOneVolume.setStyle("-fx-padding: 0;");
         GridPane.setRowSpan(channelOneVolume, 3);
         primaryPane.add(channelOneVolume, 3, maxCols - 4);
 
@@ -111,22 +116,14 @@ public class CenterPnl {
         });
         channelOneBass.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelOneBass.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        // channelOneBass.setScaleX(0.8);
-        // channelOneBass.setScaleY(0.8);
         primaryPane.add(channelOneBass, 3, maxCols - 5);
 
         ImageView channelOneBassImg = new ImageView("/Knobs/knob-bg.png");
         channelOneBassImg.fitWidthProperty().bind(channelOneBass.widthProperty());
         channelOneBassImg.fitHeightProperty().bind(channelOneBass.heightProperty());
         channelOneBassImg.setMouseTransparent(true);
-        // channelOneBassImg.setScaleX(0.8);
-        // channelOneBassImg.setScaleY(0.8);
 
         primaryPane.add(channelOneBassImg, 3, maxCols - 5);
-
-        // Label bassLabelOne = new Label("   B");
-        // bassLabelOne.setMouseTransparent(true);
-        // primaryPane.add(bassLabelOne, 3, maxCols - 5);
 
         CircularSlider channelOneTreble = new CircularSlider(9, false, "/Knobs/knob-green-fg.png");
         channelOneTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -137,21 +134,13 @@ public class CenterPnl {
         });
         channelOneTreble.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelOneTreble.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        // channelOneTreble.setScaleX(0.8);
-        // channelOneTreble.setScaleY(0.8);
         primaryPane.add(channelOneTreble, 3, maxCols - 6);
 
         ImageView channelOneTrebleImg = new ImageView("/Knobs/knob-bg.png");
         channelOneTrebleImg.fitWidthProperty().bind(channelOneTreble.widthProperty());
         channelOneTrebleImg.fitHeightProperty().bind(channelOneTreble.heightProperty());
         channelOneTrebleImg.setMouseTransparent(true);
-        // channelOneTrebleImg.setScaleX(0.8);
-        // channelOneTrebleImg.setScaleY(0.8);
         primaryPane.add(channelOneTrebleImg, 3, maxCols - 6);
-
-        // Label trebleLabelOne = new Label("   T");
-        // trebleLabelOne.setMouseTransparent(true);
-        // primaryPane.add(trebleLabelOne, 3, maxCols - 6);
 
         CircularSlider channelOneSpeed = new CircularSlider(9, false, "/Knobs/knob-red-fg.png");
         channelOneSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -162,21 +151,13 @@ public class CenterPnl {
         });
         channelOneSpeed.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelOneSpeed.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        // channelOneSpeed.setScaleX(0.8);
-        // channelOneSpeed.setScaleY(0.8);
         primaryPane.add(channelOneSpeed, 3, maxCols - 7);
 
         ImageView channelOneSpeedImg = new ImageView("/Knobs/knob-bg.png");
         channelOneSpeedImg.fitWidthProperty().bind(channelOneSpeed.widthProperty());
         channelOneSpeedImg.fitHeightProperty().bind(channelOneSpeed.heightProperty());
         channelOneSpeedImg.setMouseTransparent(true);
-        // channelOneSpeedImg.setScaleX(0.8);
-        // channelOneSpeedImg.setScaleY(0.8);
         primaryPane.add(channelOneSpeedImg, 3, maxCols - 7);
-
-        // Label speedLabelOne = new Label("   S");
-        // speedLabelOne.setMouseTransparent(true);
-        // primaryPane.add(speedLabelOne, 3, maxCols - 7);
 
         VBox audioIndicatorOne = new VBox(8);
         audioIndicatorOne.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -203,6 +184,9 @@ public class CenterPnl {
         primaryPane.add(audioIndicatorOne, 4, maxCols - 6);
     }
 
+    /**
+     * Creates the GUI elements in the right channel column.
+     */
     private void initializeChannelTwo() {
         ToggleButton channelTwoCue = new ToggleButton(); // Button that can be tied to boolean value
         channelTwoCue.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -244,8 +228,6 @@ public class CenterPnl {
         channelTwoVolume.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelTwoVolume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 
-        // channelTwoVolume.setStyle("-fx-padding: 0;");
-
         GridPane.setRowSpan(channelTwoVolume, 3);
         primaryPane.add(channelTwoVolume, maxCols - 3, maxCols - 4);
 
@@ -258,22 +240,14 @@ public class CenterPnl {
         });
         channelTwoBass.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelTwoBass.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        // channelTwoBass.setScaleX(0.8);
-        // channelTwoBass.setScaleY(0.8);
         primaryPane.add(channelTwoBass, maxCols - 3, maxCols - 5);
 
         ImageView channelTwoBassImg = new ImageView("/Knobs/knob-bg.png");
         channelTwoBassImg.fitWidthProperty().bind(channelTwoBass.widthProperty());
         channelTwoBassImg.fitHeightProperty().bind(channelTwoBass.heightProperty());
         channelTwoBassImg.setMouseTransparent(true);
-        // channelTwoBassImg.setScaleX(0.8);
-        // channelTwoBassImg.setScaleY(0.8);
 
         primaryPane.add(channelTwoBassImg, maxCols - 3, maxCols - 5);
-
-        // Label bassLabelTwo = new Label("   B");
-        // bassLabelTwo.setMouseTransparent(true);
-        // primaryPane.add(bassLabelTwo, maxCols - 3, maxCols - 5);
 
         CircularSlider channelTwoTreble = new CircularSlider(9, false, "/Knobs/knob-green-fg.png");
         channelTwoTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -284,22 +258,14 @@ public class CenterPnl {
         });
         channelTwoTreble.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelTwoTreble.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        // channelTwoTreble.setScaleX(0.8);
-        // channelTwoTreble.setScaleY(0.8);
         primaryPane.add(channelTwoTreble, maxCols - 3, maxCols - 6);
 
         ImageView channelTwoTrebleImg = new ImageView("/Knobs/knob-bg.png");
         channelTwoTrebleImg.fitWidthProperty().bind(channelTwoTreble.widthProperty());
         channelTwoTrebleImg.fitHeightProperty().bind(channelTwoTreble.heightProperty());
         channelTwoTrebleImg.setMouseTransparent(true);
-        // channelTwoTrebleImg.setScaleX(0.8);
-        // channelTwoTrebleImg.setScaleY(0.8);
 
         primaryPane.add(channelTwoTrebleImg, maxCols - 3, maxCols - 6);
-
-        // Label trebleLabelTwo = new Label("   T");
-        // trebleLabelTwo.setMouseTransparent(true);
-        // primaryPane.add(trebleLabelTwo, maxCols - 3, maxCols - 6);
 
         CircularSlider channelTwoSpeed = new CircularSlider(9, false, "/Knobs/knob-red-fg.png");
         channelTwoSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -312,22 +278,14 @@ public class CenterPnl {
         });
         channelTwoSpeed.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         channelTwoSpeed.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
-        // channelTwoSpeed.setScaleX(0.8);
-        // channelTwoSpeed.setScaleY(0.8);
         primaryPane.add(channelTwoSpeed, maxCols - 3, maxCols - 7);
 
         ImageView channelTwoSpeedImg = new ImageView("/Knobs/knob-bg.png");
         channelTwoSpeedImg.fitWidthProperty().bind(channelTwoSpeed.widthProperty());
         channelTwoSpeedImg.fitHeightProperty().bind(channelTwoSpeed.heightProperty());
         channelTwoSpeedImg.setMouseTransparent(true);
-        // channelTwoSpeedImg.setScaleY(0.8);
-        // channelTwoSpeedImg.setScaleX(0.8);
 
         primaryPane.add(channelTwoSpeedImg, maxCols - 3, maxCols - 7);
-
-        // Label speedLabelTwo = new Label("   S");
-        // speedLabelTwo.setMouseTransparent(true);
-        // primaryPane.add(speedLabelTwo, maxCols - 3, maxCols - 7);
 
         VBox audioIndicatorTwo = new VBox(8);
         audioIndicatorTwo.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -360,6 +318,11 @@ public class CenterPnl {
         primaryPane.add(audioIndicatorTwo, maxCols - 4, maxCols - 6);
     }
 
+    /**
+     * Updates the audio indicator with colours corresponding to sound intensity.
+     * @param rms Root-mean-square, a mathematical calculation representing an averaged
+     *            intensity of sound over a given time
+     */
     public void updateAudioIndicatorOne(double rms) {
         int totalDots = auIndicatorCirclesOne.length;
         int activeDots = Math.min((int) (rms * totalDots * 5), totalDots);
@@ -380,6 +343,11 @@ public class CenterPnl {
         });
     }
 
+    /**
+     * Updates the audio indicator with colours corresponding to sound intensity.
+     * @param rms Root-mean-square, a mathematical calculation representing an averaged
+     *            intensity of sound over a given time
+     */
     public void updateAudioIndicatorTwo(double rms) {
         int totalDots = auIndicatorCirclesTwo.length;
         int activeDots = Math.min((int) (rms * totalDots * 5), totalDots);

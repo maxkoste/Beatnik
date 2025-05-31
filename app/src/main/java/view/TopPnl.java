@@ -31,8 +31,11 @@ public class TopPnl {
 		initializeWaveForms();
 	}
 
+	/**
+	 * Creates the GUI buttons on top of the screen.
+	 */
 	private void initializeButtons() {
-		Button channelOnePlayPause = new Button("⏯");
+		Button channelOnePlayPause = new Button();
 		channelOnePlayPause.setOnAction(this::handleChannelOnePlayPause);
 		channelOnePlayPause.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		channelOnePlayPause.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
@@ -40,7 +43,7 @@ public class TopPnl {
 		channelOnePlayPause.getStylesheets().add("topPanel.css");
 		buttons[0] = channelOnePlayPause;
 
-		Button channelTwoPlayPause = new Button("⏯");
+		Button channelTwoPlayPause = new Button();
 		channelTwoPlayPause.setOnAction(this::handleChannelTwoPlayPause);
 		channelTwoPlayPause.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		channelTwoPlayPause.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
@@ -48,7 +51,7 @@ public class TopPnl {
 		channelTwoPlayPause.getStylesheets().add("topPanel.css");
 		buttons[1] = channelTwoPlayPause;
 
-		Button channelOneTrackCue = new Button("C");
+		Button channelOneTrackCue = new Button();
 		channelOneTrackCue.setOnAction(this::handleChannelOneTrackCue);
 		channelOneTrackCue.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		channelOneTrackCue.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
@@ -56,7 +59,7 @@ public class TopPnl {
 		channelOneTrackCue.getStylesheets().add("topPanel.css");
 		buttons[2] = channelOneTrackCue;
 
-		Button channelTwoTrackCue = new Button("C");
+		Button channelTwoTrackCue = new Button();
 		channelTwoTrackCue.setOnAction(this::handleChannelTwoTrackCue);
 		channelTwoTrackCue.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		channelTwoTrackCue.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
@@ -64,7 +67,7 @@ public class TopPnl {
 		channelTwoTrackCue.getStylesheets().add("topPanel.css");
 		buttons[3] = channelTwoTrackCue;
 
-		Button channelOneSkip = new Button("⏭");
+		Button channelOneSkip = new Button();
 		channelOneSkip.setOnAction(this::handleChannelOneSkip);
 		channelOneSkip.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		channelOneSkip.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
@@ -73,7 +76,7 @@ public class TopPnl {
 		channelOneSkip.getStylesheets().add("topPanel.css");
 		buttons[4] = channelOneSkip;
 
-		Button channelTwoSkip = new Button("⏭");
+		Button channelTwoSkip = new Button();
 		channelTwoSkip.setOnAction(this::handleChannelTwoSkip);
 		channelTwoSkip.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		channelTwoSkip.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
@@ -100,6 +103,9 @@ public class TopPnl {
 		}
 	}
 
+	/**
+	 * Creates the containers for the waveform graphics on top of the screen.
+	 */
 	private void initializeWaveForms() {
 		StackPane waveformOneContainer = new StackPane();
 		waveformOneContainer.setAlignment(Pos.TOP_LEFT);
@@ -136,6 +142,9 @@ public class TopPnl {
 		primaryPane.add(waveformTwoContainer, 1, 2);
 	}
 
+	/**
+	 * Sets the informational text on the waveform graphic.
+	 */
 	public void setInfoText(boolean playlist, String song, int channel) {
 		if (channel == 1) {
 			if (playlist) {
