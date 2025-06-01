@@ -516,6 +516,14 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		return confirm.getResult() == ButtonType.OK;
 	}
 
+	public void resetChannelOneEffects() {
+		centerPnl.resetChannelOneBassTreblePitch();
+	}
+
+	public void resetChannelTwoEffects() {
+		centerPnl.resetChannelTwoBassTreblePitch();
+	}
+
 	public void selectPlaylistIndex(int index) {
 		playlistSelector.select(index);
 	}
