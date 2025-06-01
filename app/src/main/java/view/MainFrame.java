@@ -50,6 +50,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 	private CenterPnl centerPnl;
 	private int progressCounter;
 	private Soundboard soundboard;
+	private RightPnl rightPnl;
 
 	public MainFrame(Controller controller) {
 		this.controller = controller;
@@ -111,7 +112,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		topPnl = new TopPnl(this, controller, primaryPane, numCols);
 		soundboard = new Soundboard(controller);
     new LeftPnl(soundboard, this, primaryPane, numCols, this.controller);
-    new RightPnl(this, primaryPane, numCols);
+    rightPnl = new RightPnl(this, primaryPane, numCols);
 		centerPnl = new CenterPnl(controller, primaryPane, numCols);
 
 		primaryScene = new Scene(root, (screenHeight * 0.9), (screenHeight * 0.9)); // Add pane to scene
@@ -522,6 +523,11 @@ public class MainFrame implements EventHandler<ActionEvent> {
 
 	public void resetChannelTwoEffects() {
 		centerPnl.resetChannelTwoBassTreblePitch();
+	}
+
+	public void resetEffectIntensityAndSelector(){
+		rightPnl.resetEffectIntensity();
+		rightPnl.resetEffectSelector();
 	}
 
 	public void selectPlaylistIndex(int index) {

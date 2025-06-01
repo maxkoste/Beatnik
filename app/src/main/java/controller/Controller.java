@@ -211,6 +211,8 @@ public class Controller {
 			resetToDefaults(audioPlayer2);
 			frame.resetChannelTwoEffects();
 		}
+		resetAllToDefaults();
+		frame.resetEffectIntensityAndSelector();
 		playSong(channel);
 		frame.setWaveformAudioData(songsData.get(songPath), channel);
 	}
@@ -548,9 +550,24 @@ public class Controller {
 	}
 
 	private void resetToDefaults(MediaPlayer player) {
-    player.setBass(0f);
-    player.setTreble(0f);
-    player.setPlaybackSpeed(1.0);
+    	player.setBass(0f);
+    	player.setTreble(0f);
+    	player.setPlaybackSpeed(1.0);
+		player.setDelayEffectMix(0f);
+		player.setFlangerEffectMix(0f);
+		player.setFilterFrequency(0f);
+	}
+
+	private void resetAllToDefaults() {
+    	if (audioPlayer1 != null) {
+        	resetToDefaults(audioPlayer1);
+    	}
+    	if (audioPlayer2 != null) {
+        	resetToDefaults(audioPlayer2);
+    	}
+    	for (String key : effectIntensityMap.keySet()) {
+        	effectIntensityMap.put(key, 0.0f);
+    	}
 	}
 
 	/**
