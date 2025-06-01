@@ -547,7 +547,7 @@ public class Controller {
 	 *
 	 * Timer that calls the waveform to be updated based on the current time of the
 	 * song (Channel 1)
-	 * Runs every 5 ms (pretty sick)
+	 * Runs every 4 ms (pretty sick)
 	 */
 	public class TimerThreadOne extends Thread {
 		public void run() {
@@ -559,7 +559,7 @@ public class Controller {
 						frame.updateWaveformOne(dispatcherOne.secondsProcessed());
 					}
 				}
-			}, 0, 5);
+			}, 0, 4);
 		}
 	}
 
@@ -567,7 +567,7 @@ public class Controller {
 	 *
 	 * Timer that calls the waveform to be updated based on the current time of the
 	 * song (Channel 2)
-	 * Runs every 5 ms (pretty sick)
+	 * Runs every 4 ms (pretty sick)
 	 */
 	public class TimerThreadTwo extends Thread {
 		public void run() {
@@ -579,7 +579,7 @@ public class Controller {
 						frame.updateWaveformTwo(dispatcherTwo.secondsProcessed());
 					}
 				}
-			}, 0, 5);
+			}, 0, 4);
 		}
 	}
 }
