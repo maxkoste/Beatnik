@@ -58,7 +58,6 @@ public class Equalizer implements AudioProcessor {
         // Apply bandpass filter
         bandPassFilter.process(audioEvent);
 
-        // Apply gain and mix with original signal
         for (int i = audioEvent.getOverlap(); i < audioFloatBuffer.length; i++) {
             // Mix filtered signal with gain and original signal
             float filteredSignal = audioFloatBuffer[i] * gain;
