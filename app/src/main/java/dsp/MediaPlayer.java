@@ -131,7 +131,6 @@ public class MediaPlayer {
 					// Cue signal
 					if (cueEnabled && cueEvent != null) {
 						cueVolumeProcessor.process(cueEvent);
-						volumeProcessor.process(cueEvent);
 						cuePlayer.write(cueEvent.getByteBuffer());
 					}
 
