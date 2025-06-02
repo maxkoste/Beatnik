@@ -157,20 +157,22 @@ public class Controller {
 	 */
 	private void preloadSongData() {
 		ObservableList<String> songFileNames = playlistManager.getSongsGUI();
-		for (int i = 0; i < songFileNames.size(); i++) {
-			int pos = i;
-			Thread extractor = new Thread(() -> {
-				String songName = songFileNames.get(pos);
-				float[] songData = extract(songName);
-				synchronized (lock) {
-					songsData.put(songName, songData);
-					frame.updateLoading(songFileNames.size());
-					nbrOfThreads.release();
-				}
-			});
-			extractor.setDaemon(true);
-			extractor.start();
-		}
+		if (!songFileNames.isEmpty()) {
+			for (int i = 0; i < songFileNames.size(); i++) {
+				int pos = i;
+				Thread extractor = new Thread(() -> {
+					String songName = songFileNames.get(pos);
+					float[] songData = extract(songName);
+					synchronized (lock) {
+						songsData.put(songName, songData);
+						frame.updateLoading(songFileNames.size());
+						nbrOfThreads.release();
+					}
+				});
+				extractor.setDaemon(true);
+				extractor.start();
+			}
+		} else frame.updateLoading(0);
 	}
 
 	/**
@@ -466,6 +468,7 @@ public class Controller {
 		String fileName = desinationFile.getName();
 		playlistManager.getSongsGUI().add(fileName);
 		songsData.put(fileName, extract(fileName));
+		nbrOfThreads.release();
 	}
 
 	/**
