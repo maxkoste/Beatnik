@@ -12,6 +12,9 @@ public class RightPnl {
     private GridPane primaryPane;
     private int maxCols;
 
+    private CircularSlider effectIntensity;
+    private CircularSlider effectSelector;
+
     public RightPnl(MainFrame mainFrame, GridPane primaryPane, int maxCols) {
         this.mainFrame = mainFrame;
         this.primaryPane = primaryPane;
@@ -24,7 +27,7 @@ public class RightPnl {
      * Creates the GUI elements on the right side of the screen.
      */
     private void initialize() {
-        CircularSlider effectIntensity = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
+        effectIntensity = new CircularSlider(9, false, "/Knobs/knob-black-fg.png");
         effectIntensity.setAngle(0.0); // Starts of at 0 degrees
         effectIntensity.valueProperty().addListener((observable, oldValue, newValue) -> {
             float volume = newValue.floatValue();
@@ -54,7 +57,7 @@ public class RightPnl {
         GridPane.setColumnSpan(effectIntensityLabel, 3);
         primaryPane.add(effectIntensityLabel, maxCols - 2, 6);
 
-        CircularSlider effectSelector = new CircularSlider(5, true, "/Knobs/knob-black-fg.png");
+        effectSelector = new CircularSlider(5, true, "/Knobs/knob-black-fg.png");
         effectSelector.valueProperty().addListener((observable, oldValue, newValue) -> {
             int effectSelectorValue = newValue.intValue();
             mainFrame.setEffect(effectSelectorValue);
@@ -121,5 +124,13 @@ public class RightPnl {
         masterVolumeLabel.setAlignment(Pos.TOP_CENTER);
         GridPane.setColumnSpan(masterVolumeLabel, 3);
         primaryPane.add(masterVolumeLabel, maxCols - 2, maxCols);
+    }
+
+    public void resetEffectIntensity() {
+        effectIntensity.setAngle(0.0);
+    }
+
+    public void resetEffectSelector() {
+        effectSelector.setAngle(135.0);
     }
 }

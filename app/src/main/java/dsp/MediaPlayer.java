@@ -79,7 +79,7 @@ public class MediaPlayer {
 			TarsosDSPAudioFormat format = playbackDispatcher.getFormat();
 
 			bassEqualizer = new Equalizer(format.getSampleRate(),
-					80, 80); // 80Hz center, 50Hz bandwidth
+					50, 80); // 80Hz center, 50Hz bandwidth
 			flangerEffect = new Flanger(0.0002,
 					0, format.getSampleRate(), 3);
 			trebleEqualizer = new Equalizer(format.getSampleRate(),
@@ -120,9 +120,11 @@ public class MediaPlayer {
 					if (cueEnabled) {
 						cueEvent = makeCueEvent(audioEvent);
 					}
+
+					volumeProcessor.process(audioEvent);
+
 					// Master signal
 					if (!cueEnabled) {
-						volumeProcessor.process(audioEvent);
 						masterPlayer.write(audioEvent.getByteBuffer());
 					}
 

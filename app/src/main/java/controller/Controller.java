@@ -157,20 +157,22 @@ public class Controller {
 	 */
 	private void preloadSongData() {
 		ObservableList<String> songFileNames = playlistManager.getSongsGUI();
-		for (int i = 0; i < songFileNames.size(); i++) {
-			int pos = i;
-			Thread extractor = new Thread(() -> {
-				String songName = songFileNames.get(pos);
-				float[] songData = extract(songName);
-				synchronized (lock) {
-					songsData.put(songName, songData);
-					frame.updateLoading(songFileNames.size());
-					nbrOfThreads.release();
-				}
-			});
-			extractor.setDaemon(true);
-			extractor.start();
-		}
+		if (!songFileNames.isEmpty()) {
+			for (int i = 0; i < songFileNames.size(); i++) {
+				int pos = i;
+				Thread extractor = new Thread(() -> {
+					String songName = songFileNames.get(pos);
+					float[] songData = extract(songName);
+					synchronized (lock) {
+						songsData.put(songName, songData);
+						frame.updateLoading(songFileNames.size());
+						nbrOfThreads.release();
+					}
+				});
+				extractor.setDaemon(true);
+				extractor.start();
+			}
+		} else frame.updateLoading(0);
 	}
 
 	/**
@@ -204,9 +206,15 @@ public class Controller {
 	public void setSong(int channel, String songPath) {
 		if (channel == 1) {
 			audioPlayer1.setSong(songPath);
+			frame.resetChannelOneEffects();
+			frame.resetChannelOneVolume();
 		} else {
 			audioPlayer2.setSong(songPath);
+			frame.resetChannelTwoEffects();
+			frame.resetChannelTwoVolume();
 		}
+		resetAllToDefaults();
+		frame.resetEffectIntensityAndSelector();
 		playSong(channel);
 		frame.setWaveformAudioData(songsData.get(songPath), channel);
 	}
@@ -466,6 +474,7 @@ public class Controller {
 		String fileName = desinationFile.getName();
 		playlistManager.getSongsGUI().add(fileName);
 		songsData.put(fileName, extract(fileName));
+		nbrOfThreads.release();
 	}
 
 	/**
@@ -543,11 +552,18 @@ public class Controller {
 		});
 	}
 
+
+	private void resetAllToDefaults() {
+    	for (String key : effectIntensityMap.keySet()) {
+        	effectIntensityMap.put(key, 0.0f);
+    	}
+	}
+
 	/**
 	 *
 	 * Timer that calls the waveform to be updated based on the current time of the
 	 * song (Channel 1)
-	 * Runs every 5 ms (pretty sick)
+	 * Runs every 4 ms (pretty sick)
 	 */
 	public class TimerThreadOne extends Thread {
 		public void run() {
@@ -559,7 +575,7 @@ public class Controller {
 						frame.updateWaveformOne(dispatcherOne.secondsProcessed());
 					}
 				}
-			}, 0, 5);
+			}, 0, 4);
 		}
 	}
 
@@ -567,7 +583,7 @@ public class Controller {
 	 *
 	 * Timer that calls the waveform to be updated based on the current time of the
 	 * song (Channel 2)
-	 * Runs every 5 ms (pretty sick)
+	 * Runs every 4 ms (pretty sick)
 	 */
 	public class TimerThreadTwo extends Thread {
 		public void run() {
@@ -579,7 +595,7 @@ public class Controller {
 						frame.updateWaveformTwo(dispatcherTwo.secondsProcessed());
 					}
 				}
-			}, 0, 5);
+			}, 0, 4);
 		}
 	}
 }
