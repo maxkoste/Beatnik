@@ -205,9 +205,11 @@ public class Controller {
 		if (channel == 1) {
 			audioPlayer1.setSong(songPath);
 			frame.resetChannelOneEffects();
+			frame.resetChannelOneVolume();
 		} else {
 			audioPlayer2.setSong(songPath);
 			frame.resetChannelTwoEffects();
+			frame.resetChannelTwoVolume();
 		}
 		resetAllToDefaults();
 		frame.resetEffectIntensityAndSelector();

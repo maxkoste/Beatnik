@@ -517,6 +517,10 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		return confirm.getResult() == ButtonType.OK;
 	}
 
+	public void resetEffectIntensityAndSelector(){
+		rightPnl.resetEffectIntensity();
+		rightPnl.resetEffectSelector();
+	}
 	public void resetChannelOneEffects() {
 		centerPnl.resetChannelOneBassTreblePitch();
 	}
@@ -525,9 +529,12 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		centerPnl.resetChannelTwoBassTreblePitch();
 	}
 
-	public void resetEffectIntensityAndSelector(){
-		rightPnl.resetEffectIntensity();
-		rightPnl.resetEffectSelector();
+	public void resetChannelOneVolume(){
+		centerPnl.resetChannelOneVolumeSlider();
+	}
+
+	public void resetChannelTwoVolume(){
+		centerPnl.resetChannelTwoVolumeSlider();
 	}
 
 	public void selectPlaylistIndex(int index) {

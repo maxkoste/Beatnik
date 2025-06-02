@@ -29,6 +29,9 @@ public class CenterPnl {
     private CircularSlider channelTwoTreble;
     private CircularSlider channelTwoSpeed;
 
+    private Slider channelOneVolume;
+    private Slider channelTwoVolume;
+
     public CenterPnl(Controller controller, GridPane primaryPane, int maxCols) {
         this.controller = controller;
         this.primaryPane = primaryPane;
@@ -101,7 +104,7 @@ public class CenterPnl {
             channelOneCueImage.setImage(new Image(getClass().getResourceAsStream(imagePath)));
         });
 
-        Slider channelOneVolume = new Slider();
+        channelOneVolume = new Slider();
         channelOneVolume.setOrientation(Orientation.VERTICAL);
         channelOneVolume.setMax(100.0);
         channelOneVolume.setBlockIncrement(20);
@@ -223,7 +226,7 @@ public class CenterPnl {
             channelTwoCueImage.setImage(new Image(getClass().getResourceAsStream(imagePath)));
         });
 
-        Slider channelTwoVolume = new Slider();
+        channelTwoVolume = new Slider();
         channelTwoVolume.setOrientation(Orientation.VERTICAL);
         channelTwoVolume.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         channelTwoVolume.setMax(100.0);
@@ -398,5 +401,13 @@ public class CenterPnl {
         if (channelTwoSpeed != null) {
             channelTwoSpeed.setAngle(135f);
         }
+    }
+
+    public void resetChannelOneVolumeSlider(){
+        channelOneVolume.setValue(50);
+    }
+
+    public void resetChannelTwoVolumeSlider(){
+        channelTwoVolume.setValue(50);
     }
 }
