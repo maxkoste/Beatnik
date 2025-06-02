@@ -21,6 +21,17 @@ public class CenterPnl {
     private Circle[] auIndicatorCirclesOne = new Circle[15];
     private Circle[] auIndicatorCirclesTwo = new Circle[15];
 
+    private CircularSlider channelOneBass;
+    private CircularSlider channelOneTreble;
+    private CircularSlider channelOneSpeed;
+
+    private CircularSlider channelTwoBass;
+    private CircularSlider channelTwoTreble;
+    private CircularSlider channelTwoSpeed;
+
+    private Slider channelOneVolume;
+    private Slider channelTwoVolume;
+
     public CenterPnl(Controller controller, GridPane primaryPane, int maxCols) {
         this.controller = controller;
         this.primaryPane = primaryPane;
@@ -92,7 +103,7 @@ public class CenterPnl {
             channelOneCueImage.setImage(new Image(getClass().getResourceAsStream(imagePath)));
         });
 
-        Slider channelOneVolume = new Slider();
+        channelOneVolume = new Slider();
         channelOneVolume.setOrientation(Orientation.VERTICAL);
         channelOneVolume.setMax(100.0);
         channelOneVolume.setBlockIncrement(20);
@@ -106,7 +117,7 @@ public class CenterPnl {
         GridPane.setRowSpan(channelOneVolume, 3);
         primaryPane.add(channelOneVolume, 3, maxCols - 4);
 
-        CircularSlider channelOneBass = new CircularSlider(9, false, "/Knobs/knob-blue-fg.png");
+        channelOneBass = new CircularSlider(9, false, "/Knobs/knob-blue-fg.png");
         channelOneBass.valueProperty().addListener((observable, oldValue, newValue) -> {
             float bassGain = newValue.floatValue();
             // Scale value from 0–270 to 0–100dB
@@ -124,7 +135,7 @@ public class CenterPnl {
 
         primaryPane.add(channelOneBassImg, 3, maxCols - 5);
 
-        CircularSlider channelOneTreble = new CircularSlider(9, false, "/Knobs/knob-green-fg.png");
+        channelOneTreble = new CircularSlider(9, false, "/Knobs/knob-green-fg.png");
         channelOneTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
             // Scale the value from 0-270 to 0-100dB
             float trebleGain = newValue.floatValue();
@@ -141,7 +152,7 @@ public class CenterPnl {
         channelOneTrebleImg.setMouseTransparent(true);
         primaryPane.add(channelOneTrebleImg, 3, maxCols - 6);
 
-        CircularSlider channelOneSpeed = new CircularSlider(9, false, "/Knobs/knob-red-fg.png");
+        channelOneSpeed = new CircularSlider(9, false, "/Knobs/knob-red-fg.png");
         channelOneSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
             double rawValue = newValue.doubleValue(); // 0.0 - 270.0// Map 0.0 - 270.0 to 0.8 - 1.2
             double mappedValue = 1.2 - (rawValue / 270.0) * (1.2 - 0.8);// Round to 2 decimal places
@@ -214,7 +225,7 @@ public class CenterPnl {
             channelTwoCueImage.setImage(new Image(getClass().getResourceAsStream(imagePath)));
         });
 
-        Slider channelTwoVolume = new Slider();
+        channelTwoVolume = new Slider();
         channelTwoVolume.setOrientation(Orientation.VERTICAL);
         channelTwoVolume.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
         channelTwoVolume.setMax(100.0);
@@ -230,7 +241,7 @@ public class CenterPnl {
         GridPane.setRowSpan(channelTwoVolume, 3);
         primaryPane.add(channelTwoVolume, maxCols - 3, maxCols - 4);
 
-        CircularSlider channelTwoBass = new CircularSlider(9, false, "/Knobs/knob-blue-fg.png");
+        channelTwoBass = new CircularSlider(9, false, "/Knobs/knob-blue-fg.png");
         channelTwoBass.valueProperty().addListener((observable, oldValue, newValue) -> {
             float bassGain = newValue.floatValue();
             // Scale value from 0–270 to 0–100dB
@@ -248,7 +259,7 @@ public class CenterPnl {
 
         primaryPane.add(channelTwoBassImg, maxCols - 3, maxCols - 5);
 
-        CircularSlider channelTwoTreble = new CircularSlider(9, false, "/Knobs/knob-green-fg.png");
+        channelTwoTreble = new CircularSlider(9, false, "/Knobs/knob-green-fg.png");
         channelTwoTreble.valueProperty().addListener((observable, oldValue, newValue) -> {
             // Scale the value from 0-270 to 0-100dB
             float trebleGain = newValue.floatValue();
@@ -266,7 +277,7 @@ public class CenterPnl {
 
         primaryPane.add(channelTwoTrebleImg, maxCols - 3, maxCols - 6);
 
-        CircularSlider channelTwoSpeed = new CircularSlider(9, false, "/Knobs/knob-red-fg.png");
+        channelTwoSpeed = new CircularSlider(9, false, "/Knobs/knob-red-fg.png");
         channelTwoSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
             double rawValue = newValue.doubleValue(); // 0.0 - 270.0
             // Map 0.0 - 270.0 to 0.8 - 1.2
@@ -365,5 +376,37 @@ public class CenterPnl {
                 }
             }
         });
+    }
+
+    public void resetChannelOneBassTreblePitch() {
+        if (channelOneBass != null) {
+            channelOneBass.setAngle(135f);
+        }
+        if (channelOneTreble != null) {
+            channelOneTreble.setAngle(135f);
+        }
+        if (channelOneSpeed != null) {
+            channelOneSpeed.setAngle(135f);
+        }
+    }
+
+    public void resetChannelTwoBassTreblePitch() {
+        if (channelTwoBass != null) {
+            channelTwoBass.setAngle(135f);
+        }
+        if (channelTwoTreble != null) {
+            channelTwoTreble.setAngle(135f);
+        }
+        if (channelTwoSpeed != null) {
+            channelTwoSpeed.setAngle(135f);
+        }
+    }
+
+    public void resetChannelOneVolumeSlider(){
+        channelOneVolume.setValue(50);
+    }
+
+    public void resetChannelTwoVolumeSlider(){
+        channelTwoVolume.setValue(50);
     }
 }

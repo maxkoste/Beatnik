@@ -206,9 +206,15 @@ public class Controller {
 	public void setSong(int channel, String songPath) {
 		if (channel == 1) {
 			audioPlayer1.setSong(songPath);
+			frame.resetChannelOneEffects();
+			frame.resetChannelOneVolume();
 		} else {
 			audioPlayer2.setSong(songPath);
+			frame.resetChannelTwoEffects();
+			frame.resetChannelTwoVolume();
 		}
+		resetAllToDefaults();
+		frame.resetEffectIntensityAndSelector();
 		playSong(channel);
 		frame.setWaveformAudioData(songsData.get(songPath), channel);
 	}
@@ -544,6 +550,13 @@ public class Controller {
 			public void processingFinished() {
 			}
 		});
+	}
+
+
+	private void resetAllToDefaults() {
+    	for (String key : effectIntensityMap.keySet()) {
+        	effectIntensityMap.put(key, 0.0f);
+    	}
 	}
 
 	/**
