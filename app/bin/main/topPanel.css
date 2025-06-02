@@ -1,0 +1,50 @@
+
+.button {
+    -fx-text-fill: #FCF8F5;
+    -fx-background-color: #2B3240;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent;
+    -fx-background-radius: 5;
+    -fx-border-radius: 0;
+
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, #1C2029, 1, 1.0, 0, 10);
+}
+
+.button:hover {
+    -fx-background-color: #363C4A;
+    -fx-cursor: hand;
+}
+
+.button:pressed {
+    -fx-background-color: #252833;
+	-fx-translate-y: 2px;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.4), 6, 0.4, 0, 2);
+}
+
+
+
+/* Blue Experiment */
+/* .button { */
+/*     -fx-text-fill: #FCF8F5; */
+/*     -fx-background-color: #468AB9; */
+/*     -fx-font-weight: bold; */
+/*     -fx-border-color: transparent; */
+/*     -fx-background-radius: 5; */
+/*     -fx-border-radius: 0; */
+/**/
+/*     -fx-padding: 0; */
+/*     -fx-effect: dropshadow(gaussian,#5382A3, 1, 1.0, 0, 10); */
+/* } */
+/**/
+/* .button:hover { */
+/*     -fx-background-color: #68A2CC; */
+/*     -fx-cursor: hand; */
+/* } */
+/**/
+/* .button:pressed { */
+/*     -fx-background-color: #5382A3; */
+/* 	-fx-translate-y: 2px; */
+/*     /* subtle "press" movement */ */
+/*     -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.4), 6, 0.4, 0, 2); */
+/* } */

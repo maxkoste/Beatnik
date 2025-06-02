@@ -1,7 +1,6 @@
 
 .button {
     -fx-text-fill: #f7f9fc;
-	-fx-text-size: 30pt;
     -fx-background-color: #69C7A5;
     -fx-font-weight: bold;
     -fx-border-color: transparent;
@@ -10,7 +9,7 @@
 
     -fx-pref-width: 20px;
     -fx-pref-height: 20px;
-    -fx-font-size: 40pt;
+    -fx-font-size: 10pt;
     -fx-padding: 0;
     -fx-effect: dropshadow(gaussian, #569C7B, 1, 1.0, 0, 5);
 }

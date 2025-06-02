@@ -77,7 +77,6 @@ public class CircularSlider extends Control {
 	}
 
 	/**
-	 *
 	 * Clamps the value to make sure that it is between min and max
 	 */
 	private void adjustValues() {
