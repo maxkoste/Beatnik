@@ -22,12 +22,12 @@ public class Soundboard implements EventHandler<ActionEvent> {
 	/**
 	 * @param controller
 	 */
-	public Soundboard(Controller controller) {
+	public Soundboard(Controller controller, Stage primaryStage) {
 
 		this.gridSize = 4;
 		this.controller = controller;
 
-		initializeSoundBoard();
+		initializeSoundBoard(primaryStage);
 	}
 
 	/**
@@ -36,11 +36,12 @@ public class Soundboard implements EventHandler<ActionEvent> {
 	 * applies images for the gui artefacts and creates a gridPane layout for
 	 * managing the layout
 	 */
-	private void initializeSoundBoard() {
+	private void initializeSoundBoard(Stage primaryStage) {
 		this.stage = new Stage();
 		this.stage.setAlwaysOnTop(true);
 		stage.setTitle("Soundboard");
 		stage.setResizable(false);
+		stage.initOwner(primaryStage);
 		GridPane grid = new GridPane();
 
 		for (int i = 0; i < this.gridSize; i++) {
@@ -129,10 +130,5 @@ public class Soundboard implements EventHandler<ActionEvent> {
 	@Override
 	public void handle(ActionEvent actionEvent) {
 		this.stage.show();
-	}
-
-	public void exit() {
-		// TODO: do something here to shut this piece of shit soundboard down when the
-		// main application quits
 	}
 }

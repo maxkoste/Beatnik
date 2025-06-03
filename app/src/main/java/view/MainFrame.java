@@ -110,7 +110,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		initializeSongsPane();
 		initializePlaylistPane();
 		topPnl = new TopPnl(this, controller, primaryPane, numCols);
-		soundboard = new Soundboard(controller);
+		soundboard = new Soundboard(controller, primaryStage);
     new LeftPnl(soundboard, this, primaryPane, numCols, this.controller);
     rightPnl = new RightPnl(this, primaryPane, numCols);
 		centerPnl = new CenterPnl(controller, primaryPane, numCols);
@@ -314,7 +314,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Import a song");
 		fileChooser.getExtensionFilters().addAll(
-				new FileChooser.ExtensionFilter("Audio Files", "*.wav", "*.mp3"));
+				new FileChooser.ExtensionFilter("Audio Files", "*.wav", "*.mp3", "*.mp4", "*.FLAC"));
 		File selectedFile = fileChooser.showOpenDialog(playlistStage);
 		if (selectedFile != null) {
 			try {

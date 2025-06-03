@@ -50,12 +50,18 @@ public class SoundPlayer {
 	 * @param volume value between 1-100
 	 */
 	public void setVolume(float volume) {
-		if (clip == null)
+		if (clip == null || gainControl == null)
 			return;
 
-		float min = gainControl.getMinimum();
-		float max = gainControl.getMaximum();
-		float dB = min + (max - min) * volume; // interpolate between min and max
-		this.gainControl.setValue(dB);
+		float min = gainControl.getMinimum(); // -80 dB
+		float max = gainControl.getMaximum(); // 6.0 dB
+
+		float logScale = (float) Math.log10(1 + 9 * volume);
+		float dB = min + (max - min) * logScale;
+
+		// Clamp to min-max range
+		dB = Math.max(min, Math.min(dB, max));
+
+		gainControl.setValue(dB);
 	}
 }
