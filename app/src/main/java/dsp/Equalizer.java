@@ -35,7 +35,7 @@ public class Equalizer implements AudioProcessor {
 		System.out.println(gainDb);
 		float scaledDb = (gainDb - 50) * 0.24f; // This maps 0-100 to +/-12dB
 
-		// Increase the Q value of the
+		// Increase the Q value of the EQ when cutting
 		if (scaledDb < 0 && !cut) {
 			this.bandwidth = bandwidth * 2;
 			this.bandPassFilter.setBandWidth(this.bandwidth);
@@ -85,9 +85,9 @@ public class Equalizer implements AudioProcessor {
 
 	/**
 	 * called when the audio buffer is completely processed (song is over)
+	 * not used here
 	 */
 	@Override
 	public void processingFinished() {
-		// Cleanup resources if needed
 	}
 }
