@@ -17,6 +17,7 @@ Welcome to **Beatnik**, your next-generation DJ software for seamless mixing, be
 - **Gradle** for dependancies and building the project
 - **JavaFX** for the graphical user interface
 - **TarsosDSP** for audio processing
+- **ffmpeg** for audio playback
 
 ## Installation
 1. Clone this repository:
