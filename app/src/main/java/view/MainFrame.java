@@ -296,12 +296,16 @@ public class MainFrame implements EventHandler<ActionEvent> {
 	 */
 	public void handleSongSelection(MouseEvent mouseEvent) {
 		if (mouseEvent.getClickCount() == 2) {
+			String songPath = songSelector.getSelectedItem();
+			if (songPath == null) {
+				return;
+			}
 			if (channelOneActive) {
-				controller.setSong(1, songSelector.getSelectedItem());
-				setInfoText(false, songSelector.getSelectedItem(), 1);
+				controller.setSong(1, songPath);
+				setInfoText(false, songPath, 1);
 			} else {
-				controller.setSong(2, songSelector.getSelectedItem());
-				setInfoText(false, songSelector.getSelectedItem(), 2);
+				controller.setSong(2, songPath);
+				setInfoText(false, songPath, 2);
 			}
 			controller.deactivatePlaylist();
 		}
@@ -474,12 +478,16 @@ public class MainFrame implements EventHandler<ActionEvent> {
 	 */
 	public void handlePlaylistSongSelection(MouseEvent mouseEvent) {
 		if (mouseEvent.getClickCount() == 2) {
+			String songPath = playlistSongSelector.getSelectedItem();
+			if (songPath == null) {
+				return;
+			}
 			if (channelOneActive) {
 				controller.startPlaylist(1, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
-				setInfoText(true, playlistSongSelector.getSelectedItem(), 1);
+				setInfoText(true, songPath, 1);
 			} else {
 				controller.startPlaylist(2, playlistSongSelector.getSelectedIndex(), currentPlaylist.getItems());
-				setInfoText(true, playlistSongSelector.getSelectedItem(), 2);
+				setInfoText(true, songPath, 2);
 			}
 		}
 	}
