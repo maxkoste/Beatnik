@@ -133,10 +133,10 @@ public class Soundboard implements EventHandler<ActionEvent> {
 		grid.add(btn6, 1, 2);
 		grid.add(btn7, 2, 2);
 		grid.add(btn8, 3, 2);
-		grid.add(btn9, 0, 3);
+		grid.add(btn9, 1, 0);
 		grid.add(btn10, 1, 3);
 		grid.add(btn11, 2, 3);
-		grid.add(btn12, 3, 3);
+		grid.add(btn12, 2, 0);
 
 		CircularSlider volume = new CircularSlider(9, false, "/Knobs/knob-blue-fg.png");
 		volume.valueProperty().addListener((observable, oldValue, newValue) -> {
