@@ -314,7 +314,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Import a song");
 		fileChooser.getExtensionFilters().addAll(
-				new FileChooser.ExtensionFilter("Audio Files", "*.wav", "*.mp3"));
+				new FileChooser.ExtensionFilter("Audio Files", "*.wav", "*.mp3", "*.mp4", "*.FLAC"));
 		File selectedFile = fileChooser.showOpenDialog(playlistStage);
 		if (selectedFile != null) {
 			try {

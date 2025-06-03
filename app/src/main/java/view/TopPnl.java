@@ -146,17 +146,18 @@ public class TopPnl {
 	 * Sets the informational text on the waveform graphic.
 	 */
 	public void setInfoText(boolean playlist, String song, int channel) {
+		String songWithoutExtension = song.replaceFirst("\\.(mp3|mp4|wav|flac)$", "");
 		if (channel == 1) {
 			if (playlist) {
-				waveformOneText.setText(" Playing " + song + " in " + mainFrame.getSelectedPlaylist());
+				waveformOneText.setText(" Playing " + songWithoutExtension + " in " + mainFrame.getSelectedPlaylist());
 			} else {
-				waveformOneText.setText(" Playing " + song);
+				waveformOneText.setText(" Playing " + songWithoutExtension);
 			}
 		} else {
 			if (playlist) {
-				waveformTwoText.setText(" Playing " + song + " in " + mainFrame.getSelectedPlaylist());
+				waveformTwoText.setText(" Playing " + songWithoutExtension + " in " + mainFrame.getSelectedPlaylist());
 			} else {
-				waveformTwoText.setText(" Playing " + song);
+				waveformTwoText.setText(" Playing " + songWithoutExtension);
 			}
 		}
 	}
