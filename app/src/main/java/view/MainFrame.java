@@ -110,7 +110,7 @@ public class MainFrame implements EventHandler<ActionEvent> {
 		initializeSongsPane();
 		initializePlaylistPane();
 		topPnl = new TopPnl(this, controller, primaryPane, numCols);
-		soundboard = new Soundboard(controller);
+		soundboard = new Soundboard(controller, primaryStage);
     new LeftPnl(soundboard, this, primaryPane, numCols, this.controller);
     rightPnl = new RightPnl(this, primaryPane, numCols);
 		centerPnl = new CenterPnl(controller, primaryPane, numCols);
