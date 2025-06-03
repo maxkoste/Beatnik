@@ -3,10 +3,9 @@ package dsp;
 import be.tarsos.dsp.AudioEvent;
 import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.filters.BandPass;
-import be.tarsos.dsp.filters.IIRFilter;
 
 public class Equalizer implements AudioProcessor {
-	private IIRFilter bandPassFilter;
+	private BandPass bandPassFilter;
 	private float gain;
 	private float centerFrequency;
 	private float bandwidth;
@@ -22,7 +21,7 @@ public class Equalizer implements AudioProcessor {
 		this.centerFrequency = frequency;
 		this.bandwidth = bandWidth;
 		setGain(50); // knob at twelve O clock
-		bandPassFilter = new BandPass(centerFrequency, bandwidth, sampleRate);
+		this.bandPassFilter = new BandPass(centerFrequency, bandwidth, sampleRate);
 		this.cut = false;
 	}
 
@@ -35,13 +34,17 @@ public class Equalizer implements AudioProcessor {
 	public void setGain(float gainDb) {
 		System.out.println(gainDb);
 		float scaledDb = (gainDb - 50) * 0.24f; // This maps 0-100 to +/-12dB
+
+		// Increase the Q value of the
 		if (scaledDb < 0 && !cut) {
 			this.bandwidth = bandwidth * 2;
+			this.bandPassFilter.setBandWidth(this.bandwidth);
 			this.cut = true;
 		}
 		if (scaledDb > 0 && cut) {
 			this.cut = false;
 			this.bandwidth = bandwidth / 2;
+			this.bandPassFilter.setBandWidth(this.bandwidth);
 		}
 		this.gain = (float) Math.pow(10.0, scaledDb / 20.0);
 	}
