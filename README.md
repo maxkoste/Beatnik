@@ -4,6 +4,9 @@ Welcome to **Beatnik**, your next-generation DJ software for seamless mixing, be
 
 ![Grupp_24_poster](https://github.com/user-attachments/assets/2397196c-1798-4d58-9b11-c4362c21a286)
 
+## GUI SNAPSHOT
+<img width="1068" alt="Screenshot 2025-06-02 at 21 34 15" src="https://github.com/user-attachments/assets/37e8ecf0-2093-42cc-bb5b-b8107ccdf491" />
+
 ## Features
 - Intuitive UI for easy mixing
 - Customizable effects and transitions
