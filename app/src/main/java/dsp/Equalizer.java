@@ -20,8 +20,8 @@ public class Equalizer implements AudioProcessor {
 	public Equalizer(float sampleRate, float bandWidth, float frequency) {
 		this.centerFrequency = frequency;
 		this.bandwidth = bandWidth;
-		setGain(50); // knob at twelve O clock
 		this.bandPassFilter = new BandPass(centerFrequency, bandwidth, sampleRate);
+		setGain(50); // knob at twelve O clock
 		this.cut = false;
 	}
 
@@ -32,9 +32,7 @@ public class Equalizer implements AudioProcessor {
 	 * @param gainDb
 	 */
 	public void setGain(float gainDb) {
-		System.out.println(gainDb);
 		float scaledDb = (gainDb - 50) * 0.24f; // This maps 0-100 to +/-12dB
-
 		// Increase the Q value of the EQ when cutting
 		if (scaledDb < 0 && !cut) {
 			this.bandwidth = bandwidth * 2;
@@ -47,6 +45,7 @@ public class Equalizer implements AudioProcessor {
 			this.bandPassFilter.setBandWidth(this.bandwidth);
 		}
 		this.gain = (float) Math.pow(10.0, scaledDb / 20.0);
+		System.out.println((float) Math.pow(10.0, scaledDb / 20.0));
 	}
 
 	/**
