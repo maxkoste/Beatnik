@@ -80,10 +80,10 @@ public class MediaPlayer {
 
 			bassEqualizer = new Equalizer(format.getSampleRate(),
 					50, 80); // 80Hz center, 50Hz bandwidth
-			flangerEffect = new Flanger(0.0002,
+			flangerEffect = new Flanger(0.0004,
 					0, format.getSampleRate(), 3);
 			trebleEqualizer = new Equalizer(format.getSampleRate(),
-					5000, 7000); // 7khz center, 5kHz bandwidth
+					8000, 10000);
 			delayEffect = new Delay(0.5, 0.6, format.getSampleRate());
 			rateTransposer = new RateTransposer(1.0F);
 			lowPassFilter = new LowPassEqualizer(20000f, format.getSampleRate());

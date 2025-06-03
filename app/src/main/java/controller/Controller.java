@@ -141,7 +141,7 @@ public class Controller {
 	}
 
 	public void setCueVolume(float volume) {
-		if (audioPlayer1 != null) { //Set together, one check is enough.
+		if (audioPlayer1 != null) { // Set together, one check is enough.
 			audioPlayer1.setCueVolume(volume * (latestVolume1 / 100));
 			audioPlayer2.setCueVolume(volume * (latestVolume2 / 100));
 			latestCueVolume = volume;
@@ -172,7 +172,8 @@ public class Controller {
 				extractor.setDaemon(true);
 				extractor.start();
 			}
-		} else frame.updateLoading(0);
+		} else
+			frame.updateLoading(0);
 	}
 
 	/**
@@ -358,7 +359,7 @@ public class Controller {
 	 */
 	public void nextSong(int channel) {
 		if (playlistSongPaths != null) {
-			currentPosInPlaylist = (currentPosInPlaylist +1) % playlistSongPaths.size();
+			currentPosInPlaylist = (currentPosInPlaylist + 1) % playlistSongPaths.size();
 			setSong(channel, playlistSongPaths.get(currentPosInPlaylist));
 			frame.setInfoText(true, playlistSongPaths.get(currentPosInPlaylist), channel);
 		} else {
@@ -554,11 +555,10 @@ public class Controller {
 		});
 	}
 
-
 	private void resetAllToDefaults() {
-    	for (String key : effectIntensityMap.keySet()) {
-        	effectIntensityMap.put(key, 0.0f);
-    	}
+		for (String key : effectIntensityMap.keySet()) {
+			effectIntensityMap.put(key, 0.0f);
+		}
 	}
 
 	/**
