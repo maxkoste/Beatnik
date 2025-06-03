@@ -10,7 +10,6 @@ public class Equalizer implements AudioProcessor {
 	private float gain;
 	private float centerFrequency;
 	private float bandwidth;
-	private float sampleRate;
 	private boolean cut;
 
 	/**
@@ -20,10 +19,9 @@ public class Equalizer implements AudioProcessor {
 	 * @param frequency  the center of the frequency that is effected
 	 */
 	public Equalizer(float sampleRate, float bandWidth, float frequency) {
-		this.sampleRate = sampleRate;
 		this.centerFrequency = frequency;
 		this.bandwidth = bandWidth;
-		this.gain = 0.0f;
+		setGain(50); // knob at twelve O clock
 		bandPassFilter = new BandPass(centerFrequency, bandwidth, sampleRate);
 		this.cut = false;
 	}
@@ -35,6 +33,7 @@ public class Equalizer implements AudioProcessor {
 	 * @param gainDb
 	 */
 	public void setGain(float gainDb) {
+		System.out.println(gainDb);
 		float scaledDb = (gainDb - 50) * 0.24f; // This maps 0-100 to +/-12dB
 		if (scaledDb < 0 && !cut) {
 			this.bandwidth = bandwidth * 2;
@@ -74,8 +73,6 @@ public class Equalizer implements AudioProcessor {
 			// Clip to prevent distortion
 			if (mixedSignal > 1.0f) {
 				mixedSignal = 1.0f;
-			} else if (mixedSignal < -1.0f) {
-				mixedSignal = -1.0f;
 			}
 
 			audioFloatBuffer[i] = mixedSignal;
