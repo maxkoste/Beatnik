@@ -6,7 +6,6 @@ import be.tarsos.dsp.AudioProcessor;
 import be.tarsos.dsp.io.jvm.AudioDispatcherFactory;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import view.MainFrame;
 
@@ -55,6 +54,15 @@ public class Controller {
 	private SoundPlayer soundEffect2;
 	private SoundPlayer soundEffect3;
 	private SoundPlayer soundEffect4;
+	private SoundPlayer soundEffect5;
+	private SoundPlayer soundEffect6;
+	private SoundPlayer soundEffect7;
+	private SoundPlayer soundEffect8;
+	private SoundPlayer soundEffect9;
+	private SoundPlayer soundEffect10;
+	private SoundPlayer soundEffect11;
+	private SoundPlayer soundEffect12;
+
 	private SoundPlayer[] soundEffects;
 
 	/**
@@ -119,12 +127,28 @@ public class Controller {
 		soundEffect2 = new SoundPlayer("/SoundEffects/dundun.wav");
 		soundEffect3 = new SoundPlayer("/SoundEffects/fart.wav");
 		soundEffect4 = new SoundPlayer("/SoundEffects/yippi.wav");
+		soundEffect5 = new SoundPlayer("/SoundEffects/5.wav");
+		soundEffect6 = new SoundPlayer("/SoundEffects/6.wav");
+		soundEffect7 = new SoundPlayer("/SoundEffects/7.wav");
+		soundEffect8 = new SoundPlayer("/SoundEffects/thunder.wav");
+		soundEffect9 = new SoundPlayer("/SoundEffects/9.wav");
+		soundEffect10 = new SoundPlayer("/SoundEffects/10.wav");
+		soundEffect11 = new SoundPlayer("/SoundEffects/11.wav");
+		soundEffect12 = new SoundPlayer("/SoundEffects/12.wav");
 
-		this.soundEffects = new SoundPlayer[4];
+		this.soundEffects = new SoundPlayer[12];
 		this.soundEffects[0] = soundEffect1;
 		this.soundEffects[1] = soundEffect2;
 		this.soundEffects[2] = soundEffect3;
 		this.soundEffects[3] = soundEffect4;
+		this.soundEffects[4] = soundEffect5;
+		this.soundEffects[5] = soundEffect6;
+		this.soundEffects[6] = soundEffect7;
+		this.soundEffects[7] = soundEffect8;
+		this.soundEffects[8] = soundEffect9;
+		this.soundEffects[9] = soundEffect10;
+		this.soundEffects[10] = soundEffect11;
+		this.soundEffects[11] = soundEffect12;
 
 		audioPlayer1.setCueVolume(50);
 		audioPlayer1.setVolume(50);
@@ -280,10 +304,8 @@ public class Controller {
 	public void resetSong(int channel) {
 		if (channel == 1) {
 			audioPlayer1.resetSong();
-			frame.resetChannelOneEffects();
 		} else {
 			audioPlayer2.resetSong();
-			frame.resetChannelTwoEffects();
 		}
 		playSong(channel);
 	}
@@ -307,6 +329,29 @@ public class Controller {
 				break;
 			case 4:
 				soundEffect4.play();
+			case 5:
+				soundEffect5.play();
+				break;
+			case 6:
+				soundEffect6.play();
+				break;
+			case 7:
+				soundEffect7.play();
+				break;
+			case 8:
+				soundEffect8.play();
+				break;
+			case 9:
+				soundEffect9.play();
+				break;
+			case 10:
+				soundEffect10.play();
+				break;
+			case 11:
+				soundEffect11.play();
+				break;
+			case 12:
+				soundEffect12.play();
 				break;
 		}
 	}
