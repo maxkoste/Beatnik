@@ -329,6 +329,7 @@ public class Controller {
 				break;
 			case 4:
 				soundEffect4.play();
+				break;
 			case 5:
 				soundEffect5.play();
 				break;
