@@ -64,7 +64,7 @@ public class Soundboard implements EventHandler<ActionEvent> {
 		soundbarScene.getStylesheets().addAll("soundboard.css");
 		stage.setScene(soundbarScene);
 
-		Button[] buttons = new Button[4];
+		Button[] buttons = new Button[12];
 
 		Button btn1 = new Button("1");
 		buttons[0] = btn1;
@@ -74,9 +74,27 @@ public class Soundboard implements EventHandler<ActionEvent> {
 		buttons[2] = btn3;
 		Button btn4 = new Button("4");
 		buttons[3] = btn4;
+		Button btn5 = new Button("5");
+		buttons[4] = btn5;
+		Button btn6 = new Button("6");
+		buttons[5] = btn6;
+		Button btn7 = new Button("7");
+		buttons[6] = btn7;
+		Button btn8 = new Button("8");
+		buttons[7] = btn8;
+		Button btn9 = new Button("9");
+		buttons[8] = btn9;
+		Button btn10 = new Button("10");
+		buttons[9] = btn10;
+		Button btn11 = new Button("11");
+		buttons[10] = btn11;
+		Button btn12 = new Button("12");
+		buttons[11] = btn12;
 
 		int counter = 0;
-		String[] resources = { "/Symbols/daddy.png", "/Symbols/fart.png", "/Symbols/horns.png", "/Symbols/yipi.png" };
+		String[] resources = { "/Symbols/daddy.png", "/Symbols/fart.png", "/Symbols/horns.png", "/Symbols/yipi.png",
+				"/Symbols/1.png", "/Symbols/2.png", "/Symbols/3.png", "/Symbols/4.png",
+				"/Symbols/5.png", "/Symbols/6.png", "/Symbols/7.png", "/Symbols/8.png" };
 
 		for (Button button : buttons) {
 			button.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -98,11 +116,27 @@ public class Soundboard implements EventHandler<ActionEvent> {
 		btn2.setOnAction(e -> controller.playSoundEffect(2));
 		btn3.setOnAction(e -> controller.playSoundEffect(3));
 		btn4.setOnAction(e -> controller.playSoundEffect(4));
+		btn5.setOnAction(e -> controller.playSoundEffect(1));
+		btn6.setOnAction(e -> controller.playSoundEffect(2));
+		btn7.setOnAction(e -> controller.playSoundEffect(3));
+		btn8.setOnAction(e -> controller.playSoundEffect(4));
+		btn9.setOnAction(e -> controller.playSoundEffect(1));
+		btn10.setOnAction(e -> controller.playSoundEffect(2));
+		btn11.setOnAction(e -> controller.playSoundEffect(3));
+		btn12.setOnAction(e -> controller.playSoundEffect(4));
 
-		grid.add(btn1, 1, 1);
-		grid.add(btn2, 1, 2);
-		grid.add(btn3, 2, 1);
-		grid.add(btn4, 2, 2);
+		grid.add(btn1, 0, 1);
+		grid.add(btn2, 0, 2);
+		grid.add(btn3, 1, 1);
+		grid.add(btn4, 1, 2);
+		grid.add(btn5, 2, 1);
+		grid.add(btn6, 2, 2);
+		grid.add(btn7, 3, 1);
+		grid.add(btn8, 3, 2);
+		grid.add(btn9, 0, 3);
+		grid.add(btn10, 1, 3);
+		grid.add(btn11, 2, 3);
+		grid.add(btn12, 3, 3);
 
 		CircularSlider volume = new CircularSlider(9, false, "/Knobs/knob-blue-fg.png");
 		volume.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -112,7 +146,7 @@ public class Soundboard implements EventHandler<ActionEvent> {
 		volume.setMinSize(Double.MIN_VALUE, Double.MIN_VALUE);
 		volume.setScaleX(0.6);
 		volume.setScaleY(0.6);
-		grid.add(volume, 3, 1);
+		grid.add(volume, 3, 0);
 
 		ImageView cueImg = new ImageView("/Knobs/knob-bg.png");
 		cueImg.fitWidthProperty().bind(volume.widthProperty());
@@ -120,7 +154,7 @@ public class Soundboard implements EventHandler<ActionEvent> {
 		cueImg.setMouseTransparent(true);
 		cueImg.setScaleX(0.6);
 		cueImg.setScaleY(0.6);
-		grid.add(cueImg, 3, 1);
+		grid.add(cueImg, 3, 0);
 	}
 
 	/**
