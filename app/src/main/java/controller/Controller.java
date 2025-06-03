@@ -279,8 +279,10 @@ public class Controller {
 	public void resetSong(int channel) {
 		if (channel == 1) {
 			audioPlayer1.resetSong();
+			frame.resetChannelOneEffects();
 		} else {
 			audioPlayer2.resetSong();
+			frame.resetChannelTwoEffects();
 		}
 		playSong(channel);
 	}
