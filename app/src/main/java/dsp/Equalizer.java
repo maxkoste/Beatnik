@@ -11,6 +11,7 @@ public class Equalizer implements AudioProcessor {
 	private float centerFrequency;
 	private float bandwidth;
 	private float sampleRate;
+	private boolean cut;
 
 	/**
 	 * 
@@ -24,6 +25,7 @@ public class Equalizer implements AudioProcessor {
 		this.bandwidth = bandWidth;
 		this.gain = 0.0f;
 		bandPassFilter = new BandPass(centerFrequency, bandwidth, sampleRate);
+		this.cut = false;
 	}
 
 	/**
@@ -34,6 +36,14 @@ public class Equalizer implements AudioProcessor {
 	 */
 	public void setGain(float gainDb) {
 		float scaledDb = (gainDb - 50) * 0.24f; // This maps 0-100 to +/-12dB
+		if (scaledDb < 0 && !cut) {
+			this.bandwidth = bandwidth * 2;
+			this.cut = true;
+		}
+		if (scaledDb > 0 && cut) {
+			this.cut = false;
+			this.bandwidth = bandwidth / 2;
+		}
 		this.gain = (float) Math.pow(10.0, scaledDb / 20.0);
 	}
 
