@@ -98,7 +98,7 @@ public class Flanger implements AudioProcessor {
      * @param wet
      */
     public void setWet(double wet) {
-        this.wet = (float) wet;
-        this.dry = (float) (1 - wet);
+        this.wet = (float) wet/2;
+        this.dry = (float) (1 - wet/2);
     }
 }

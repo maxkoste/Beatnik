@@ -45,7 +45,6 @@ public class Equalizer implements AudioProcessor {
 			this.bandPassFilter.setBandWidth(this.bandwidth);
 		}
 		this.gain = (float) Math.pow(10.0, scaledDb / 20.0);
-		System.out.println((float) Math.pow(10.0, scaledDb / 20.0));
 	}
 
 	/**
