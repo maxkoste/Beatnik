@@ -10,10 +10,11 @@ Welcome to **Beatnik**, your next-generation DJ software for seamless mixing, be
 ## Features
 - Intuitive UI for easy mixing
 - Playlist management
-- Parametric EQs: Bas and Treble
-- Varispeed by controlling samplingsize
+- Per channel parametric EQs: bas and treble
+- Per channel varispeed
 - Effects: delay, phaser and filter
 - Soundboard with sound effects.
+- Crossfade between channels. 
 
 ## Technologies Used
 - **Java** for core development
